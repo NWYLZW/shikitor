@@ -181,7 +181,7 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
   render()
   const shikitor: Shikitor = {
     get value() {
-      return input.value
+      return getValue()
     },
     set value(value: string) {
       changeValue(value)
