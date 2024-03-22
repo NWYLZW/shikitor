@@ -1,6 +1,7 @@
 import './index.scss'
 
 import { type BundledLanguage, type BundledTheme, getHighlighter } from 'shiki'
+import type { PickByValue } from '../types'
 import { throttle } from '../utils'
 
 export interface TextRange {
@@ -60,6 +61,14 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     value, onChange,
     plugins = []
   } = options
+  function callAllPlugins<
+    K extends Exclude<keyof PickByValue<Plugin, (...args: any[]) => any>, undefined>
+  >(method: K, ...args: Parameters<Exclude<Plugin[K], undefined>>) {
+    return plugins.map(plugin => plugin[method]?.(
+      // @ts-ignore
+      ...args
+    ))
+  }
 
   const [input, output] = initInputAndOutput(options)
   target.append(output, input)
@@ -112,56 +121,56 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     render()
   }
   input.addEventListener('input', () => changeValue(input.value))
-  let prevOutputHoverElement: Element | null = null;
+  let prevOutputHoverElement: Element | null = null
   input.addEventListener("mousemove", throttle(e => {
-    input.style.pointerEvents = "none";
-    output.style.pointerEvents = "auto";
-    const outputHoverElement = document.elementFromPoint(e.clientX, e.clientY);
-    input.style.pointerEvents = "";
-    output.style.pointerEvents = "";
+    input.style.pointerEvents = "none"
+    output.style.pointerEvents = "auto"
+    const outputHoverElement = document.elementFromPoint(e.clientX, e.clientY)
+    input.style.pointerEvents = ""
+    output.style.pointerEvents = ""
     if (outputHoverElement === prevOutputHoverElement) {
-      return;
+      return
     }
-    prevOutputHoverElement = outputHoverElement;
+    prevOutputHoverElement = outputHoverElement
     if (outputHoverElement === null) {
-      return;
+      return
     }
     if (
       outputHoverElement.className.includes("shiki-editor")
       && outputHoverElement.className.includes("output")
     ) {
-      return;
+      return
     }
 
     if (!outputHoverElement?.className.includes("position")) {
-      return;
+      return
     }
 
     const offsetStr = /offset:(\d+)/
       .exec(outputHoverElement.className)
-      ?.[1];
+      ?.[1]
     if (!offsetStr) {
-      return;
+      return
     }
-    const offset = Number(offsetStr);
+    const offset = Number(offsetStr)
     if (isNaN(offset)) {
-      return;
+      return
     }
     const [line, start, end] = /position:(\d+):(\d+),(\d+)/
       .exec(outputHoverElement.className)
       ?.slice(1)
       ?.map(Number)
-    ?? [];
+    ?? []
     if (!line || !start || !end || [line, start, end].some(isNaN)) {
-      return;
+      return
     }
 
-    plugins.map(plugin => plugin.onHoverElement?.({ offset, line: line, start: start, end: end }, {
+    callAllPlugins('onHoverElement', { offset, line: line, start: start, end: end }, {
       content: input.value.slice(start - 1, end - 1),
       element: outputHoverElement,
       raw: input.value,
-    }));
-  }, 50));
+    })
+  }, 50))
 
   render()
   const shikitor: Shikitor = {
@@ -172,6 +181,6 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
       changeValue(value)
     }
   }
-  plugins.map(plugin => plugin.install?.(shikitor))
+  callAllPlugins('install', shikitor)
   return shikitor
 }
