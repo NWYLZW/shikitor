@@ -35,6 +35,7 @@ export interface ShikitorOptions {
 
 export interface Shikitor {
   value: string
+  onDispose: () => void
 }
 
 function initInputAndOutput(options: ShikitorOptions) {
@@ -179,6 +180,9 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     },
     set value(value: string) {
       changeValue(value)
+    },
+    onDispose() {
+      callAllPlugins('onDispose')
     }
   }
   callAllPlugins('install', shikitor)
