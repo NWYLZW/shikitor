@@ -23,9 +23,13 @@ export interface Plugin {
   onHoverElement?: (range: TextRange, context: OnHoverElementContext) => void
 }
 
-export interface ShikitorOptions {
-  value?: string
+export interface ShikitorEvents {
   onChange?: (value: string) => void
+  onDispose?: () => void
+}
+
+export interface ShikitorOptions extends ShikitorEvents {
+  value?: string
   language?: BundledLanguage
   lineNumbers?: "on" | "off"
   readOnly?: boolean
@@ -35,7 +39,7 @@ export interface ShikitorOptions {
 
 export interface Shikitor {
   value: string
-  onDispose: () => void
+  dispose: () => void
 }
 
 function initInputAndOutput(options: ShikitorOptions) {
@@ -60,6 +64,7 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     readOnly,
     lineNumbers = 'on',
     value, onChange,
+    onDispose,
     plugins = []
   } = options
   function callAllPlugins<
@@ -181,7 +186,8 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     set value(value: string) {
       changeValue(value)
     },
-    onDispose() {
+    dispose() {
+      onDispose?.()
       callAllPlugins('onDispose')
     }
   }
