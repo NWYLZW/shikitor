@@ -28,13 +28,12 @@
   &-output {
     overflow: hidden;
     pointer-events: none;
-    counter-reset: shiki-line 0;
     > pre {
       margin: 0;
     }
     &-line::before {
       visibility: hidden;
-      content: counter(shiki-line);
+      content: attr(data-line);
       position: absolute;
       left: 0;
       width: calc(var(--gutter-width) - 0.5em);
