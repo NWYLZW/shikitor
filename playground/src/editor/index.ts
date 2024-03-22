@@ -39,6 +39,7 @@ export interface ShikitorOptions extends ShikitorEvents {
 
 export interface Shikitor {
   value: string
+  options: Readonly<ShikitorOptions>
   dispose: () => void
 }
 
@@ -81,9 +82,13 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
   target.classList.add('shikitor')
   if (lineNumbers === 'on') {
     target.classList.add('line-numbers')
+  } else {
+    target.classList.remove('line-numbers')
   }
   if (readOnly) {
     target.classList.add('read-only')
+  } else {
+    target.classList.remove('read-only')
   }
 
   const render = async () => {
@@ -185,6 +190,16 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     },
     set value(value: string) {
       changeValue(value)
+    },
+    get options() {
+      return options
+    },
+    set options(newOptions: ShikitorOptions) {
+      Object.assign(options, newOptions)
+      if (newOptions.value) {
+        changeValue(newOptions.value)
+      }
+      render()
     },
     dispose() {
       onDispose?.()
