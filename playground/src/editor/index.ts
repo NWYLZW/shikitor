@@ -7,15 +7,13 @@ import type { PickByValue } from '../types'
 import { throttle } from '../utils'
 
 export interface TextRange {
-  offset: number
-  line: number
-  start: number
-  end: number
+  start: TextPosition
+  end: TextPosition
 }
 export interface TextPosition {
   offset: number
   line: number
-  column: number
+  character: number
 }
 export interface OnHoverElementContext {
   content: string
@@ -188,7 +186,10 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
       return
     }
 
-    callAllPlugins('onHoverElement', { offset, line: line, start: start, end: end }, {
+    callAllPlugins('onHoverElement', {
+      start: { offset, line, character: start },
+      end: { offset, line, character: end }
+    }, {
       content: input.value.slice(start - 1, end - 1),
       element: outputHoverElement,
       raw: input.value,
