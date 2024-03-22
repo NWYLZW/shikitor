@@ -2,6 +2,12 @@ import './index.scss'
 
 import { type BundledLanguage, type BundledTheme, getHighlighter } from 'shiki'
 
+export interface Plugin {
+  name: string
+  install: (editor: Shikitor) => void
+  onDispose?: () => void
+}
+
 export interface ShikitorOptions {
   value?: string
   onChange?: (value: string) => void
@@ -9,6 +15,7 @@ export interface ShikitorOptions {
   lineNumbers?: "on" | "off"
   readOnly?: boolean
   theme?: BundledTheme
+  plugins?: Plugin[]
 }
 
 export interface Shikitor {
@@ -36,7 +43,8 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     language = 'javascript',
     readOnly,
     lineNumbers = 'on',
-    value, onChange
+    value, onChange,
+    plugins
   } = options
 
   const [input, output] = initInputAndOutput(options)
@@ -49,9 +57,8 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     target.classList.add('read-only')
   }
 
-  const highlighter = getHighlighter({ themes: [theme], langs: [language] })
   const render = async () => {
-    const { codeToTokens } = await highlighter
+    const { codeToTokens } = await getHighlighter({ themes: [theme], langs: [language] })
 
     const codeToHtml = (code: string) => {
       const {
@@ -93,7 +100,7 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
   input.addEventListener('input', () => changeValue(input.value))
 
   render()
-  return {
+  const shikitor: Shikitor = {
     get value() {
       return input.value
     },
@@ -101,4 +108,6 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
       changeValue(value)
     }
   }
+  plugins?.map(plugin => plugin.install(shikitor))
+  return shikitor
 }
