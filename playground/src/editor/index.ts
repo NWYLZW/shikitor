@@ -10,6 +10,11 @@ export interface TextRange {
   start: number
   end: number
 }
+export interface TextPosition {
+  offset: number
+  line: number
+  column: number
+}
 export interface OnHoverElementContext {
   content: string
   element: Element
@@ -20,6 +25,7 @@ export interface Plugin {
   name?: string
   install?: (editor: Shikitor) => void
   onDispose?: () => void
+  onCursorChange?: (cursor: TextPosition) => void
   onHoverElement?: (range: TextRange, context: OnHoverElementContext) => void
 }
 
