@@ -102,7 +102,7 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
         themeName,
         rootStyle = ''
       } = codeToTokens(code, {
-        lang: "javascript",
+        lang: language,
         theme: theme
       })
       target.style.color = fg
