@@ -59,39 +59,39 @@ function initInputAndOutput(options: ShikitorOptions) {
 }
 
 export function create(target: HTMLDivElement, options: ShikitorOptions): Shikitor {
-  const {
-    theme = 'github-light',
-    language = 'javascript',
-    readOnly,
-    lineNumbers = 'on',
-    value, onChange,
-    onDispose,
-    plugins = []
-  } = options
+  let pluginsRef = { get current() { return options.plugins } }
   function callAllPlugins<
     K extends Exclude<keyof PickByValue<Plugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<Plugin[K], undefined>>) {
-    return plugins.map(plugin => plugin[method]?.(
+    return pluginsRef.current?.map(plugin => plugin[method]?.(
       // @ts-ignore
       ...args
     ))
   }
-
   const [input, output] = initInputAndOutput(options)
-  target.append(output, input)
   target.classList.add('shikitor')
-  if (lineNumbers === 'on') {
-    target.classList.add('line-numbers')
-  } else {
-    target.classList.remove('line-numbers')
-  }
-  if (readOnly) {
-    target.classList.add('read-only')
-  } else {
-    target.classList.remove('read-only')
-  }
+  target.append(output, input)
 
-  const render = async () => {
+  const renderOptions = () => {
+    const {
+      readOnly,
+      lineNumbers = 'on'
+    } = options
+    if (lineNumbers === 'on') {
+      target.classList.add('line-numbers')
+    } else {
+      target.classList.remove('line-numbers')
+    }
+    if (readOnly) {
+      target.classList.add('read-only')
+    } else {
+      target.classList.remove('read-only')
+    }
+  }
+  const renderOutput = async () => {
+    const {
+      theme = 'github-light', language = 'javascript'
+    } = options
     const { codeToTokens } = await getHighlighter({ themes: [theme], langs: [language] })
 
     const codeToHtml = (code: string) => {
@@ -126,10 +126,11 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
   }
 
   const getValue = () => input.value
+  const setValue = (value: string) => input.value = value
   const changeValue = (value: string) => {
-    input.value = value
-    onChange?.(getValue())
-    render()
+    setValue(value)
+    options.onChange?.(getValue())
+    renderOutput()
   }
   input.addEventListener('input', () => changeValue(input.value))
   let prevOutputHoverElement: Element | null = null
@@ -183,7 +184,8 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     })
   }, 50))
 
-  render()
+  renderOptions()
+  renderOutput()
   const shikitor: Shikitor = {
     get value() {
       return getValue()
@@ -196,13 +198,12 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     },
     set options(newOptions: ShikitorOptions) {
       Object.assign(options, newOptions)
-      if (newOptions.value) {
-        changeValue(newOptions.value)
-      }
-      render()
+      options.value && setValue(options.value)
+      renderOptions()
+      renderOutput()
     },
     dispose() {
-      onDispose?.()
+      options.onDispose?.()
       callAllPlugins('onDispose')
     }
   }
