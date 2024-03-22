@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "stripInternal": true,
+    "outDir": "temp"
+  },
+  "exclude": ["**/tests", "**/dist"]
+}

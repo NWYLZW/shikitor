@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "shikitor-workspace",
+  "version": "0.0.1",
+  "description": "shikitor workspace",
+  "devDependencies": {
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "shikiro-playground",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.2.3",
+    "shiki": "^1.2.0",
+    "@shikijs/core": "^1.2.0",
+    "sass": "^1.72.0"
+  }
+}

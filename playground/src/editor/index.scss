@@ -1,0 +1,45 @@
+.shikitor {
+  --gutter-width: 3em;
+
+  &.line-numbers &-output-line::before {
+    visibility: visible;
+  }
+  &-input, &-output {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: var(--font-family, monospace);
+    font-size: inherit;
+  }
+  &.line-numbers &-input, &-output {
+    padding-left: var(--gutter-width);
+  }
+  &-input {
+    resize: none;
+    color: transparent;
+    caret-color: var(--caret-color, white);
+    background-color: transparent;
+    outline: none;
+    overflow: auto;
+    white-space: pre;
+  }
+  &-output {
+    overflow: hidden;
+    pointer-events: none;
+    counter-reset: shiki-line 0;
+    > pre {
+      margin: 0;
+    }
+    &-line::before {
+      visibility: hidden;
+      content: counter(shiki-line);
+      position: absolute;
+      left: 0;
+      width: calc(var(--gutter-width) - 0.5em);
+      padding-right: 0.5em;
+      text-align: right;
+    }
+  }
+}
