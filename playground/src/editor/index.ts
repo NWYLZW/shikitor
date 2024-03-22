@@ -1,6 +1,8 @@
 import './index.scss'
 
+import type { DecorationItem } from '@shikijs/core'
 import { type BundledLanguage, type BundledTheme, getHighlighter } from 'shiki'
+
 import type { PickByValue } from '../types'
 import { throttle } from '../utils'
 
@@ -40,6 +42,7 @@ export interface ShikitorOptions extends ShikitorEvents {
   lineNumbers?: "on" | "off"
   readOnly?: boolean
   theme?: BundledTheme
+  decorations?: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
   plugins?: Plugin[]
 }
 
@@ -96,7 +99,8 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
   }
   const renderOutput = async () => {
     const {
-      theme = 'github-light', language = 'javascript'
+      theme = 'github-light', language = 'javascript',
+      decorations = [],
     } = options
     const { codeToTokens } = await getHighlighter({ themes: [theme], langs: [language] })
 
@@ -117,6 +121,7 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
       target.style.cssText += rootStyle
       themeName && target.classList.add(themeName)
 
+      console.log(decorations)
       const lines = tokensLines.map((tokenLine, index) => (`<span class="shikitor-output-line" data-line="${index + 1}">${
 				tokenLine
 					.map(token => `<span class="${
