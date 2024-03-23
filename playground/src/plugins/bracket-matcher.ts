@@ -1,20 +1,21 @@
 import { definePlugin } from '../editor'
 
+const bracketMap: Record<string, string | undefined> = {
+  '(': ')',
+  '[': ']',
+  '{': '}',
+  ')': '(',
+  ']': '[',
+  '}': '{'
+}
+const lBrackets = ['(', '[', '{']
+
 export default definePlugin({
   name: 'shikitor-bracket-matcher',
   onCursorChange(cursor) {
     const value = this.value
     const prev = value[cursor.offset - 1]
     const next = value[cursor.offset]
-    const bracketMap: Record<string, string | undefined> = {
-      '(': ')',
-      '[': ']',
-      '{': '}',
-      ')': '(',
-      ']': '[',
-      '}': '{'
-    }
-    const lBrackets = ['(', '[', '{']
     const prevBracket = bracketMap[prev]
     const nextBracket = bracketMap[next]
     const relativeBracket = prevBracket || nextBracket
