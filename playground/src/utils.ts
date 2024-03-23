@@ -1,17 +1,17 @@
 import type { DecorationItem } from '@shikijs/core'
 
 export function throttle<T extends (...args: any[]) => void>(fn: T, delay: number) {
-  let last = 0;
+  let last = 0
   return (...args: any[]) => {
-    const now = Date.now();
+    const now = Date.now()
     if (now - last >= delay) {
-      fn(...args);
-      last = now;
+      fn(...args)
+      last = now
     }
-  };
+  }
 }
 
-function getRawTextHelper(text: string) {
+export function getRawTextHelper(text: string) {
   return {
     getOffset: (line: number, character: number) => {
       const lines = text.split('\n')
@@ -34,7 +34,7 @@ function getRawTextHelper(text: string) {
   }
 }
 
-function decorateTokens(
+export function decorateTokens(
   rawText: string,
   tokensLines: {
     content: string
