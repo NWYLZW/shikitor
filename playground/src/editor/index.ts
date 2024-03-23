@@ -37,7 +37,7 @@ export interface ShikitorEvents {
 export interface ShikitorOptions extends ShikitorEvents {
   value?: string
   language?: BundledLanguage
-  lineNumbers?: "on" | "off"
+  lineNumbers?: 'on' | 'off'
   readOnly?: boolean
   theme?: BundledTheme
   decorations?: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
@@ -57,10 +57,10 @@ function initInputAndOutput(options: ShikitorOptions) {
 
   input.value = options.value ?? ''
   input.classList.add('shikitor-input')
-  input.setAttribute("autocapitalize", "off")
-  input.setAttribute("autocomplete", "off")
-  input.setAttribute("autocorrect", "off")
-  input.setAttribute("spellcheck", "false")
+  input.setAttribute('autocapitalize', 'off')
+  input.setAttribute('autocomplete', 'off')
+  input.setAttribute('autocorrect', 'off')
+  input.setAttribute('spellcheck', 'false')
 
   output.classList.add('shikitor-output')
   return [input, output] as const
@@ -109,7 +109,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
         theme: theme
       })
       target.style.color = fg
-      target.style.setProperty("--caret-color", fg)
+      target.style.setProperty('--caret-color', fg)
       target.style.backgroundColor = bg
       target.style.cssText += rootStyle
       themeName && target.classList.add(themeName)
@@ -121,13 +121,13 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
 				tokenLine
 					.map(token => `<span
             class="${
-              (token.tagName ? `${token.tagName} ` : "") +
+              (token.tagName ? `${token.tagName} ` : '') +
               `offset:${token.offset} ` +
               `position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length} ` +
               `font-style:${token.fontStyle}`
             }"
             style="color: ${token.color}">${token.content}</span>`)
-					.join("")
+					.join('')
 			}</span>`))
       return `<pre tabindex="0"><code>${lines.join('<br>')}</code></pre>`
     }
@@ -142,12 +142,12 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     renderOutput()
   }
   let prevOutputHoverElement: Element | null = null
-  input.addEventListener("mousemove", throttle(e => {
-    input.style.pointerEvents = "none"
-    output.style.pointerEvents = "auto"
+  input.addEventListener('mousemove', throttle(e => {
+    input.style.pointerEvents = 'none'
+    output.style.pointerEvents = 'auto'
     const outputHoverElement = document.elementFromPoint(e.clientX, e.clientY)
-    input.style.pointerEvents = ""
-    output.style.pointerEvents = ""
+    input.style.pointerEvents = ''
+    output.style.pointerEvents = ''
     if (outputHoverElement === prevOutputHoverElement) {
       return
     }
@@ -156,13 +156,13 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       return
     }
     if (
-      outputHoverElement.className.includes("shiki-editor")
-      && outputHoverElement.className.includes("output")
+      outputHoverElement.className.includes('shiki-editor')
+      && outputHoverElement.className.includes('output')
     ) {
       return
     }
 
-    if (!outputHoverElement?.className.includes("position")) {
+    if (!outputHoverElement?.className.includes('position')) {
       return
     }
 
