@@ -5,7 +5,7 @@ import type { BundledLanguage, BundledTheme } from 'shiki'
 import { getHighlighter } from 'shiki'
 
 import type { PickByValue } from '../types'
-import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, throttle } from '../utils'
+import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, listen, throttle } from '../utils'
 
 export interface TextRange {
   start: OffsetOrPosition
@@ -217,7 +217,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     prevCursor = cursor
   }
   input.addEventListener('click', () => updateCursor())
-  document.addEventListener('selectionchange', () => updateCursor(-1))
+  const offDocumentSelectionChange = listen(document, 'selectionchange', () => updateCursor(-1))
   input.addEventListener('keydown', () => {
     // TODO throttle cursor update
     setTimeout(updateCursor, 10)
@@ -258,6 +258,8 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
         : Object.assign(options, newOptions)
     },
     dispose() {
+      offDocumentSelectionChange()
+      target.innerHTML = ''
       options.onDispose?.()
       callAllPlugins('onDispose')
     }
