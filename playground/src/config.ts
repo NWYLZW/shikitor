@@ -23,11 +23,9 @@ export default {
     defaultCode = value
   },
   get cursor() {
-    console.log('Getting cursor:', cursor)
     return cursor
   },
   onCursorChange(newCursor) {
-    console.log('Cursor changed:', newCursor)
     cursor = newCursor
   },
   language: 'javascript',
