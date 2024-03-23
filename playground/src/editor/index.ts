@@ -35,11 +35,13 @@ export function definePlugin(plugin: Plugin) {
 
 export interface ShikitorEvents {
   onChange?: (value: string) => void
+  onCursorChange?: (cursor?: ResolvedPosition) => void
   onDispose?: () => void
 }
 
 export interface ShikitorOptions extends ShikitorEvents {
   value?: string
+  cursor?: ResolvedPosition
   language?: BundledLanguage
   lineNumbers?: 'on' | 'off'
   readOnly?: boolean
@@ -206,12 +208,14 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   // TODO selection change case
   function updateCursor(offset: number = input.selectionStart) {
     if (offset === -1) {
+      options.onCursorChange?.()
       callAllPlugins('onCursorChange')
       return
     }
     const rawTextHelper = getRawTextHelper(getValue())
     const cursor = rawTextHelper.getResolvedPositions(offset)
     if (cursor.offset !== prevCursor.offset) {
+      options.onCursorChange?.(cursor)
       callAllPlugins('onCursorChange', cursor)
     }
     prevCursor = cursor
