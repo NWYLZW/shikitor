@@ -202,6 +202,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
 
   let prevCursor: ResolvedPosition = { offset: 0, line: 0, character: 0 }
   input.addEventListener('input', () => changeValue(input.value))
+  // TODO selection change case
   function updateCursor(offset: number = input.selectionStart) {
     const rawTextHelper = getRawTextHelper(getValue())
     const cursor = rawTextHelper.getResolvedPositions(offset)
