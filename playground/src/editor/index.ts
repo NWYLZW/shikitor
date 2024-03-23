@@ -23,10 +23,14 @@ export interface OnHoverElementContext {
 
 export interface Plugin {
   name?: string
-  install?: (editor: Shikitor) => void
-  onDispose?: () => void
-  onCursorChange?: (cursor: TextPosition) => void
-  onHoverElement?: (range: TextRange, context: OnHoverElementContext) => void
+  install?: (this: Shikitor, editor: Shikitor) => void
+  onDispose?: (this: Shikitor) => void
+  onCursorChange?: (this: Shikitor, cursor: TextPosition) => void
+  onHoverElement?: (this: Shikitor, range: TextRange, context: OnHoverElementContext) => void
+}
+
+export function definePlugin(plugin: Plugin) {
+  return plugin
 }
 
 export interface ShikitorEvents {
@@ -72,7 +76,8 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   function callAllPlugins<
     K extends Exclude<keyof PickByValue<Plugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<Plugin[K], undefined>>) {
-    return pluginsRef.current?.map(plugin => plugin[method]?.(
+    return pluginsRef.current?.map(plugin => plugin[method]?.call(
+      shikitor,
       // @ts-ignore
       ...args
     ))
