@@ -14,6 +14,14 @@ const name = 'shikitor-bracket-matcher'
 export default definePlugin({
   name,
   onCursorChange(cursor) {
+    const { decorations = [] } = this.options
+    let newDecorations = [
+      ...decorations.filter(d => !d.tagName?.includes(name))
+    ]
+    if (!cursor) {
+      this.updateOptions({ decorations: newDecorations })
+      return
+    }
     const value = this.value
     const prev = value[cursor.offset - 1]
     const next = value[cursor.offset]
@@ -21,10 +29,6 @@ export default definePlugin({
     const prevBracket = bracketMap[prev]
     const nextBracket = bracketMap[next]
     const relativeBracket = prevBracket || nextBracket
-    let newDecorations = [
-      ...(this.options.decorations ?? [])
-        .filter(d => !d.tagName?.includes(name))
-    ]
     if (relativeBracket) {
       const bracket = prevBracket ? prev : next
 

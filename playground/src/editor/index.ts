@@ -25,7 +25,7 @@ export interface Plugin {
   name?: string
   install?: (this: Shikitor, editor: Shikitor) => void
   onDispose?: (this: Shikitor) => void
-  onCursorChange?: (this: Shikitor, cursor: ResolvedPosition) => void
+  onCursorChange?: (this: Shikitor, cursor?: ResolvedPosition) => void
   onHoverElement?: (this: Shikitor, range: ResolvedTextRange, context: OnHoverElementContext) => void
 }
 
@@ -204,6 +204,10 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   input.addEventListener('input', () => changeValue(input.value))
   // TODO selection change case
   function updateCursor(offset: number = input.selectionStart) {
+    if (offset === -1) {
+      callAllPlugins('onCursorChange')
+      return
+    }
     const rawTextHelper = getRawTextHelper(getValue())
     const cursor = rawTextHelper.getResolvedPositions(offset)
     if (cursor.offset !== prevCursor.offset) {
@@ -212,6 +216,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     prevCursor = cursor
   }
   input.addEventListener('click', () => updateCursor())
+  document.addEventListener('selectionchange', () => updateCursor(-1))
   input.addEventListener('keydown', () => {
     // TODO throttle cursor update
     setTimeout(updateCursor, 10)
