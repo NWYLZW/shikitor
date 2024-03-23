@@ -8,7 +8,6 @@ const container = document.querySelector<HTMLDivElement>('#container')!
 console.log('Creating Shikitor instance')
 let shikitor = create(container, config)
 function init() {
-  console.log(config.cursor)
   shikitor.focus(!config.cursor ? undefined : {
     start: config.cursor.offset, end: config.cursor.offset
   })
