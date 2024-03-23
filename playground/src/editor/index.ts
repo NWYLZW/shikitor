@@ -47,6 +47,7 @@ export interface ShikitorOptions extends ShikitorEvents {
 export interface Shikitor {
   value: string
   options: Readonly<ShikitorOptions>
+  updateOptions: (options: ShikitorOptions | ((options: ShikitorOptions) => ShikitorOptions)) => void
   dispose: () => void
 }
 
@@ -65,7 +66,8 @@ function initInputAndOutput(options: ShikitorOptions) {
   return [input, output] as const
 }
 
-export function create(target: HTMLDivElement, options: ShikitorOptions): Shikitor {
+export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Shikitor {
+  let options = { ...inputOptions }
   const pluginsRef = { get current() { return options.plugins } }
   function callAllPlugins<
     K extends Exclude<keyof PickByValue<Plugin, (...args: any[]) => any>, undefined>
@@ -214,10 +216,15 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
       return options
     },
     set options(newOptions: ShikitorOptions) {
-      Object.assign(options, newOptions)
+      options = newOptions
       options.value && setValue(options.value)
       renderOptions()
       renderOutput()
+    },
+    updateOptions(newOptions) {
+      shikitor.options = typeof newOptions === 'function'
+        ? newOptions(options)
+        : Object.assign(options, newOptions)
     },
     dispose() {
       options.onDispose?.()
