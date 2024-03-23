@@ -217,7 +217,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     }
     prevCursor = cursor
   }
-  input.addEventListener('click', () => updateCursor)
+  input.addEventListener('click', () => updateCursor())
   input.addEventListener('keydown', () => {
     // TODO throttle cursor update
     setTimeout(updateCursor, 10)
