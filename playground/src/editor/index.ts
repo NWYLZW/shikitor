@@ -1,6 +1,6 @@
 import './index.scss'
 
-import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
+import type { DecorationItem, OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 import { getHighlighter } from 'shiki'
 
@@ -8,6 +8,10 @@ import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, throttle } from '../utils'
 
 export interface TextRange {
+  start: OffsetOrPosition
+  end: OffsetOrPosition
+}
+export interface ResolvedTextRange {
   start: ResolvedPosition
   end: ResolvedPosition
 }
@@ -22,7 +26,7 @@ export interface Plugin {
   install?: (this: Shikitor, editor: Shikitor) => void
   onDispose?: (this: Shikitor) => void
   onCursorChange?: (this: Shikitor, cursor: ResolvedPosition) => void
-  onHoverElement?: (this: Shikitor, range: TextRange, context: OnHoverElementContext) => void
+  onHoverElement?: (this: Shikitor, range: ResolvedTextRange, context: OnHoverElementContext) => void
 }
 
 export function definePlugin(plugin: Plugin) {
@@ -47,6 +51,7 @@ export interface ShikitorOptions extends ShikitorEvents {
 export interface Shikitor {
   value: string
   options: Readonly<ShikitorOptions>
+  focus: (range?: Partial<TextRange>) => void
   updateOptions: (options: ShikitorOptions | ((options: ShikitorOptions) => ShikitorOptions)) => void
   dispose: () => void
 }
@@ -228,6 +233,17 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       options.value && setValue(options.value)
       renderOptions()
       renderOutput()
+    },
+    focus({ start, end } = {}) {
+      const { getResolvedPositions } = getRawTextHelper(getValue())
+      const resolvedStartPos = getResolvedPositions(start ?? 0)
+      input.setSelectionRange(
+        resolvedStartPos.offset,
+        end === undefined
+          ? resolvedStartPos.offset
+          : getResolvedPositions(end).offset
+      )
+      input.focus()
     },
     updateOptions(newOptions) {
       shikitor.options = typeof newOptions === 'function'
