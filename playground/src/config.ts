@@ -13,7 +13,12 @@ function add(a, b) {
 let cursor: undefined | ResolvedPosition
 
 export default {
-  value: defaultCode,
+  get value() {
+    return defaultCode
+  },
+  set value(value) {
+    defaultCode = value
+  },
   onChange(value) {
     defaultCode = value
   },
