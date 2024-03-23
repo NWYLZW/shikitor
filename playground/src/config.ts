@@ -1,16 +1,30 @@
-import type { ShikitorOptions } from './editor'
+import type { ResolvedPosition } from '@shikijs/core'
+
+import type { ShikitorOptions } from './core/editor'
 import bracketMatcher from './plugins/bracket-matcher'
 
-const defaultCode = `
+let defaultCode = `
 console.log("Hello, World!")
 
 function add(a, b) {
   return a + b
 }
 `.trimStart()
+let cursor: undefined | ResolvedPosition
 
 export default {
   value: defaultCode,
+  onChange(value) {
+    defaultCode = value
+  },
+  get cursor() {
+    console.log('Getting cursor:', cursor)
+    return cursor
+  },
+  onCursorChange(newCursor) {
+    console.log('Cursor changed:', newCursor)
+    cursor = newCursor
+  },
   language: 'javascript',
   theme: 'github-dark',
   plugins: [bracketMatcher]

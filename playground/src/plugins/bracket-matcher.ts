@@ -1,4 +1,4 @@
-import { definePlugin } from '../editor'
+import { definePlugin } from '../core/plugin'
 
 const bracketMap: Record<string, string | undefined> = {
   '(': ')',

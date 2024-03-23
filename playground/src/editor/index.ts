@@ -1,62 +1,12 @@
 import './index.scss'
 
-import type { DecorationItem, OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
-import type { BundledLanguage, BundledTheme } from 'shiki'
+import type { ResolvedPosition } from '@shikijs/core'
 import { getHighlighter } from 'shiki'
 
+import type { Shikitor, ShikitorOptions } from '../core/editor'
+import type { ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, listen, throttle } from '../utils'
-
-export interface TextRange {
-  start: OffsetOrPosition
-  end: OffsetOrPosition
-}
-export interface ResolvedTextRange {
-  start: ResolvedPosition
-  end: ResolvedPosition
-}
-export interface OnHoverElementContext {
-  content: string
-  element: Element
-  raw: string
-}
-
-export interface Plugin {
-  name?: string
-  install?: (this: Shikitor, editor: Shikitor) => void
-  onDispose?: (this: Shikitor) => void
-  onCursorChange?: (this: Shikitor, cursor?: ResolvedPosition) => void
-  onHoverElement?: (this: Shikitor, range: ResolvedTextRange, context: OnHoverElementContext) => void
-}
-
-export function definePlugin(plugin: Plugin) {
-  return plugin
-}
-
-export interface ShikitorEvents {
-  onChange?: (value: string) => void
-  onCursorChange?: (cursor?: ResolvedPosition) => void
-  onDispose?: () => void
-}
-
-export interface ShikitorOptions extends ShikitorEvents {
-  value?: string
-  cursor?: ResolvedPosition
-  language?: BundledLanguage
-  lineNumbers?: 'on' | 'off'
-  readOnly?: boolean
-  theme?: BundledTheme
-  decorations?: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
-  plugins?: Plugin[]
-}
-
-export interface Shikitor {
-  value: string
-  options: Readonly<ShikitorOptions>
-  focus: (range?: Partial<TextRange>) => void
-  updateOptions: (options: ShikitorOptions | ((options: ShikitorOptions) => ShikitorOptions)) => void
-  dispose: () => void
-}
 
 function initInputAndOutput(options: ShikitorOptions) {
   const input = document.createElement('textarea')
@@ -75,11 +25,11 @@ function initInputAndOutput(options: ShikitorOptions) {
 
 export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Shikitor {
   let options = { ...inputOptions }
-  const pluginsRef = { get current() { return options.plugins } }
-  function callAllPlugins<
-    K extends Exclude<keyof PickByValue<Plugin, (...args: any[]) => any>, undefined>
-  >(method: K, ...args: Parameters<Exclude<Plugin[K], undefined>>) {
-    return pluginsRef.current?.map(plugin => plugin[method]?.call(
+  const ShikitorPluginsRef = { get current() { return options.plugins } }
+  function callAllShikitorPlugins<
+    K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
+  >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
+    return ShikitorPluginsRef.current?.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
       shikitor,
       // @ts-ignore
       ...args
@@ -193,7 +143,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       return
     }
 
-    callAllPlugins('onHoverElement', {
+    callAllShikitorPlugins('onHoverElement', {
       start: { offset, line, character: start },
       end: { offset, line, character: end }
     }, {
@@ -209,14 +159,14 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   function updateCursor(offset: number = input.selectionStart) {
     if (offset === -1) {
       options.onCursorChange?.()
-      callAllPlugins('onCursorChange')
+      callAllShikitorPlugins('onCursorChange')
       return
     }
     const rawTextHelper = getRawTextHelper(getValue())
     const cursor = rawTextHelper.getResolvedPositions(offset)
     if (cursor.offset !== prevCursor.offset) {
       options.onCursorChange?.(cursor)
-      callAllPlugins('onCursorChange', cursor)
+      callAllShikitorPlugins('onCursorChange', cursor)
     }
     prevCursor = cursor
   }
@@ -265,9 +215,9 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       offDocumentSelectionChange()
       target.innerHTML = ''
       options.onDispose?.()
-      callAllPlugins('onDispose')
+      callAllShikitorPlugins('onDispose')
     }
   }
-  callAllPlugins('install', shikitor)
+  callAllShikitorPlugins('install', shikitor)
   return shikitor
 }
