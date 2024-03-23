@@ -1,22 +1,17 @@
 import './index.scss'
 
+import config from './config'
 import { create } from './editor'
-import bracketMatcher from './plugins/bracket-matcher'
 
-const container = document.querySelector<HTMLDivElement>('#container')
+const container = document.querySelector<HTMLDivElement>('#container')!
 
-const defaultCode = `
-console.log("Hello, World!")
+console.log('Creating Shikitor instance')
+const shikitor = create(container, config)
 
-function add(a, b) {
-  return a + b
-}
-`.trimStart()
-if (container) {
-  const shikitor = create(container, {
-    value: defaultCode,
-    language: 'javascript',
-    theme: 'github-dark',
-    plugins: [bracketMatcher]
+if (import.meta.hot) {
+  import.meta.hot.accept('./config.ts', newModule => {
+    if (!newModule) return
+    const { default: newConfig } = newModule as unknown as { default: typeof config }
+    shikitor.options = newConfig
   })
 }
