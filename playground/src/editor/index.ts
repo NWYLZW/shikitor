@@ -4,7 +4,7 @@ import type { DecorationItem } from '@shikijs/core'
 import { type BundledLanguage, type BundledTheme, getHighlighter } from 'shiki'
 
 import type { PickByValue } from '../types'
-import { type DecoratedThemedToken, decorateTokens, throttle } from '../utils'
+import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, throttle } from '../utils'
 
 export interface TextRange {
   start: TextPosition
@@ -149,6 +149,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     options.onChange?.(getValue())
     renderOutput()
   }
+  const rawTextHelper = getRawTextHelper(getValue())
   input.addEventListener('input', () => changeValue(input.value))
   let prevOutputHoverElement: Element | null = null
   input.addEventListener("mousemove", throttle(e => {
@@ -203,6 +204,21 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       raw: input.value
     })
   }, 50))
+  let prevCursor: TextPosition = { offset: 0, line: 0, character: 0 }
+  input.addEventListener('click', () => {
+    const cursor = rawTextHelper.getResolvedPositions(input.selectionStart)
+    if (cursor.offset !== prevCursor.offset) {
+      callAllPlugins('onCursorChange', cursor)
+    }
+    prevCursor = cursor
+  })
+  input.addEventListener('keyup', () => {
+    const cursor = rawTextHelper.getResolvedPositions(input.selectionStart)
+    if (cursor.offset !== prevCursor.offset) {
+      callAllPlugins('onCursorChange', cursor)
+    }
+    prevCursor = cursor
+  })
 
   renderOptions()
   renderOutput()
