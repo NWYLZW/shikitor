@@ -153,7 +153,6 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     options.onChange?.(getValue())
     renderOutput()
   }
-  const rawTextHelper = getRawTextHelper(getValue())
   let prevOutputHoverElement: Element | null = null
   input.addEventListener("mousemove", throttle(e => {
     input.style.pointerEvents = "none"
@@ -211,6 +210,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   let prevCursor: TextPosition = { offset: 0, line: 0, character: 0 }
   input.addEventListener('input', () => changeValue(input.value))
   function updateCursor(offset: number = input.selectionStart) {
+    const rawTextHelper = getRawTextHelper(getValue())
     const cursor = rawTextHelper.getResolvedPositions(offset)
     if (cursor.offset !== prevCursor.offset) {
       callAllPlugins('onCursorChange', cursor)
