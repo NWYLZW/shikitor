@@ -35,6 +35,7 @@ export default definePlugin({
       })
       const increase = lBrackets.includes(relativeBracket) ? -1 : 1
       const stack = []
+      // TODO `console.log(")")`
       for (let i = bracketOffset + increase; ; i += increase) {
         if (i < 0 || i >= value.length) {
           break
