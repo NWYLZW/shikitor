@@ -88,7 +88,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       lineNumbers = 'on'
     } = options
     target.classList.toggle('line-numbers', lineNumbers === 'on')
-    target.classList.toggle('read-only', readOnly)
+    target.classList.toggle('read-only', readOnly === true)
   }
   const renderOutput = async () => {
     const {
