@@ -98,7 +98,7 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
   const renderOutput = async () => {
     const {
       theme = 'github-light', language = 'javascript',
-      decorations = [],
+      decorations = []
     } = options
     const { codeToTokens } = await getHighlighter({ themes: [theme], langs: [language] })
 
@@ -197,7 +197,7 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
     }, {
       content: input.value.slice(start - 1, end - 1),
       element: outputHoverElement,
-      raw: input.value,
+      raw: input.value
     })
   }, 50))
 
