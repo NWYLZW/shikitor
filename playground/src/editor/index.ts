@@ -4,7 +4,7 @@ import type { DecorationItem } from '@shikijs/core'
 import { type BundledLanguage, type BundledTheme, getHighlighter } from 'shiki'
 
 import type { PickByValue } from '../types'
-import { throttle } from '../utils'
+import { type DecoratedThemedToken, decorateTokens, throttle } from '../utils'
 
 export interface TextRange {
   start: TextPosition
@@ -119,14 +119,19 @@ export function create(target: HTMLDivElement, options: ShikitorOptions): Shikit
       target.style.cssText += rootStyle
       themeName && target.classList.add(themeName)
 
-      console.log(decorations)
-      const lines = tokensLines.map((tokenLine, index) => (`<span class="shikitor-output-line" data-line="${index + 1}">${
+      const decoratedTokensLines: DecoratedThemedToken[][] = decorations.length > 0
+        ? decorateTokens(code, tokensLines, decorations)
+        : tokensLines
+      const lines = decoratedTokensLines.map((tokenLine, index) => (`<span class="shikitor-output-line" data-line="${index + 1}">${
 				tokenLine
-					.map(token => `<span class="${
-						`offset:${token.offset} ` +
-						`position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length} ` +
-						`font-style:${token.fontStyle}`
-					}" style="color: ${token.color}">${token.content}</span>`)
+					.map(token => `<span
+            class="${
+              (token.tagName ? `${token.tagName} ` : "") +
+              `offset:${token.offset} ` +
+              `position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length} ` +
+              `font-style:${token.fontStyle}`
+            }"
+            style="color: ${token.color}">${token.content}</span>`)
 					.join("")
 			}</span>`))
       return `<pre tabindex="0"><code>${lines}</code></pre>`
