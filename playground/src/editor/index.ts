@@ -85,6 +85,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   }
   const [input, output] = initInputAndOutput(options)
   target.classList.add('shikitor')
+  target.innerHTML = ''
   target.append(output, input)
 
   const renderOptions = () => {
