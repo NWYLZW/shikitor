@@ -145,6 +145,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   const setValue = (value: string) => input.value = value
   const changeValue = (value: string) => {
     setValue(value)
+    options.value = value
     options.onChange?.(getValue())
     renderOutput()
   }
