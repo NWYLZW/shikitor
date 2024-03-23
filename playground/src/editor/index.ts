@@ -141,11 +141,10 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
             style="color: ${token.color}">${token.content}</span>`)
 					.join("")
 			}</span>`))
-      return `<pre tabindex="0"><code>${lines}</code></pre>`
+      return `<pre tabindex="0"><code>${lines.join('<br>')}</code></pre>`
     }
     output.innerHTML = codeToHtml(input.value)
   }
-
   const getValue = () => input.value
   const setValue = (value: string) => input.value = value
   const changeValue = (value: string) => {
