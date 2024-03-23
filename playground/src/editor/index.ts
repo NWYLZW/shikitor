@@ -66,7 +66,7 @@ function initInputAndOutput(options: ShikitorOptions) {
 }
 
 export function create(target: HTMLDivElement, options: ShikitorOptions): Shikitor {
-  let pluginsRef = { get current() { return options.plugins } }
+  const pluginsRef = { get current() { return options.plugins } }
   function callAllPlugins<
     K extends Exclude<keyof PickByValue<Plugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<Plugin[K], undefined>>) {
