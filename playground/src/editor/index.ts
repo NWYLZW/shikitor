@@ -1,19 +1,15 @@
 import './index.scss'
 
-import type { DecorationItem } from '@shikijs/core'
-import { type BundledLanguage, type BundledTheme, getHighlighter } from 'shiki'
+import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
+import type { BundledLanguage, BundledTheme } from 'shiki'
+import { getHighlighter } from 'shiki'
 
 import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, throttle } from '../utils'
 
 export interface TextRange {
-  start: TextPosition
-  end: TextPosition
-}
-export interface TextPosition {
-  offset: number
-  line: number
-  character: number
+  start: ResolvedPosition
+  end: ResolvedPosition
 }
 export interface OnHoverElementContext {
   content: string
@@ -25,7 +21,7 @@ export interface Plugin {
   name?: string
   install?: (this: Shikitor, editor: Shikitor) => void
   onDispose?: (this: Shikitor) => void
-  onCursorChange?: (this: Shikitor, cursor: TextPosition) => void
+  onCursorChange?: (this: Shikitor, cursor: ResolvedPosition) => void
   onHoverElement?: (this: Shikitor, range: TextRange, context: OnHoverElementContext) => void
 }
 
@@ -207,7 +203,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     })
   }, 50))
 
-  let prevCursor: TextPosition = { offset: 0, line: 0, character: 0 }
+  let prevCursor: ResolvedPosition = { offset: 0, line: 0, character: 0 }
   input.addEventListener('input', () => changeValue(input.value))
   function updateCursor(offset: number = input.selectionStart) {
     const rawTextHelper = getRawTextHelper(getValue())
