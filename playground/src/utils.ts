@@ -1,4 +1,4 @@
-import type { DecorationItem } from '@shikijs/core'
+import type { DecorationItem, ThemedToken } from '@shikijs/core'
 
 export function throttle<T extends (...args: any[]) => void>(fn: T, delay: number) {
   let last = 0
@@ -34,19 +34,15 @@ export function getRawTextHelper(text: string) {
   }
 }
 
+export type DecoratedThemedToken = ThemedToken & { tagName?: string }
+
 export function decorateTokens(
   rawText: string,
-  tokensLines: {
-    content: string
-    offset: number
-    color: string
-    fontStyle: number
-    tagName?: string
-  }[][],
+  tokensLines: DecoratedThemedToken[][],
   decorations: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
 ) {
   const { getOffset, getPosition } = getRawTextHelper(rawText)
-  const result = tokensLines
+  const result: DecoratedThemedToken[][] = []
   for (const { start, end, tagName } of decorations) {
     const startOffset = typeof start === 'number'
       ? start
@@ -119,7 +115,7 @@ export function decorateTokens(
         }
       }
     }
-    tokensLines[startPosition.line - 1] = newTokensLine
+    result[startPosition.line - 1] = newTokensLine
   }
   return result
 }
