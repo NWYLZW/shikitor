@@ -153,7 +153,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     })
   }, 50))
 
-  let prevCursor: ResolvedPosition = { offset: 0, line: 0, character: 0 }
+  let prevCursor: ResolvedPosition = options.cursor ?? { offset: 0, line: 0, character: 0 }
   input.addEventListener('input', () => changeValue(input.value))
   // TODO selection change case
   function updateCursor(offset: number = input.selectionStart) {
@@ -171,7 +171,14 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     prevCursor = cursor
   }
   input.addEventListener('click', () => updateCursor())
-  const offDocumentSelectionChange = listen(document, 'selectionchange', () => updateCursor(-1))
+  let resetCursorLock = false
+  const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
+    if (resetCursorLock) {
+      resetCursorLock = false
+      return
+    }
+    updateCursor(-1)
+  })
   input.addEventListener('keydown', () => {
     // TODO throttle cursor update
     setTimeout(updateCursor, 10)
@@ -204,6 +211,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
           ? resolvedStartPos.offset
           : getResolvedPositions(end).offset
       )
+      resetCursorLock = true
       input.focus()
     },
     updateOptions(newOptions) {
