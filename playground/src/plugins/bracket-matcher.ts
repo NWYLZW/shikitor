@@ -10,17 +10,20 @@ const bracketMap: Record<string, string | undefined> = {
 }
 const lBrackets = ['(', '[', '{']
 
+const name = 'shikitor-bracket-matcher'
 export default definePlugin({
-  name: 'shikitor-bracket-matcher',
+  name,
   onCursorChange(cursor) {
     const value = this.value
     const prev = value[cursor.offset - 1]
     const next = value[cursor.offset]
+
     const prevBracket = bracketMap[prev]
     const nextBracket = bracketMap[next]
     const relativeBracket = prevBracket || nextBracket
     let newDecorations = [
       ...(this.options.decorations ?? [])
+        .filter(d => !d.tagName?.includes(name))
     ]
     if (relativeBracket) {
       const bracket = prevBracket ? prev : next
@@ -31,7 +34,7 @@ export default definePlugin({
       newDecorations.push({
         start: bracketOffset,
         end: bracketOffset + 1,
-        tagName: 'shikitor-bg-lighting'
+        tagName: `shikitor-bg-lighting ${name}`
       })
       const increase = lBrackets.includes(relativeBracket) ? -1 : 1
       const stack = []
@@ -49,7 +52,7 @@ export default definePlugin({
             newDecorations.push({
               start: i,
               end: i + 1,
-              tagName: 'shikitor-bg-lighting'
+              tagName: `shikitor-bg-lighting ${name}`
             })
             break
           }
