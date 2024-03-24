@@ -55,12 +55,21 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
   }
+  const memo: [deps?: unknown[], _highlighter?: ReturnType<typeof getHighlighter>] = []
+  const highlighter = (theme: string, language: string) => {
+    const [[_theme, _language] = [], _highlighter] = memo
+    if (_theme !== theme || _language !== language || !_highlighter) {
+      memo[0] = [theme, language]
+      memo[1] = getHighlighter({ themes: [theme], langs: [language] })
+    }
+    return memo[1]!
+  }
   const renderOutput = async () => {
     const {
       theme = 'github-light', language = 'javascript',
       decorations = []
     } = options
-    const { codeToTokens } = await getHighlighter({ themes: [theme], langs: [language] })
+    const { codeToTokens } = await highlighter(theme, language)
 
     const codeToHtml = (code: string) => {
       const {
