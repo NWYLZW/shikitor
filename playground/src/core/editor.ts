@@ -24,12 +24,22 @@ export interface ShikitorOptions extends ShikitorEvents {
   )[]
 }
 
+export type UpdateDispatcher<T> = (value: T | ((value: T) => T)) => void
+
+export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: T) {
+  if (typeof value === 'function') {
+    (value as Function)(oldValue)
+  } else {
+    return value
+  }
+}
+
 export interface Shikitor {
   value: string
   language?: BundledLanguage
   options: Readonly<ShikitorOptions>
   focus: (range?: Partial<TextRange>) => void
-  updateOptions: (options: ShikitorOptions | ((options: ShikitorOptions) => ShikitorOptions)) => void
-  updateLanguage: (language: BundledLanguage) => void
+  updateOptions: UpdateDispatcher<Shikitor['options']>
+  updateLanguage: UpdateDispatcher<Shikitor['language']>
   dispose: () => void
 }

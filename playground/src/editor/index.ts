@@ -3,7 +3,7 @@ import './index.scss'
 import type { ResolvedPosition } from '@shikijs/core'
 import { getHighlighter } from 'shiki'
 
-import type { Shikitor, ShikitorOptions } from '../core/editor'
+import { callUpdateDispatcher, type Shikitor, type ShikitorOptions } from '../core/editor'
 import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens } from '../utils/decorateTokens'
@@ -227,7 +227,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       renderOutput()
     },
     updateLanguage(language) {
-      this.language = language
+      this.language = callUpdateDispatcher(language, options.language)
     },
     focus({ start, end } = {}) {
       const { getResolvedPositions } = getRawTextHelper(getValue())
