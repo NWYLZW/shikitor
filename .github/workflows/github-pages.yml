@@ -29,7 +29,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run:  pnpm install --no-frozen-lockfile && node scripts/bootstrap.mjs
+        run:  pnpm install --no-frozen-lockfile
 
       - name: Build site
         run: pnpm --filter shikitor-playground build
