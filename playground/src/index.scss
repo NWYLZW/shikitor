@@ -52,6 +52,7 @@ body {
     }
     > .right {
       display: flex;
+      align-items: center;
       gap: 10px;
     }
     select {
@@ -68,6 +69,16 @@ body {
         opacity: 1;
         border: 1px solid var(--fg, white);
       }
+      &:hover {
+        opacity: 1;
+      }
+    }
+    a {
+      display: flex;
+      color: var(--fg, white);
+      text-decoration: none;
+      opacity: .8;
+      transition: .2s;
       &:hover {
         opacity: 1;
       }
