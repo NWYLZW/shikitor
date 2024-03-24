@@ -6,7 +6,8 @@ import { getHighlighter } from 'shiki'
 import type { Shikitor, ShikitorOptions } from '../core/editor'
 import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
-import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, lazy, listen, throttle } from '../utils'
+import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, lazy, listen } from '../utils'
+import { throttle } from '../utils/throttle'
 
 function initInputAndOutput(options: ShikitorOptions) {
   const input = document.createElement('textarea')
