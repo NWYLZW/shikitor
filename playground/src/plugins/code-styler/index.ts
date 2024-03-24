@@ -6,14 +6,15 @@ interface CodeStylerOptions {
   insertSpaces?: boolean
 }
 export default ({
-  tabSize = 2,
+  tabSize: inputTabSize = 2,
   insertSpaces = true
 }: CodeStylerOptions = {}) => definePlugin({
   name: 'shikitor-code-styler',
   onKeydown(e) {
     if (e.key !== 'Tab') return
     e.preventDefault()
-    if (tabSize < 1) return
+    if (inputTabSize < 1) return
+    const tabSize = ~~inputTabSize
 
     const textarea = e.target
     const { selectionStart, selectionEnd, value } = textarea
