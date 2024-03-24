@@ -1,6 +1,7 @@
 import type { ResolvedPosition } from '@shikijs/core'
 
 import type { ShikitorOptions } from './core/editor'
+import type { ShikitorPlugin } from './core/plugin'
 import bracketMatcher from './plugins/bracket-matcher'
 import codeStyler from './plugins/code-styler'
 import { unzipStr, zipStr } from './utils/zipStr'
@@ -57,6 +58,17 @@ if (query.has('language')) {
 if (query.has('theme')) {
   queryOptions.theme = query.get('theme')!
 }
+
+// @ts-ignore
+const bundledPluginModules: Record<string, () => Promise<{
+  default: ShikitorPlugin | (() => ShikitorPlugin)
+}>> = import.meta.glob(['./plugins/*.ts', './plugins/*/index.ts'])
+export const bundledPluginsInfo = Object
+  .entries(bundledPluginModules)
+  .map(([path, module]) => {
+    const name = path.match(/\.\/plugins\/(.+?)(\/index)?\.ts$/)?.[1]
+    return { id: name, name, module }
+  })
 
 export default {
   get value() {
