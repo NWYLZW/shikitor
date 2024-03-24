@@ -41,6 +41,23 @@ switch (type) {
 export const hashType = type
 export const hashContent = content
 
+interface QueryOptions {
+  language?: string
+  theme?: string
+}
+
+const query = new URLSearchParams(location.search)
+const queryOptions: QueryOptions = {
+  language: 'javascript',
+  theme: 'github-dark'
+}
+if (query.has('language')) {
+  queryOptions.language = query.get('language')!
+}
+if (query.has('theme')) {
+  queryOptions.theme = query.get('theme')!
+}
+
 export default {
   get value() {
     return code
@@ -57,8 +74,7 @@ export default {
   onCursorChange(newCursor) {
     cursor = newCursor
   },
-  language: 'javascript',
-  theme: 'github-dark',
+  ...queryOptions,
   plugins: [
     bracketMatcher,
     codeStyler,
