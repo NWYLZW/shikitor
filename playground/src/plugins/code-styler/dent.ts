@@ -55,8 +55,11 @@ export function indent(
   } = options
   const valueLength = text.length
 
-  const startLineOffset = getLineStart(text, start)
-  const endLineOffset = getLineEnd(text, end)
+  const [
+    startLineOffset, endLineOffset
+  ] = [
+    getLineStart(text, start), getLineEnd(text, end)
+  ]
 
   const startAtLineStart = start === 0 || text[start - 1] === '\n'
   const endAtLineEnd = end === valueLength || text[end] === '\n' || text[end] === '\r'
