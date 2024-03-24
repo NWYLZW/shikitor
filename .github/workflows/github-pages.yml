@@ -33,7 +33,7 @@ jobs:
 
       - name: Build site
         env:
-          BASE: shikitor
+          BASE: /shikitor/
         run: pnpm --filter shikitor-playground build
 
       - name: Deploy to GitHub Pages
