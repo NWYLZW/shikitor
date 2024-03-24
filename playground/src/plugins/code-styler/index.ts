@@ -1,5 +1,5 @@
 import { definePlugin } from '../../core/plugin'
-import { indent } from './dent'
+import { indent, outdent } from './dent'
 
 interface CodeStylerOptions {
   tabSize?: number
@@ -16,9 +16,9 @@ export default ({
 
     const textarea = e.target
     const { selectionStart, selectionEnd, value } = textarea
-    if (e.shiftKey) {
-    } else {
-      const { replacement, range, selection, selectionMode } = indent(
+    const caller = e.shiftKey ? outdent : indent
+    try {
+      const { replacement, range, selection, selectionMode } = caller(
         value,
         [selectionStart, selectionEnd],
         { tabSize, insertSpaces }
@@ -26,6 +26,11 @@ export default ({
       textarea.setRangeText(replacement, ...range, selectionMode)
       textarea.setSelectionRange(...selection)
       textarea.dispatchEvent(new Event('input'))
+    } catch (e) {
+      const error = e as any
+      if ('message' in error && error.message !== 'No outdent') {
+        throw e
+      }
     }
   }
 })
