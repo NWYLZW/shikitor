@@ -35,6 +35,11 @@ export function indent(
   const endAtLineEnd = end === valueLength || text[end] === '\n' || text[end] === '\r'
   const selectBothEnds = start !== end && startAtLineStart && endAtLineEnd
 
+  const item = insertSpaces
+    ? ' '.repeat(tabSize)
+    : '\t'
+  const insertStrItemLength = item.length
+
   let replacement: string
   let range: [number, number]
   let selectionMode: SelectionMode
@@ -43,11 +48,7 @@ export function indent(
       if (str[offset] === '\n' || str[offset] === '\r' || offset === lineEnd) return leading
 
       const tabCount = 1 + ~~(countLeadingSpaces(leading, 0, tabSize) / tabSize)
-
-      if (insertSpaces) {
-        return ' '.repeat(tabCount * tabSize)
-      }
-      return '\t'.repeat(tabCount)
+      return item.repeat(tabCount)
     })
     range = [lineStart, lineEnd]
     selectionMode = 'select'
