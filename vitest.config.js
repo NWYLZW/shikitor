@@ -1,3 +1,4 @@
+import swc from 'rollup-plugin-swc3'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
@@ -16,7 +17,9 @@ export default defineConfig({
       include: ['**/tests/**/*.spec.ts']
     }
   },
+  esbuild: false,
   plugins: [
-    tsconfigPaths()
+    tsconfigPaths(),
+    swc()
   ]
 })
