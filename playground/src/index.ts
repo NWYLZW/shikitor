@@ -79,12 +79,12 @@ document
         break
       case 2:
         card.requestFullscreen()
-        this.src = `${import.meta.env.BASE_URL}public/fullscreen_exit.svg`
+        this.src = `${import.meta.env.BASE_URL}/fullscreen_exit.svg`
         break
       case 0:
         card.classList.remove('fullscreen')
         document.exitFullscreen()
-        this.src = `${import.meta.env.BASE_URL}public/fullscreen.svg`
+        this.src = `${import.meta.env.BASE_URL}/fullscreen.svg`
         break
     }
   })
