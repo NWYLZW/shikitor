@@ -11,7 +11,6 @@
     "vite": "^5.2.3",
     "shiki": "^1.2.0",
     "@shikijs/core": "^1.2.0",
-    "vite-tsconfig-paths": "^4.3.2",
     "sass": "^1.72.0"
   }
 }
