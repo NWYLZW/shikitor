@@ -18,12 +18,13 @@ export default ({
     const { selectionStart, selectionEnd, value } = textarea
     if (e.shiftKey) {
     } else {
-      const { replacement, range, selectionMode } = indent(
+      const { replacement, range, selection, selectionMode } = indent(
         value,
         [selectionStart, selectionEnd],
         { tabSize, insertSpaces }
       )
       textarea.setRangeText(replacement, ...range, selectionMode)
+      textarea.setSelectionRange(...selection)
       textarea.dispatchEvent(new Event('input'))
     }
   }

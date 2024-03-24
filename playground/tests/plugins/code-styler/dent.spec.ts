@@ -35,26 +35,36 @@ describe('indent', () => {
     expect(s1).toStrictEqual([4, 4])
   })
   test('insert indent at the beginning of the line when select text', () => {
-    const { replacement: r0, range: range0, selectionMode: m0 } = indent('const a = 1', [0, 1])
+    const { replacement: r0, range: range0, selection: s0, selectionMode: m0 } = indent('const a = 1', [0, 1])
     expect(m0).toBe('select')
     expect(r0).toBe('  const a = 1')
     expect(range0).toStrictEqual([0, 11])
-    const { replacement: r1, range: range1, selectionMode: m1 } = indent(' const a = 1', [1, 0])
+    expect(s0).toStrictEqual([2, 3])
+    const { replacement: r1, range: range1, selection: s1, selectionMode: m1 } = indent(' const a = 1', [0, 1])
     expect(m1).toBe('select')
     expect(r1).toBe('  const a = 1')
     expect(range1).toStrictEqual([0, 12])
-    const { replacement: r2, range: range2, selectionMode: m2 } = indent('const a = 1', [0, 1])
+    expect(s1).toStrictEqual([1, 2])
+    const { replacement: r2, range: range2, selection: s2, selectionMode: m2 } = indent('const a = 1', [1, 2])
     expect(m2).toBe('select')
     expect(r2).toBe('  const a = 1')
     expect(range2).toStrictEqual([0, 11])
+    expect(s2).toStrictEqual([3, 4])
     // TODO
-    const { replacement: r3, range: range3, selectionMode: m3 } = indent('const a = 1\n', [0, 'const a = 1\n'.length])
-    const { replacement: r4, range: range4, selectionMode: m4 } = indent('const a = 1\nconst b = 2', [
+    const { replacement: r3, range: range3, selection: s3, selectionMode: m3 } = indent('const a = 1\n', [0, 'const a = 1\n'.length])
+    const { replacement: r4, range: range4, selection: s4, selectionMode: m4 } = indent(trimIndent(`
+      const a = 1
+      const b = 2
+    `), [
       'c'.length,
       'const a = 1\nc'.length
     ])
     expect(m4).toBe('select')
     expect(r4).toBe('  const a = 1\n  const b = 2')
     expect(range4).toStrictEqual([0, 23])
+    expect(s4).toStrictEqual([
+      '  c'.length,
+      '  const a = 1\n  c'.length
+    ])
   })
 })

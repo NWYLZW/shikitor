@@ -43,6 +43,7 @@ export function indent(
   let replacement: string
   let range: [number, number]
   let selectionMode: SelectionMode
+  let padding = insertStrItemLength
   if (selectBothEnds || start !== end) {
     replacement = text
       .slice(lineStart, lineEnd)
@@ -59,29 +60,25 @@ export function indent(
     range = [start, end]
     selectionMode = 'end'
     if (insertSpaces) {
-      const padding = tabSize - ((start - lineStart) % tabSize)
+      padding = tabSize - ((start - lineStart) % tabSize)
       replacement = ' '.repeat(padding)
     }
   }
 
-  let replacementLFCount = 0
+  const firstLine = getLine(text, start)
+  const firstLineForReplacement = getLine(replacement, 0)
+  let firstLineInsertCharCount
   if (selectionMode === 'select') {
-    for (let i = 0; i < replacement.length; i++) {
-      if (replacement[i] === '\n') {
-        replacementLFCount++
-      }
-    }
+    firstLineInsertCharCount = firstLineForReplacement.length - firstLine.length
+  } else {
+    firstLineInsertCharCount = padding
   }
-  const lineInsertCharCount = selectionMode === 'end'
-    ? replacement.length
-    : (insertSpaces ? tabSize : 1)
+  const originalLength = range[1] - range[0]
+  const newLength = replacement.length
+  const insertCharCount = newLength - originalLength
   const newSelection = [
-    start + lineInsertCharCount,
-    end + lineInsertCharCount * (
-      replacementLFCount === 0
-        ? 1
-        : replacementLFCount
-    )
+    start + firstLineInsertCharCount,
+    end + insertCharCount
   ] as [number, number]
   return {
     replacement, range,
@@ -106,6 +103,19 @@ function getLineEnd(value: string, index: number) {
     index++
   }
   return index
+}
+
+function getLine(value: string, index: number) {
+  let line = ''
+  let i = index
+  while (i > 0 && value[i - 1] !== '\n') {
+    i--
+  }
+  while (i < value.length && value[i] !== '\n') {
+    line += value[i]
+    i++
+  }
+  return line
 }
 
 function isMultiLine(value: string, start: number, end: number) {
