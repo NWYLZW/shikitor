@@ -6,7 +6,7 @@ import { getHighlighter } from 'shiki'
 import type { Shikitor, ShikitorOptions } from '../core/editor'
 import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
-import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, listen, throttle } from '../utils'
+import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, lazy, listen, throttle } from '../utils'
 
 function initInputAndOutput(options: ShikitorOptions) {
   const input = document.createElement('textarea')
@@ -55,15 +55,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
   }
-  const memo: [deps?: unknown[], _highlighter?: ReturnType<typeof getHighlighter>] = []
-  const highlighter = (theme: string, language: string) => {
-    const [[_theme, _language] = [], _highlighter] = memo
-    if (_theme !== theme || _language !== language || !_highlighter) {
-      memo[0] = [theme, language]
-      memo[1] = getHighlighter({ themes: [theme], langs: [language] })
-    }
-    return memo[1]!
-  }
+  const highlighter = lazy((theme: string, language: string) => getHighlighter({ themes: [theme], langs: [language] }))
   const renderOutput = async () => {
     const {
       theme = 'github-light', language = 'javascript',
