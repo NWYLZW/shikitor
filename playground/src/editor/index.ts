@@ -23,8 +23,15 @@ function initInputAndOutput(options: ShikitorOptions) {
   return [input, output] as const
 }
 
+function resolveInputOptions(options: ShikitorOptions) {
+  return {
+    ...options,
+    plugins: options.plugins?.map(plugin => typeof plugin === 'function' ? plugin() : plugin)
+  }
+}
+
 export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Shikitor {
-  let options = { ...inputOptions }
+  let options = resolveInputOptions(inputOptions)
   const shikitorPluginsRef = { get current() { return options.plugins } }
   function callAllShikitorPlugins<
     K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
@@ -197,7 +204,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       return options
     },
     set options(newOptions: ShikitorOptions) {
-      options = newOptions
+      options = resolveInputOptions(newOptions)
       options.value && setValue(options.value)
       renderOptions()
       renderOutput()

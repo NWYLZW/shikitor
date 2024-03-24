@@ -18,7 +18,10 @@ export interface ShikitorOptions extends ShikitorEvents {
   readOnly?: boolean
   theme?: BundledTheme
   decorations?: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
-  plugins?: ShikitorPlugin[]
+  plugins?: (
+    | ShikitorPlugin
+    | (() => ShikitorPlugin)
+  )[]
 }
 
 export interface Shikitor {
