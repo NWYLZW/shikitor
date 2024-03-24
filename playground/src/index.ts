@@ -3,7 +3,7 @@ import 'typed-query-selector'
 
 import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
 
-import config, { hashContent, hashType } from './config'
+import config, { bundledPluginsInfo, hashContent, hashType } from './config'
 import { create } from './editor'
 import { getGist, type GistFile } from './utils/gist'
 
@@ -11,12 +11,16 @@ const container = document.querySelector('div#container')!
 
 const languageSelector = document.querySelector('select#language-selector')!
 const themeSelector = document.querySelector('select#theme-selector')!
+const pluginsSelector = document.querySelector('select#plugins-selector')!
 
 languageSelector.innerHTML = bundledLanguagesInfo
   .map(lang => `<option value="${lang.id}">${lang.name}</option>`)
   .join('')
 themeSelector.innerHTML = bundledThemesInfo
   .map(theme => `<option value="${theme.id}">${theme.displayName}</option>`)
+  .join('')
+pluginsSelector.innerHTML = bundledPluginsInfo
+  .map(plugin => `<option value="${plugin.id}">${plugin.name}</option>`)
   .join('')
 
 languageSelector.addEventListener('change', () => {
@@ -27,12 +31,22 @@ themeSelector.addEventListener('change', () => {
   config.theme = themeSelector.value as typeof config.theme
   shikitor.updateOptions({ theme: config.theme })
 })
+pluginsSelector.addEventListener('change', () => {
+  // console.log(pluginsSelector, pluginsSelector.value)
+  // const plugin = bundledPluginsInfo.find(plugin => plugin.id === pluginsSelector.value)
+  // if (!plugin) return
+  // plugin.module().then(({ default: plugin }) => {
+  //   if (!plugin) return
+  //   shikitor.updateOptions({ plugins: [plugin] })
+  // })
+})
 
 console.log('Creating Shikitor instance')
 let shikitor = create(container, config)
 async function init() {
   languageSelector.value = config.language ?? 'plaintext'
   themeSelector.value = config.theme ?? 'nord'
+  pluginsSelector.value = config.plugins?.map(plugin => plugin.name).join(',') ?? ''
   shikitor.focus(!config.cursor ? undefined : {
     start: config.cursor.offset, end: config.cursor.offset
   })

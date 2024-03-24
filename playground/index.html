@@ -17,10 +17,16 @@
 <body>
     <div class="card">
       <div class="header">
-        <select name="language" id="language-selector">
-        </select>
-        <select name="theme" id="theme-selector">
-        </select>
+        <div class="left">
+          <select name="language" id="language-selector">
+          </select>
+          <select name="theme" id="theme-selector">
+          </select>
+        </div>
+        <div class="right">
+          <select name="plugins" id="plugins-selector" multiple style='display: none;'>
+          </select>
+        </div>
       </div>
       <div id="container"></div>
     </div>

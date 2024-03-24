@@ -19,6 +19,7 @@ body {
   overflow: hidden;
   .header {
     display: flex;
+    justify-content: space-between;
     gap: 10px;
     position: relative;
     padding: 8px 20px;
@@ -34,7 +35,17 @@ body {
       background-color: var(--fg, white);
       opacity: 0.2;
     }
-    > select {
+    > .left {
+      flex-grow: 1;
+      display: flex;
+      gap: 10px;
+    }
+    > .right {
+      display: flex;
+      gap: 10px;
+    }
+    select {
+      height: 20px;
       background-color: var(--bg, black);
       color: var(--fg, white);
       opacity: .8;
