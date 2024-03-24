@@ -2,6 +2,7 @@ import type { ResolvedPosition } from '@shikijs/core'
 
 import type { ShikitorOptions } from './core/editor'
 import bracketMatcher from './plugins/bracket-matcher'
+import codeStyler from './plugins/code-styler'
 
 let defaultCode = `
 console.log("Hello, World!")
@@ -30,5 +31,8 @@ export default {
   },
   language: 'javascript',
   theme: 'github-dark',
-  plugins: [bracketMatcher]
+  plugins: [
+    bracketMatcher,
+    codeStyler
+  ]
 } as ShikitorOptions
