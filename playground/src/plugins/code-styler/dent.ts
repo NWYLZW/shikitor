@@ -34,7 +34,7 @@ export function indent(
   const endAtLineEnd = end === valueLength || text[end] === '\n' || text[end] === '\r'
   const selectBothEnds = start !== end && startAtLineStart && endAtLineEnd
 
-  if (selectBothEnds || isMultiLine(text, start, end)) {
+  if (selectBothEnds || start !== end) {
     const replacement = text.slice(lineStart, lineEnd).replaceAll(/^[ \t]*/gm, (leading, offset, str) => {
       if (str[offset] === '\n' || str[offset] === '\r' || offset === lineEnd) return leading
 
