@@ -16,6 +16,33 @@ interface ReplacementRangeText {
   selectionMode?: SelectionMode
 }
 
+function updateSelection(
+  text: string,
+  [start, end]: [start: number, end: number],
+  padding: number,
+  {
+    replacement,
+    range,
+    selectionMode
+  }: Omit<ReplacementRangeText, 'selection'>
+): [number, number] {
+  const firstLine = getLine(text, start)
+  const firstLineForReplacement = getLine(replacement, 0)
+  let firstLineInsertCharCount
+  if (selectionMode === 'select') {
+    firstLineInsertCharCount = firstLineForReplacement.length - firstLine.length
+  } else {
+    firstLineInsertCharCount = padding
+  }
+  const originalLength = range[1] - range[0]
+  const newLength = replacement.length
+  const insertCharCount = newLength - originalLength
+  return [
+    start + firstLineInsertCharCount,
+    end + insertCharCount
+  ]
+}
+
 export function indent(
   text: string,
   selection: [start: number, end?: number],
@@ -65,24 +92,13 @@ export function indent(
     }
   }
 
-  const firstLine = getLine(text, start)
-  const firstLineForReplacement = getLine(replacement, 0)
-  let firstLineInsertCharCount
-  if (selectionMode === 'select') {
-    firstLineInsertCharCount = firstLineForReplacement.length - firstLine.length
-  } else {
-    firstLineInsertCharCount = padding
-  }
-  const originalLength = range[1] - range[0]
-  const newLength = replacement.length
-  const insertCharCount = newLength - originalLength
-  const newSelection = [
-    start + firstLineInsertCharCount,
-    end + insertCharCount
-  ] as [number, number]
   return {
     replacement, range,
-    selection: newSelection,
+    selection: updateSelection(text, [start, end], padding, {
+      replacement,
+      range,
+      selectionMode
+    }),
     selectionMode
   }
 }
