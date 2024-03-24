@@ -1,5 +1,6 @@
+import * as process from 'process'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/shikitor/'
+  base: process.env.BASE ?? '/'
 })

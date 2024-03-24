@@ -32,6 +32,8 @@ jobs:
         run:  pnpm install --no-frozen-lockfile
 
       - name: Build site
+        env:
+          BASE: shikitor
         run: pnpm --filter shikitor-playground build
 
       - name: Deploy to GitHub Pages
