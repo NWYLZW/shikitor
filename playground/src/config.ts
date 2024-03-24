@@ -3,7 +3,7 @@ import type { ResolvedPosition } from '@shikijs/core'
 import type { ShikitorOptions } from './core/editor'
 import bracketMatcher from './plugins/bracket-matcher'
 import codeStyler from './plugins/code-styler'
-import { unzipStr, zipStr } from './utils'
+import { unzipStr, zipStr } from './utils/zipStr'
 
 const DEFAULT_CODE = `
 console.log("Hello, World!")
