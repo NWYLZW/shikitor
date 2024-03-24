@@ -14,11 +14,7 @@ describe('indent', () => {
     expect(m0).toBe('end')
     expect(r0).toBe('  ')
     expect(s0).toStrictEqual([0, 0])
-    const start = 'const a = 1'.length
-      // for '\n'
-      + 1
-      // for ' '
-      + 1
+    const start = 'const a = 1\n '.length
     const { replacement: r1, selection: s1, selectionMode: m1 } = indent(code, [start])
     expect(m1).toBe('end')
     expect(r1).toBe(' ')
