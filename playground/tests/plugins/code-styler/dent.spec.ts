@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import { indent, outdent } from '../../../src/plugins/code-styler/dent'
-import { trimIndent } from '../../../src/utils'
+import { trimIndent } from '../../../src/utils/trimIndent'
 
 describe('indent', () => {
   test('insert indent at the beginning of the line', () => {
