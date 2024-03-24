@@ -12,6 +12,7 @@ export interface DentOptions {
 interface ReplacementRangeText {
   replacement: string
   range: [start: number, end: number]
+  selection: [start: number, end: number]
   selectionMode?: SelectionMode
 }
 
@@ -60,8 +61,28 @@ export function indent(
     }
   }
 
+  let replacementLFCount = 0
+  if (selectionMode === 'select') {
+    for (let i = 0; i < replacement.length; i++) {
+      if (replacement[i] === '\n') {
+        replacementLFCount++
+      }
+    }
+  }
+  const lineInsertCharCount = selectionMode === 'end'
+    ? replacement.length
+    : (insertSpaces ? tabSize : 1)
+  const newSelection = [
+    start + lineInsertCharCount,
+    end + lineInsertCharCount * (
+      replacementLFCount === 0
+        ? 1
+        : replacementLFCount
+    )
+  ] as [number, number]
   return {
     replacement, range,
+    selection: newSelection,
     selectionMode
   }
 }
