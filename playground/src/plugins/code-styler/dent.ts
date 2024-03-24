@@ -11,7 +11,7 @@ export interface DentOptions {
 
 interface ReplacementRangeText {
   replacement: string
-  selection: [start: number, end: number]
+  range: [start: number, end: number]
   selectionMode?: SelectionMode
 }
 
@@ -47,7 +47,7 @@ export function indent(
     })
     return {
       replacement: replacement,
-      selection: [lineStart, lineEnd],
+      range: [lineStart, lineEnd],
       selectionMode: 'select'
     }
   }
@@ -60,7 +60,7 @@ export function indent(
 
   return {
     replacement: replacement,
-    selection: [start, end],
+    range: [start, end],
     selectionMode: 'end'
   }
 }
