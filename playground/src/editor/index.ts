@@ -12,6 +12,10 @@ import { lazy } from '../utils/lazy'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
 
+function cssvar(name: string) {
+  return `--shikitor-${name}`
+}
+
 function initInputAndOutput(options: ShikitorOptions) {
   const input = document.createElement('textarea')
   const output = document.createElement('div')
@@ -79,7 +83,9 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
         theme: theme
       })
       target.style.color = fg
-      target.style.setProperty('--caret-color', fg)
+      target.style.setProperty(cssvar('fg-color'), fg)
+      target.style.setProperty(cssvar('bg-color'), bg)
+      target.style.setProperty(cssvar('caret-color'), fg)
       target.style.backgroundColor = bg
       target.style.cssText += rootStyle
       themeName && target.classList.add(themeName)
