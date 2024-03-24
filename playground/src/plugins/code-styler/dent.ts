@@ -34,8 +34,11 @@ export function indent(
   const endAtLineEnd = end === valueLength || text[end] === '\n' || text[end] === '\r'
   const selectBothEnds = start !== end && startAtLineStart && endAtLineEnd
 
+  let replacement: string
+  let range: [number, number]
+  let selectionMode: SelectionMode
   if (selectBothEnds || start !== end) {
-    const replacement = text.slice(lineStart, lineEnd).replaceAll(/^[ \t]*/gm, (leading, offset, str) => {
+    replacement = text.slice(lineStart, lineEnd).replaceAll(/^[ \t]*/gm, (leading, offset, str) => {
       if (str[offset] === '\n' || str[offset] === '\r' || offset === lineEnd) return leading
 
       const tabCount = 1 + ~~(countLeadingSpaces(leading, 0, tabSize) / tabSize)
@@ -45,23 +48,21 @@ export function indent(
       }
       return '\t'.repeat(tabCount)
     })
-    return {
-      replacement: replacement,
-      range: [lineStart, lineEnd],
-      selectionMode: 'select'
+    range = [lineStart, lineEnd]
+    selectionMode = 'select'
+  } else {
+    replacement = '\t'
+    range = [start, end]
+    selectionMode = 'end'
+    if (insertSpaces) {
+      const padding = tabSize - ((start - lineStart) % tabSize)
+      replacement = ' '.repeat(padding)
     }
   }
 
-  let replacement = '\t'
-  if (insertSpaces) {
-    const padding = tabSize - ((start - lineStart) % tabSize)
-    replacement = ' '.repeat(padding)
-  }
-
   return {
-    replacement: replacement,
-    range: [start, end],
-    selectionMode: 'end'
+    replacement, range,
+    selectionMode
   }
 }
 
