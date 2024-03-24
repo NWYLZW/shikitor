@@ -9,7 +9,16 @@ export interface OnHoverElementContext {
   raw: string
 }
 
-export interface ShikitorPlugin {
+export type _KeyboardEvent = KeyboardEvent & {
+  target: HTMLTextAreaElement
+}
+interface Keyboards {
+  onKeyup?: (this: Shikitor, e: _KeyboardEvent) => void
+  onKeydown?: (this: Shikitor, e: _KeyboardEvent) => void
+  onKeypress?: (this: Shikitor, e: _KeyboardEvent) => void
+}
+
+export interface ShikitorPlugin extends Keyboards {
   name?: string
   install?: (this: Shikitor, editor: Shikitor) => void
   onDispose?: (this: Shikitor) => void

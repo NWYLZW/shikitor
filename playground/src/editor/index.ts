@@ -4,7 +4,7 @@ import type { ResolvedPosition } from '@shikijs/core'
 import { getHighlighter } from 'shiki'
 
 import type { Shikitor, ShikitorOptions } from '../core/editor'
-import type { ShikitorPlugin } from '../core/plugin'
+import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens, getRawTextHelper, listen, throttle } from '../utils'
 
@@ -186,9 +186,10 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     }
     updateCursor(-1)
   })
-  input.addEventListener('keydown', () => {
+  input.addEventListener('keydown', e => {
     // TODO throttle cursor update
     setTimeout(updateCursor, 10)
+    callAllShikitorPlugins('onKeydown', e as _KeyboardEvent)
   })
 
   renderOptions()
