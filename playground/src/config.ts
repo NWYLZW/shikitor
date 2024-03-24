@@ -88,6 +88,12 @@ export default {
           const zipCode = zipStr(code)
           const url = new URL(location.href)
           url.hash = `zip-code/${zipCode}`
+          const query = new URLSearchParams()
+          this.options.language
+            && query.set('language', this.options.language)
+          this.options.theme
+            && query.set('theme', this.options.theme)
+          url.search = query.toString()
           history.pushState(null, '', url.toString())
         }
       }
