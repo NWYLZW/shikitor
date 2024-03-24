@@ -4,7 +4,7 @@ import { indent } from '../../../src/plugins/code-styler/dent'
 import { trimIndent } from '../../../src/utils'
 
 describe('indent', () => {
-  test('should insert indent in the beginning of the line', () => {
+  test('insert indent in the beginning of the line', () => {
     const code = trimIndent(`
       const a = 1
        const b = 2
@@ -24,7 +24,7 @@ describe('indent', () => {
     expect(r1).toBe(' ')
     expect(s1).toStrictEqual([start, start])
   })
-  test('should insert indent in the middle of the line', () => {
+  test('insert indent in the middle of the line', () => {
     const code = trimIndent(`
       const a = 1
       const b = 2
