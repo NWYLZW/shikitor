@@ -215,7 +215,8 @@ export function unzipStr(str: string) {
   return secondLevel
 }
 
-interface GistFile {
+export interface GistFile {
+  filename: string
   size: number
   content: string
   language: string
