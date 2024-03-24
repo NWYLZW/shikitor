@@ -31,10 +31,12 @@ function updateSelection(
   const insertCharCount = newLength - originalLength
   const newEndOffset = end + insertCharCount
   if (start === end) {
-    if (start === 0 || text[start - 1] === '\n')
-      return [start, start]
-    if (newEndOffset < 0)
-      return [0, 0]
+    if (newEndOffset < 0) {
+      if (start === 0 || text[start - 1] === '\n')
+        return [start, start]
+      else
+        return [0, 0]
+    }
     return [newEndOffset, newEndOffset]
   }
 
