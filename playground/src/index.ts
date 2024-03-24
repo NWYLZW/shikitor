@@ -3,7 +3,7 @@ import 'typed-query-selector'
 
 import config, { hashContent, hashType } from './config'
 import { create } from './editor'
-import { getGist, type GistFile } from './utils'
+import { getGist, type GistFile } from './utils/gist'
 
 const container = document.querySelector('div#container')!
 
