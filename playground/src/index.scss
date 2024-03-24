@@ -38,14 +38,14 @@ body {
       background-color: var(--bg, black);
       color: var(--fg, white);
       opacity: .8;
-      border: none;
+      border: 1px solid transparent;
       font-size: .8em;
       cursor: pointer;
       transition: .2s;
       &:focus {
         outline: none;
         opacity: 1;
-        border-color: var(--fg, white);
+        border: 1px solid var(--fg, white);
       }
       &:hover {
         opacity: 1;
