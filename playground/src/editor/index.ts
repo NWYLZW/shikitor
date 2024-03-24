@@ -196,6 +196,10 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     setTimeout(updateCursor, 10)
     callAllShikitorPlugins('onKeydown', e as _KeyboardEvent)
   })
+  input.addEventListener('scroll', () => {
+    output.scrollTop = input.scrollTop
+    output.scrollLeft = input.scrollLeft
+  })
 
   renderOptions()
   renderOutput()
