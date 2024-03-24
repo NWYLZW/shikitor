@@ -13,6 +13,7 @@ export default ({
   onKeydown(e) {
     if (e.key !== 'Tab') return
     e.preventDefault()
+    if (tabSize <= 0) return
 
     const textarea = e.target
     const { selectionStart, selectionEnd, value } = textarea
