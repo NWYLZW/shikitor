@@ -34,6 +34,16 @@ body {
       background-color: var(--fg, white);
       opacity: 0.2;
     }
+    > select {
+      background-color: var(--bg, black);
+      color: var(--fg, white);
+      border: none;
+      font-size: .8em;
+      &:focus {
+        outline: none;
+        border-color: var(--fg, white);
+      }
+    }
   }
 }
 #container {

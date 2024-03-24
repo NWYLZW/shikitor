@@ -1,15 +1,38 @@
 import './index.scss'
 import 'typed-query-selector'
 
+import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
+
 import config, { hashContent, hashType } from './config'
 import { create } from './editor'
 import { getGist, type GistFile } from './utils/gist'
 
 const container = document.querySelector('div#container')!
 
+const languageSelector = document.querySelector('select#language-selector')!
+const themeSelector = document.querySelector('select#theme-selector')!
+
+languageSelector.innerHTML = bundledLanguagesInfo
+  .map(lang => `<option value="${lang.id}">${lang.name}</option>`)
+  .join('')
+themeSelector.innerHTML = bundledThemesInfo
+  .map(theme => `<option value="${theme.id}">${theme.displayName}</option>`)
+  .join('')
+
+languageSelector.addEventListener('change', () => {
+  config.language = languageSelector.value as typeof config.language
+  shikitor.updateLanguage(config.language)
+})
+themeSelector.addEventListener('change', () => {
+  config.theme = themeSelector.value as typeof config.theme
+  shikitor.updateOptions({ theme: config.theme })
+})
+
 console.log('Creating Shikitor instance')
 let shikitor = create(container, config)
 async function init() {
+  languageSelector.value = config.language ?? 'plaintext'
+  themeSelector.value = config.theme ?? 'nord'
   shikitor.focus(!config.cursor ? undefined : {
     start: config.cursor.offset, end: config.cursor.offset
   })
