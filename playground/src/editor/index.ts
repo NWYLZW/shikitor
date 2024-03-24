@@ -25,11 +25,11 @@ function initInputAndOutput(options: ShikitorOptions) {
 
 export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Shikitor {
   let options = { ...inputOptions }
-  const ShikitorPluginsRef = { get current() { return options.plugins } }
+  const shikitorPluginsRef = { get current() { return options.plugins } }
   function callAllShikitorPlugins<
     K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
-    return ShikitorPluginsRef.current?.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
+    return shikitorPluginsRef.current?.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
       shikitor,
       // @ts-ignore
       ...args
