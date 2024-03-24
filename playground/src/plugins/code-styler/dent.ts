@@ -106,16 +106,16 @@ function getLineEnd(value: string, index: number) {
 }
 
 function getLine(value: string, index: number) {
-  let line = ''
   let i = index
   while (i > 0 && value[i - 1] !== '\n') {
     i--
   }
+  const left = i
   while (i < value.length && value[i] !== '\n') {
-    line += value[i]
     i++
   }
-  return line
+  const right = i
+  return value.slice(left, right)
 }
 
 function isMultiLine(value: string, start: number, end: number) {
