@@ -147,6 +147,7 @@ export function outdent(
 
   const selectLinesContent = text.slice(startLineOffset, endLineOffset)
   const replacement = selectLinesContent.replaceAll(/^[ \t]*/gm, (leading) => {
+    // TODO https://t.me/c/1066867565/1736194
     const leadingSpaces = countLeadingSpaces(leading, 0, tabSize) - tabSize
     const tabCount = ~~(leadingSpaces / tabSize)
     const tabCountRemainder = leadingSpaces % tabSize
