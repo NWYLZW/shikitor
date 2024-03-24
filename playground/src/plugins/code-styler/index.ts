@@ -1,4 +1,5 @@
 import { definePlugin } from '../../core/plugin'
+import { indent } from './dent'
 
 interface CodeStylerOptions {
   tabSize?: number
@@ -17,12 +18,12 @@ export default ({
     const { selectionStart, selectionEnd, value } = textarea
     if (e.shiftKey) {
     } else {
-      const spaces = ' '.repeat(tabSize)
-      const newValue = value.slice(0, selectionStart) + spaces + value.slice(selectionEnd)
-      const newSelectionStart = selectionStart + spaces.length
-      const newSelectionEnd = newSelectionStart
-      textarea.value = newValue
-      textarea.setSelectionRange(newSelectionStart, newSelectionEnd)
+      const { replacement, selection, selectionMode } = indent(
+        value,
+        [selectionStart, selectionEnd],
+        { tabSize, insertSpaces }
+      )
+      textarea.setRangeText(replacement, ...selection, selectionMode)
       textarea.dispatchEvent(new Event('input'))
     }
   }
