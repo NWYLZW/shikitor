@@ -220,7 +220,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       renderOutput()
     },
     updateOptions(newOptions) {
-      shikitor.options = callUpdateDispatcher(newOptions, options) ?? {}
+      shikitor.options = Object.assign(options, callUpdateDispatcher(newOptions, options) ?? {})
     },
     get language() {
       return options.language
