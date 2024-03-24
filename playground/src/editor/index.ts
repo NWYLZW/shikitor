@@ -219,6 +219,9 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       renderOptions()
       renderOutput()
     },
+    updateOptions(newOptions) {
+      shikitor.options = callUpdateDispatcher(newOptions, options) ?? {}
+    },
     get language() {
       return options.language
     },
@@ -240,11 +243,6 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       )
       resetCursorLock = true
       input.focus()
-    },
-    updateOptions(newOptions) {
-      shikitor.options = typeof newOptions === 'function'
-        ? newOptions(options)
-        : Object.assign(options, newOptions)
     },
     dispose() {
       offDocumentSelectionChange()
