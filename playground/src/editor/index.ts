@@ -176,6 +176,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   input.addEventListener('input', () => changeValue(input.value))
   const prevSelection = { start: 0, end: 0 }
   function updateCursor() {
+    // TODO backspace, delete
     const selection = { start: input.selectionStart, end: input.selectionEnd }
     const offset = selection.start !== prevSelection.start
       ? selection.start
