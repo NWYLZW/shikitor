@@ -7,10 +7,10 @@ import type { Shikitor, ShikitorOptions } from '../core/editor'
 import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
 import { lazy } from '../utils'
-import { throttle } from '../utils/throttle'
-import { listen } from '../utils/listen'
-import { getRawTextHelper } from '../utils/getRawTextHelper'
 import { type DecoratedThemedToken, decorateTokens } from '../utils/decorateTokens'
+import { getRawTextHelper } from '../utils/getRawTextHelper'
+import { listen } from '../utils/listen'
+import { throttle } from '../utils/throttle'
 
 function initInputAndOutput(options: ShikitorOptions) {
   const input = document.createElement('textarea')
