@@ -36,9 +36,10 @@ switch (type) {
   case 'base64':
     code = atob(content)
     break
-  case 'gist':
-    break
 }
+
+export const hashType = type
+export const hashContent = content
 
 export default {
   get value() {
