@@ -4,9 +4,9 @@ import type { ShikitorOptions } from './core/editor'
 import type { ShikitorPlugin } from './core/plugin'
 import bracketMatcher from './plugins/bracket-matcher'
 import codeStyler from './plugins/code-styler'
-import { unzipStr, zipStr } from './utils/zipStr'
+import { unzipStr } from './utils/zipStr'
 
-const DEFAULT_CODE = `
+export const DEFAULT_CODE = `
 console.log("Hello, World!")
 
 function add(a, b) {
@@ -89,26 +89,6 @@ export default {
   ...queryOptions,
   plugins: [
     bracketMatcher,
-    codeStyler,
-    {
-      name: 'shikitor-saver',
-      onKeydown(e) {
-        if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault()
-          if (code === DEFAULT_CODE) return
-
-          const zipCode = zipStr(code)
-          const url = new URL(location.href)
-          url.hash = `zip-code/${zipCode}`
-          const query = new URLSearchParams()
-          this.options.language
-            && query.set('language', this.options.language)
-          this.options.theme
-            && query.set('theme', this.options.theme)
-          url.search = query.toString()
-          history.pushState(null, '', url.toString())
-        }
-      }
-    }
+    codeStyler
   ]
 } as ShikitorOptions

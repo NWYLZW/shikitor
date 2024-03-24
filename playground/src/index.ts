@@ -3,9 +3,33 @@ import 'typed-query-selector'
 
 import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
 
-import config, { bundledPluginsInfo, hashContent, hashType } from './config'
+import config, { bundledPluginsInfo, DEFAULT_CODE, hashContent, hashType } from './config'
 import { create } from './editor'
 import { getGist, type GistFile } from './utils/gist'
+import { zipStr } from './utils/zipStr'
+
+config.plugins?.push({
+  name: 'shikitor-saver',
+  onKeydown(e) {
+    if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
+      const code = this.value
+      if (code === DEFAULT_CODE) return
+
+      const zipCode = zipStr(code)
+      const url = new URL(location.href)
+      url.hash = `zip-code/${zipCode}`
+      const query = new URLSearchParams()
+      this.options.language
+        && query.set('language', this.options.language)
+      this.options.theme
+        && query.set('theme', this.options.theme)
+      query.set('fullscreen', String(fullscreenCount))
+      url.search = query.toString()
+      history.pushState(null, '', url.toString())
+    }
+  }
+})
 
 const container = document.querySelector('div#container')!
 
@@ -40,6 +64,30 @@ pluginsSelector.addEventListener('change', () => {
   //   shikitor.updateOptions({ plugins: [plugin] })
   // })
 })
+
+const fullscreenQueryCount = parseInt(new URLSearchParams(location.search).get('fullscreen') ?? '0')
+let fullscreenCount = isNaN(fullscreenQueryCount) ? 0 : fullscreenQueryCount % 3
+const card = document.querySelector('.card')!
+document
+  .querySelector('img#fullscreen')!
+  .addEventListener('click', function () {
+    fullscreenCount = (fullscreenCount + 1) % 3
+    console.log('fullscreenCount', fullscreenCount)
+    switch (fullscreenCount) {
+      case 1:
+        card.classList.add('fullscreen')
+        break
+      case 2:
+        card.requestFullscreen()
+        this.src = `${import.meta.env.BASE_URL}public/fullscreen_exit.svg`
+        break
+      case 0:
+        card.classList.remove('fullscreen')
+        document.exitFullscreen()
+        this.src = `${import.meta.env.BASE_URL}public/fullscreen.svg`
+        break
+    }
+  })
 
 console.log('Creating Shikitor instance')
 let shikitor = create(container, config)

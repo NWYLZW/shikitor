@@ -17,6 +17,16 @@ body {
   border: var(--border-size) solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  transition: .1s;
+  &.fullscreen {
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    border-radius: 0;
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+    border: none;
+  }
   .header {
     display: flex;
     justify-content: space-between;
@@ -70,5 +80,13 @@ body {
   padding: 10px 0;
   .shikitor-input, .shikitor-output {
     padding-top: 10px;
+  }
+}
+img#fullscreen {
+  cursor: pointer;
+  opacity: .6;
+  transition: .2s;
+  &:hover {
+    opacity: 1;
   }
 }
