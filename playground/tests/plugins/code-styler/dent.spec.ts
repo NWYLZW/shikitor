@@ -91,16 +91,15 @@ describe('outdent', () => {
     expect(outdent('   const a = 1', [3])).toStrictEqual({
       replacement: ' const a = 1',
       range: [0, '   const a = 1'.length],
+      selection: [1, 1],
+      selectionMode: 'end'
+    })
+    expect(outdent('   const a = 1', [0])).toStrictEqual({
+      replacement: ' const a = 1',
+      range: [0, '   const a = 1'.length],
       selection: [0, 0],
       selectionMode: 'end'
     })
-    // const result0 = outdent('   const a = 1', [0])
-    // expect(result0).toStrictEqual({
-    //   replacement: ' const a = 1',
-    //   range: [0, '   const a = 1'.length],
-    //   selection: [0, 0],
-    //   selectionMode: 'end'
-    // })
   })
   test('outdent at the middle of the line', () => {
     expect(() => outdent('const a = 1', [1])).toThrow('No outdent')
@@ -117,12 +116,12 @@ describe('outdent', () => {
       selection: [1, 1],
       selectionMode: 'end'
     })
-    // expect(outdent('   const a = 1', [4])).toStrictEqual({
-    //   replacement: ' const a = 1',
-    //   range: [0, '   const a = 1'.length],
-    //   selection: [2, 2],
-    //   selectionMode: 'end'
-    // })
+    expect(outdent('   const a = 1', [4])).toStrictEqual({
+      replacement: ' const a = 1',
+      range: [0, '   const a = 1'.length],
+      selection: [2, 2],
+      selectionMode: 'end'
+    })
   })
   test('outdent at the beginning of the line when select text', () => {
     expect(outdent(' const a = 1', [0, 1])).toStrictEqual({
@@ -179,11 +178,11 @@ describe('outdent', () => {
       selection: [0, 1],
       selectionMode: 'select'
     })
-    // expect(outdent('   const a = 1', [0, 1])).toStrictEqual({
-    //   replacement: ' const a = 1',
-    //   range: [0, '   const a = 1'.length],
-    //   selection: [0, 0],
-    //   selectionMode: 'select'
-    // })
+    expect(outdent('   const a = 1', [0, 1])).toStrictEqual({
+      replacement: ' const a = 1',
+      range: [0, '   const a = 1'.length],
+      selection: [0, 0],
+      selectionMode: 'select'
+    })
   })
 })

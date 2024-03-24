@@ -147,10 +147,15 @@ export function outdent(
 
   const selectLinesContent = text.slice(startLineOffset, endLineOffset)
   const replacement = selectLinesContent.replaceAll(/^[ \t]*/gm, (leading) => {
-    const tabCount = ~~((countLeadingSpaces(leading, 0, tabSize) - tabSize) / tabSize)
-    if (tabCount <= 0) return ''
+    const leadingSpaces = countLeadingSpaces(leading, 0, tabSize) - tabSize
+    const tabCount = ~~(leadingSpaces / tabSize)
+    const tabCountRemainder = leadingSpaces % tabSize
+    const tabCountRemainderSpaces = tabCountRemainder < 1
+      ? ''
+      : ' '.repeat(tabCountRemainder)
+    if (tabCount <= 0) return tabCountRemainderSpaces
 
-    return item.repeat(tabCount)
+    return item.repeat(tabCount) + tabCountRemainderSpaces
   })
   if (replacement === selectLinesContent) throw new Error('No outdent')
 
