@@ -4,11 +4,13 @@ const bracketMap: Record<string, string | undefined> = {
   '(': ')',
   '[': ']',
   '{': '}',
+  '<': '>',
   ')': '(',
   ']': '[',
-  '}': '{'
+  '}': '{',
+  '>': '<'
 }
-const lBrackets = ['(', '[', '{']
+const lBrackets = ['(', '[', '{', '<']
 
 const name = 'shikitor-bracket-matcher'
 export default definePlugin({
