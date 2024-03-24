@@ -45,5 +45,18 @@ describe('indent', () => {
     expect(m1).toBe('select')
     expect(r1).toBe('  const a = 1')
     expect(s1).toStrictEqual([0, 12])
+    const { replacement: r2, selection: s2, selectionMode: m2 } = indent('const a = 1', [0, 1])
+    expect(m2).toBe('select')
+    expect(r2).toBe('  const a = 1')
+    expect(s2).toStrictEqual([0, 11])
+    // TODO
+    const { replacement: r3, selection: s3, selectionMode: m3 } = indent('const a = 1\n', [0, 'const a = 1\n'.length])
+    const { replacement: r4, selection: s4, selectionMode: m4 } = indent('const a = 1\nconst b = 2', [
+      'c'.length,
+      'const a = 1\nc'.length
+    ])
+    expect(m4).toBe('select')
+    expect(r4).toBe('  const a = 1\n  const b = 2')
+    expect(s4).toStrictEqual([0, 23])
   })
 })
