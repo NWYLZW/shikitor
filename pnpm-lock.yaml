@@ -50,6 +50,9 @@ importers:
       '@shikijs/core':
         specifier: ^1.2.0
         version: 1.2.0
+      lz-string:
+        specifier: ^1.5.0
+        version: 1.5.0
       sass:
         specifier: ^1.72.0
         version: 1.72.0
@@ -2048,6 +2051,11 @@ packages:
     dependencies:
       yallist: 4.0.0
     dev: false
+
+  /lz-string@1.5.0:
+    resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
+    hasBin: true
+    dev: true
 
   /magic-string@0.30.8:
     resolution: {integrity: sha512-ISQTe55T2ao7XtlAStud6qwYPZjE4GK1S/BeVPus4jrq6JuOnQ00YKQC581RWhR122W7msZV263KzVeLoqidyQ==}
