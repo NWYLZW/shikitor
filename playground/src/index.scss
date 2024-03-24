@@ -1,0 +1,46 @@
+body {
+  background-color: var(--fg, white);
+}
+.card {
+  --border-size: 1px;
+
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 80vw;
+  height: 80vh;
+  left: calc(10vw - var(--border-size) * 2);
+  top: calc(10vh - var(--border-size) * 2);
+
+  background-color: var(--bg, black);
+  border-radius: 4px;
+  border: var(--border-size) solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  .header {
+    display: flex;
+    gap: 10px;
+    position: relative;
+    padding: 8px 20px;
+    border-bottom: var(--border-size) transparent;
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: calc(100% + var(--border-size) * 2);
+      height: var(--border-size);
+      background-color: var(--fg, white);
+      opacity: 0.2;
+    }
+  }
+}
+#container {
+  flex-grow: 1;
+  height: 0;
+  padding: 10px 0;
+  .shikitor-input, .shikitor-output {
+    padding-top: 10px;
+  }
+}

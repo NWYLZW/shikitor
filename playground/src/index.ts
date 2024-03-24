@@ -42,6 +42,17 @@ async function init() {
       }
     }
   }
+  const observer = new MutationObserver((mutationsList, observer) => {
+    for (const mutation of mutationsList) {
+      if (mutation.attributeName === 'style') {
+        const bg = getComputedStyle(container).backgroundColor
+        const fg = getComputedStyle(container).color
+        document.documentElement.style.setProperty('--bg', bg)
+        document.documentElement.style.setProperty('--fg', fg)
+      }
+    }
+  })
+  observer.observe(container, { attributes: true, attributeFilter: ['style'] })
 }
 init()
 

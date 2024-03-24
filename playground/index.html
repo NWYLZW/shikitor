@@ -7,17 +7,23 @@
       html, body {
         margin: 0;
         padding: 0;
+        width: 100vw;
+        height: 100vh;
         font-family: sans-serif;
         font-size: 16px;
-      }
-      #container {
-        width: 100%;
-        height: 100vh;
       }
     </style>
 </head>
 <body>
-    <div id="container"></div>
+    <div class="card">
+      <div class="header">
+        <select name="language" id="language">
+        </select>
+        <select name="theme" id="theme">
+        </select>
+      </div>
+      <div id="container"></div>
+    </div>
     <script src="/src/index.ts" type="module"></script>
 </body>
 </html>
