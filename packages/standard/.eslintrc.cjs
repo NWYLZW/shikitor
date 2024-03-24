@@ -105,6 +105,7 @@ module.exports = {
     'simple-import-sort/exports': 'error',
     'semi': ['error', 'never'],
     'quotes': [2, 'single'],
+    'camelcase': 'error',
     'keyword-spacing': ['error', { before: true, after: true }],
     'space-before-blocks': ['error', 'always'],
     'comma-dangle': ['error', 'never'],
