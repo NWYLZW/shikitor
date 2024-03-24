@@ -8,6 +8,7 @@ import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens } from '../utils/decorateTokens'
 import { getRawTextHelper } from '../utils/getRawTextHelper'
+import { isMultipleKey } from '../utils/isMultipleKey'
 import { lazy } from '../utils/lazy'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
@@ -174,7 +175,8 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
   let prevCursor: ResolvedPosition = options.cursor ?? { offset: 0, line: 0, character: 0 }
   input.addEventListener('input', () => changeValue(input.value))
   // TODO selection change case
-  function updateCursor(offset: number = input.selectionStart) {
+  function updateCursor() {
+    const offset = input.selectionStart
     if (offset === -1) {
       options.onCursorChange?.()
       callAllShikitorPlugins('onCursorChange')
@@ -188,14 +190,13 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     }
     prevCursor = cursor
   }
-  input.addEventListener('click', () => updateCursor())
   let resetCursorLock = false
   const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
     if (resetCursorLock) {
       resetCursorLock = false
       return
     }
-    updateCursor(-1)
+    updateCursor()
   })
   input.addEventListener('keydown', e => {
     // TODO throttle cursor update
