@@ -183,6 +183,6 @@ export function lazy<Args extends unknown[], RT>(func: (...args: Args) => RT): (
       memoized.set(func, [args, result])
       return result
     }
-    return memoized.get(func) as RT
+    return memoized.get(func)![1] as RT
   }
 }
