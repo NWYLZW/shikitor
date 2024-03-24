@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { indent } from '../../../src/plugins/code-styler/dent'
+import { indent, outdent } from '../../../src/plugins/code-styler/dent'
 import { trimIndent } from '../../../src/utils'
 
 describe('indent', () => {
@@ -66,5 +66,124 @@ describe('indent', () => {
       '  c'.length,
       '  const a = 1\n  c'.length
     ])
+  })
+})
+describe('outdent', () => {
+  test('outdent at the beginning of the line', () => {
+    const { replacement: r0, range: range0, selection: s0, selectionMode: m0 } = outdent(' const a = 1', [0])
+    expect(m0).toBe('end')
+    expect(r0).toBe('const a = 1')
+    expect(range0).toStrictEqual([0, ' const a = 1'.length])
+    expect(s0).toStrictEqual([0, 0])
+
+    const { replacement: r1, range: range1, selection: s1, selectionMode: m1 } = outdent('  const a = 1', [0])
+    expect(m1).toBe('end')
+    expect(r1).toBe('const a = 1')
+    expect(range1).toStrictEqual([0, '  const a = 1'.length])
+    expect(s1).toStrictEqual([0, 0])
+
+    const { replacement: r2, range: range2, selection: s2, selectionMode: m2 } = outdent('  const a = 1', [1])
+    expect(m2).toBe('end')
+    expect(r2).toBe('const a = 1')
+    expect(range2).toStrictEqual([0, '  const a = 1'.length])
+    expect(s2).toStrictEqual([0, 0])
+
+    const { replacement: r3, range: range3, selection: s3, selectionMode: m3 } = outdent('  const a = 1', [2])
+    expect(m3).toBe('end')
+    expect(r3).toBe('const a = 1')
+    expect(range3).toStrictEqual([0, '  const a = 1'.length])
+    expect(s3).toStrictEqual([0, 0])
+
+    // const result0 = outdent('   const a = 1', [0])
+    // expect(result0).toStrictEqual({
+    //   replacement: ' const a = 1',
+    //   range: [0, '   const a = 1'.length],
+    //   selection: [0, 0],
+    //   selectionMode: 'end'
+    // })
+  })
+  test('outdent at the middle of the line', () => {
+    expect(() => outdent('const a = 1', [1])).toThrow('No outdent')
+
+    expect(outdent(' const a = 1', [2])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, ' const a = 1'.length],
+      selection: [1, 1],
+      selectionMode: 'end'
+    })
+    expect(outdent('  const a = 1', [3])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, '  const a = 1'.length],
+      selection: [1, 1],
+      selectionMode: 'end'
+    })
+    // expect(outdent('   const a = 1', [4])).toStrictEqual({
+    //   replacement: ' const a = 1',
+    //   range: [0, '   const a = 1'.length],
+    //   selection: [2, 2],
+    //   selectionMode: 'end'
+    // })
+  })
+  test('outdent at the beginning of the line when select text', () => {
+    expect(outdent(' const a = 1', [0, 1])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, ' const a = 1'.length],
+      selection: [0, 0],
+      selectionMode: 'select'
+    })
+    expect(outdent(' const a = 1', [0, 2])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, ' const a = 1'.length],
+      selection: [0, 1],
+      selectionMode: 'select'
+    })
+    expect(outdent(' const a = 1', [1, 2])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, ' const a = 1'.length],
+      selection: [0, 1],
+      selectionMode: 'select'
+    })
+    expect(outdent('  const a = 1', [0, 1])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, '  const a = 1'.length],
+      selection: [0, 0],
+      selectionMode: 'select'
+    })
+    expect(outdent('  const a = 1', [0, 2])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, '  const a = 1'.length],
+      selection: [0, 0],
+      selectionMode: 'select'
+    })
+    expect(outdent('  const a = 1', [0, 3])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, '  const a = 1'.length],
+      selection: [0, 1],
+      selectionMode: 'select'
+    })
+    expect(outdent('  const a = 1', [1, 2])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, '  const a = 1'.length],
+      selection: [0, 0],
+      selectionMode: 'select'
+    })
+    expect(outdent('  const a = 1', [1, 3])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, '  const a = 1'.length],
+      selection: [0, 1],
+      selectionMode: 'select'
+    })
+    expect(outdent('  const a = 1', [2, 3])).toStrictEqual({
+      replacement: 'const a = 1',
+      range: [0, '  const a = 1'.length],
+      selection: [0, 1],
+      selectionMode: 'select'
+    })
+    // expect(outdent('   const a = 1', [0, 1])).toStrictEqual({
+    //   replacement: ' const a = 1',
+    //   range: [0, '   const a = 1'.length],
+    //   selection: [0, 0],
+    //   selectionMode: 'select'
+    // })
   })
 })

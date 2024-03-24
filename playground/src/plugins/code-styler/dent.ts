@@ -26,20 +26,33 @@ function updateSelection(
     selectionMode
   }: Omit<ReplacementRangeText, 'selection'>
 ): [number, number] {
+  const originalLength = range[1] - range[0]
+  const newLength = replacement.length
+  const insertCharCount = newLength - originalLength
+  const newEndOffset = end + insertCharCount
+  if (start === end) {
+    if (start === 0 || text[start - 1] === '\n')
+      return [start, start]
+    if (newEndOffset < 0)
+      return [0, 0]
+    return [newEndOffset, newEndOffset]
+  }
+
   const firstLine = getLine(text, start)
   const firstLineForReplacement = getLine(replacement, 0)
   let firstLineInsertCharCount
   if (selectionMode === 'select') {
     firstLineInsertCharCount = firstLineForReplacement.length - firstLine.length
   } else {
-    firstLineInsertCharCount = padding
+    if (insertCharCount < 0) {
+      firstLineInsertCharCount = firstLineForReplacement.length - firstLine.length
+    } else {
+      firstLineInsertCharCount = padding
+    }
   }
-  const originalLength = range[1] - range[0]
-  const newLength = replacement.length
-  const insertCharCount = newLength - originalLength
   return [
-    start + firstLineInsertCharCount,
-    end + insertCharCount
+    Math.max(start + firstLineInsertCharCount, 0),
+    Math.max(newEndOffset, 0)
   ]
 }
 
@@ -101,6 +114,59 @@ export function indent(
       replacement,
       range,
       selectionMode
+    }),
+    selectionMode
+  }
+}
+
+export function outdent(
+  text: string,
+  selection: [start: number, end?: number],
+  options: DentOptions = {}
+): ReplacementRangeText {
+  const [start, end = start] = selection
+  const {
+    tabSize = 2,
+    insertSpaces = true
+  } = options
+  const valueLength = text.length
+  const item = insertSpaces
+    ? ' '.repeat(tabSize)
+    : '\t'
+  const insertStrItemLength = item.length
+
+  const [
+    startLineOffset, endLineOffset
+  ] = [
+    getLineStart(text, start), getLineEnd(text, end)
+  ]
+
+  const startAtLineStart = start === 0 || text[start - 1] === '\n'
+  const endAtLineEnd = end === valueLength || text[end] === '\n' || text[end] === '\r'
+  const selectBothEnds = start !== end && startAtLineStart && endAtLineEnd
+
+  const selectLinesContent = text.slice(startLineOffset, endLineOffset)
+  const replacement = selectLinesContent.replaceAll(/^[ \t]*/gm, (leading) => {
+    const tabCount = ~~((countLeadingSpaces(leading, 0, tabSize) - tabSize) / tabSize)
+    if (tabCount <= 0) return ''
+
+    return item.repeat(tabCount)
+  })
+  if (replacement === selectLinesContent) throw new Error('No outdent')
+
+  const range: [number, number] = [startLineOffset, endLineOffset]
+  let selectionMode: SelectionMode
+  if (selectBothEnds || start !== end) {
+    selectionMode = 'select'
+  } else {
+    selectionMode = 'end'
+  }
+
+  return {
+    replacement, range,
+    selection: updateSelection(text, [start, end], insertStrItemLength, {
+      replacement,
+      range
     }),
     selectionMode
   }
