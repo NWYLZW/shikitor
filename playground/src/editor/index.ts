@@ -196,7 +196,9 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       resetCursorLock = false
       return
     }
-    updateCursor()
+    if (document.getSelection()?.anchorNode === target) {
+      updateCursor()
+    }
   })
   input.addEventListener('keydown', e => {
     // TODO throttle cursor update
