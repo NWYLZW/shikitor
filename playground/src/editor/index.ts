@@ -174,14 +174,12 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
 
   let prevCursor: ResolvedPosition = options.cursor ?? { offset: 0, line: 0, character: 0 }
   input.addEventListener('input', () => changeValue(input.value))
-  // TODO selection change case
+  const prevSelection = { start: 0, end: 0 }
   function updateCursor() {
-    const offset = input.selectionStart
-    if (offset === -1) {
-      options.onCursorChange?.()
-      callAllShikitorPlugins('onCursorChange')
-      return
-    }
+    const selection = { start: input.selectionStart, end: input.selectionEnd }
+    const offset = selection.start !== prevSelection.start
+      ? selection.start
+      : selection.end
     const rawTextHelper = getRawTextHelper(getValue())
     const cursor = rawTextHelper.getResolvedPositions(offset)
     if (cursor.offset !== prevCursor.offset) {
@@ -189,6 +187,8 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       callAllShikitorPlugins('onCursorChange', cursor)
     }
     prevCursor = cursor
+    prevSelection.start = selection.start
+    prevSelection.end = selection.end
   }
   let resetCursorLock = false
   const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
@@ -201,9 +201,13 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
     }
   })
   input.addEventListener('keydown', e => {
-    // TODO throttle cursor update
-    setTimeout(updateCursor, 10)
     callAllShikitorPlugins('onKeydown', e as _KeyboardEvent)
+    if (e.key === 'Escape' && !isMultipleKey(e)) {
+      if (input.selectionStart !== input.selectionEnd) {
+        e.preventDefault()
+        input.setSelectionRange(prevCursor.offset, prevCursor.offset)
+      }
+    }
   })
   input.addEventListener('scroll', () => {
     output.scrollTop = input.scrollTop
