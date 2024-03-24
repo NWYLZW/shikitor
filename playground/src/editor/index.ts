@@ -196,7 +196,7 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       resetCursorLock = false
       return
     }
-    if (document.getSelection()?.anchorNode === target) {
+    if (document.getSelection()?.focusNode === target) {
       updateCursor()
     }
   })
