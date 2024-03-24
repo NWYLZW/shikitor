@@ -214,3 +214,36 @@ export function unzipStr(str: string) {
   }
   return secondLevel
 }
+
+interface GistFile {
+  size: number
+  content: string
+  language: string
+}
+interface Gist {
+  url: string
+  html_url: string
+  files: Record<string, GistFile>
+  history: {
+    version: string
+    url: string
+  }[]
+  owner: {
+    login: string
+    url: string
+    avatar_url: string
+  }
+}
+export async function getGist(
+  hash: string, fileName?: string,
+  historyHash?: string
+) {
+  const json: Gist = await fetch(`https://api.github.com/gists/${hash}`).then(res => res.json())
+  const {
+    html_url: htmlUrl, files
+  } = json
+  return {
+    htmlUrl,
+    file: files[fileName ?? Object.keys(files)[0]] as GistFile | undefined
+  }
+}
