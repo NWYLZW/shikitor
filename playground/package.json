@@ -7,6 +7,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "typed-query-selector": "^2.11.2",
     "vite": "^5.2.3",
     "shiki": "^1.2.0",
     "@shikijs/core": "^1.2.0",

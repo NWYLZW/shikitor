@@ -1,9 +1,10 @@
 import './index.scss'
+import 'typed-query-selector'
 
 import config from './config'
 import { create } from './editor'
 
-const container = document.querySelector<HTMLDivElement>('#container')!
+const container = document.querySelector('div#container')!
 
 console.log('Creating Shikitor instance')
 let shikitor = create(container, config)
