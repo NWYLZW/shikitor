@@ -44,12 +44,14 @@ export function indent(
   let range: [number, number]
   let selectionMode: SelectionMode
   if (selectBothEnds || start !== end) {
-    replacement = text.slice(lineStart, lineEnd).replaceAll(/^[ \t]*/gm, (leading, offset, str) => {
-      if (str[offset] === '\n' || str[offset] === '\r' || offset === lineEnd) return leading
+    replacement = text
+      .slice(lineStart, lineEnd)
+      .replaceAll(/^[ \t]*/gm, (leading, offset, str) => {
+        if (str[offset] === '\n' || str[offset] === '\r' || offset === lineEnd) return leading
 
-      const tabCount = 1 + ~~(countLeadingSpaces(leading, 0, tabSize) / tabSize)
-      return item.repeat(tabCount)
-    })
+        const tabCount = 1 + ~~(countLeadingSpaces(leading, 0, tabSize) / tabSize)
+        return item.repeat(tabCount)
+      })
     range = [lineStart, lineEnd]
     selectionMode = 'select'
   } else {
