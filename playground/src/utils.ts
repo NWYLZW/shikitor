@@ -188,7 +188,7 @@ export function lazy<Args extends unknown[], RT>(func: (...args: Args) => RT): (
 }
 
 export function trimIndent(text: string) {
-  const _lines = text.split('\n')
+  const _lines = text.trimEnd().split('\n')
   const startIndex = _lines.findIndex(line => line !== '')
   const lines = _lines.slice(startIndex)
   const firstLine = lines[0]
