@@ -219,6 +219,16 @@ export function create(target: HTMLDivElement, inputOptions: ShikitorOptions): S
       renderOptions()
       renderOutput()
     },
+    get language() {
+      return options.language
+    },
+    set language(language) {
+      options.language = language
+      renderOutput()
+    },
+    updateLanguage(language) {
+      this.language = language
+    },
     focus({ start, end } = {}) {
       const { getResolvedPositions } = getRawTextHelper(getValue())
       const resolvedStartPos = getResolvedPositions(start ?? 0)

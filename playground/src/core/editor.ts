@@ -26,8 +26,10 @@ export interface ShikitorOptions extends ShikitorEvents {
 
 export interface Shikitor {
   value: string
+  language?: BundledLanguage
   options: Readonly<ShikitorOptions>
   focus: (range?: Partial<TextRange>) => void
   updateOptions: (options: ShikitorOptions | ((options: ShikitorOptions) => ShikitorOptions)) => void
+  updateLanguage: (language: BundledLanguage) => void
   dispose: () => void
 }
