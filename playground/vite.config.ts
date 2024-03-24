@@ -1,5 +1,4 @@
-import * as process from 'process'
-import swc from 'rollup-plugin-swc3'
+import swc from '@vitejs/plugin-react-swc'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
