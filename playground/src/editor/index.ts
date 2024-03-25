@@ -39,9 +39,9 @@ async function resolveInputOptions(options: ShikitorOptions) {
   return {
     ...options,
     plugins: await Promise.all(
-      options.plugins
-        ?.map(plugin => typeof plugin === 'function' ? plugin() : plugin)
-        ?? []
+      (
+        await Promise.all(options.plugins ?? [])
+      ).map(plugin => typeof plugin === 'function' ? plugin() : plugin)
     )
   }
 }

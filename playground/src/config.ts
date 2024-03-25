@@ -67,9 +67,16 @@ export const bundledPluginsInfo = Object
     const name = path.match(/\.\/plugins\/(.+?)(\/index)?\.ts$/)?.[1]
     return { id: name, name, lazyModule }
   })
-const DEFAULT_INSTALLED_PLUGINS = bundledPluginsInfo
+const DEFAULT_INSTALLED_PLUGINS: (
+  () => Promise<ShikitorPlugin>
+)[] = bundledPluginsInfo
   .filter(({ id }) => id && ['bracket-matcher', 'code-styler'].includes(id))
-  .map(({ lazyModule }) => () => lazyModule().then(({ default: plugin }) => plugin))
+  .map(({ lazyModule }) => () => lazyModule().then(({ default: plugin }) => {
+    if (typeof plugin === 'function') {
+      return plugin()
+    }
+    return plugin
+  }))
 
 export default {
   get value() {

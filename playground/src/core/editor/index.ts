@@ -1,6 +1,7 @@
 import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
+import type { Awaitable } from '../../types'
 import type { TextRange } from '../base'
 import type { ShikitorPlugin } from '../plugin'
 import type { ShikitorRegister } from './register'
@@ -20,8 +21,14 @@ export interface ShikitorOptions extends ShikitorEvents {
   theme?: BundledTheme
   decorations?: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
   plugins?: (
-    | ShikitorPlugin
-    | (() => ShikitorPlugin | Promise<ShikitorPlugin>)
+    /**
+     * [{}, Promise.resolve({}), import()]
+     */
+    | Awaitable<ShikitorPlugin>
+    /**
+     * [() => ({}), () => Promise.resolve({}), () => import()]
+     */
+    | (() => Awaitable<ShikitorPlugin>)
   )[]
 }
 
