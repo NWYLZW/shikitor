@@ -11,6 +11,7 @@ import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens } from '../utils/decorateTokens'
 import { getRawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
+import { isWhatBrowser } from '../utils/isWhatBrowser'
 import { lazy } from '../utils/lazy'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
@@ -185,7 +186,6 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   input.addEventListener('input', () => changeValue(input.value))
   const prevSelection = { start: 0, end: 0 }
   function updateCursor() {
-    // TODO backspace, delete
     const selection = { start: input.selectionStart, end: input.selectionEnd }
     const offset = selection.start !== prevSelection.start
       ? selection.start
@@ -217,6 +217,19 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         e.preventDefault()
         input.setSelectionRange(prevCursor.offset, prevCursor.offset)
       }
+    }
+    // The Chrome browser never fires a selectionchange event when backspace or delete is pressed.
+    // So we need to handle this case separately.
+    // https://issues.chromium.org/41321247
+    // https://issues.chromium.org/41399759
+    if (isWhatBrowser('chrome') && (e.key === 'Backspace' || e.key === 'Delete') && !isMultipleKey(e)) {
+      const s = { start: input.selectionStart, end: input.selectionEnd }
+      setTimeout(() => {
+        if (s.start !== input.selectionStart || s.end !== input.selectionEnd) {
+          input.setSelectionRange(input.selectionStart, input.selectionEnd)
+          document.dispatchEvent(new Event('selectionchange'))
+        }
+      }, 10)
     }
   })
   input.addEventListener('scroll', () => {
