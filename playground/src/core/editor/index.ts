@@ -1,9 +1,9 @@
 import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
-import type { TextRange } from './base'
-import type { ShikitorRegister } from './editor.register'
-import type { ShikitorPlugin } from './plugin'
+import type { TextRange } from '../base'
+import type { ShikitorPlugin } from '../plugin'
+import type { ShikitorRegister } from './register'
 
 export interface ShikitorEvents {
   onChange?: (value: string) => void
