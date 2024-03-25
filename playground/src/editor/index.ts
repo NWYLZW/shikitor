@@ -232,6 +232,8 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       }, 10)
     }
   })
+  input.addEventListener('keyup', callAllShikitorPlugins.bind(null, 'onKeyup'))
+  input.addEventListener('keypress', callAllShikitorPlugins.bind(null, 'onKeypress'))
   input.addEventListener('scroll', () => {
     output.scrollTop = input.scrollTop
     output.scrollLeft = input.scrollLeft
