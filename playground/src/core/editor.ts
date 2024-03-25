@@ -10,6 +10,8 @@ export type Selection = TextRange
 export interface ResolvedCursor extends ResolvedPosition {}
 export interface ResolvedSelection extends ResolvedTextRange {}
 
+export type LanguageSelector = '*' | BundledLanguage
+
 export interface ShikitorEvents {
   onChange?: (value: string) => void
   onCursorChange?: (cursor?: ResolvedPosition) => void
