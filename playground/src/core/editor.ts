@@ -2,6 +2,7 @@ import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import type { TextRange } from './base'
+import type { ShikitorRegister } from './editor.register'
 import type { ShikitorPlugin } from './plugin'
 
 export interface ShikitorEvents {
@@ -34,7 +35,7 @@ export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: 
   }
 }
 
-export interface Shikitor {
+export interface Shikitor extends ShikitorRegister {
   value: string
   language?: BundledLanguage
   options: Readonly<ShikitorOptions>
