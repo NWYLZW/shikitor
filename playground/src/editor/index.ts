@@ -183,9 +183,9 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       raw: input.value
     })
   }, 50))
+  input.addEventListener('input', () => changeValue(input.value))
 
   let prevCursor = options.cursor
-  input.addEventListener('input', () => changeValue(input.value))
   let prevSelection: TextRange | undefined
   function updateCursor() {
     const selection = { start: input.selectionStart, end: input.selectionEnd }
