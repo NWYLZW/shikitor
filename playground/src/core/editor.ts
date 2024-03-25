@@ -20,7 +20,7 @@ export interface ShikitorOptions extends ShikitorEvents {
   decorations?: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
   plugins?: (
     | ShikitorPlugin
-    | (() => ShikitorPlugin)
+    | (() => ShikitorPlugin | Promise<ShikitorPlugin>)
   )[]
 }
 

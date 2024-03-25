@@ -4,6 +4,7 @@ import 'typed-query-selector'
 import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
 
 import config, { bundledPluginsInfo, DEFAULT_CODE, hashContent, hashType } from './config'
+import type { Shikitor } from './core/editor'
 import { create } from './editor'
 import { getGist, type GistFile } from './utils/gist'
 import { zipStr } from './utils/zipStr'
@@ -89,8 +90,7 @@ document
     }
   })
 
-console.log('Creating Shikitor instance')
-let shikitor = create(container, config)
+let shikitor: Shikitor
 async function init() {
   languageSelector.value = config.language ?? 'plaintext'
   themeSelector.value = config.theme ?? 'nord'
@@ -139,7 +139,12 @@ async function init() {
   })
   observer.observe(container, { attributes: true, attributeFilter: ['style'] })
 }
-init()
+async function main() {
+  console.log('Creating Shikitor instance')
+  shikitor = await create(container, config)
+  init()
+}
+main()
 
 if (import.meta.hot) {
   import.meta.hot.accept('./config.ts', newModule => {
@@ -149,13 +154,13 @@ if (import.meta.hot) {
     shikitor.options = newConfig
     init()
   })
-  import.meta.hot.accept('./editor/index.ts', newModule => {
+  import.meta.hot.accept('./editor/index.ts', async newModule => {
     if (!newModule) return
     const { create: newCreate } = newModule as unknown as { create: typeof create }
 
     console.log('Recreating Shikitor instance')
     shikitor.dispose()
-    shikitor = newCreate(container, config)
+    shikitor = await newCreate(container, config)
     init()
   })
 }
