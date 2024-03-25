@@ -4,6 +4,8 @@ import type { ResolvedPosition } from '@shikijs/core'
 import { getHighlighter } from 'shiki'
 
 import { callUpdateDispatcher, type Shikitor, type ShikitorOptions } from '../core/editor'
+import type { IDisposable, LanguageSelector } from '../core/editor.base'
+import type { Popup, PopupProvider } from '../core/editor.register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
 import { type DecoratedThemedToken, decorateTokens } from '../utils/decorateTokens'
@@ -113,6 +115,9 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       return `<pre tabindex="0"><code>${lines.join('<br>')}</code></pre>`
     }
     output.innerHTML = codeToHtml(input.value)
+  }
+  const popups: Popup[] = []
+  const renderPopups = async () => {
   }
   const getValue = () => input.value
   const setValue = (value: string) => input.value = value
@@ -270,6 +275,16 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       target.innerHTML = ''
       options.onDispose?.()
       callAllShikitorPlugins('onDispose')
+    },
+    registerPopupProvider(language: LanguageSelector, provider: PopupProvider): IDisposable {
+      if (provider.position === 'relative') {
+        if (provider.target === 'cursor') {
+          return { dispose() {} }
+        }
+      }
+      if (provider.position === 'absolute') {
+      }
+      throw new Error('Not implemented')
     }
   }
   callAllShikitorPlugins('install', shikitor)

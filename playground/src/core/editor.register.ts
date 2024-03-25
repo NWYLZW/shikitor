@@ -1,5 +1,6 @@
 import type { Awaitable } from '../types'
-import type { IDisposable, LanguageSelector } from './editor.base'
+import type { ResolvedTextRange } from './base'
+import type { IDisposable, LanguageSelector, ResolvedCursor } from './editor.base'
 
 export type PopupPlacement =
   | 'top' | 'bottom'
@@ -9,14 +10,14 @@ export type PopupPlacement =
   // | 'left-top' | 'left-bottom'
   // | 'right-top' | 'right-bottom'
 
-export type PopupCard = {
+export type Popup = {
   id: string
   render(element: HTMLElement): void
 }
 
 type RelativeCursorPopupProvider = {
   target: 'cursor'
-  offset: 'line-start'
+  offset?: 'line-start'
 }
 
 type RelativeSelectionPopupProvider = {
@@ -26,7 +27,7 @@ type RelativeSelectionPopupProvider = {
 export type RelativePopupProvider = {
   position: 'relative'
   placement: PopupPlacement
-  providePopupCards(cursors: {}[], selections: {}[]): Awaitable<PopupCard[]>
+  providePopups(cursors: ResolvedCursor[], selections: ResolvedTextRange[]): Awaitable<Popup[]>
 } & (
   | RelativeCursorPopupProvider
   | RelativeSelectionPopupProvider
@@ -34,7 +35,7 @@ export type RelativePopupProvider = {
 
 export type AbsolutePopupProvider = {
   position: 'absolute'
-  providePopupCards(): Awaitable<PopupCard[]>
+  providePopupCards(): Awaitable<Popup[]>
   offset: {
     x: number
     y: number
