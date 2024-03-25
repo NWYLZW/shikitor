@@ -4,6 +4,11 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: process.env.BASE ?? '/',
   esbuild: false,
+  build: {
+    rollupOptions: {
+      external: ['shiki']
+    }
+  },
   plugins: [
     swc()
   ]
