@@ -1,4 +1,7 @@
+import type { Shikitor } from '../core/editor'
+import type { ResolvedCursor } from '../core/editor/base'
 import { definePlugin } from '../core/plugin'
+import { isMultipleKey } from '../utils/isMultipleKey'
 
 const bracketMap: Record<string, string | undefined> = {
   '(': ')',
@@ -13,9 +16,10 @@ const bracketMap: Record<string, string | undefined> = {
 const lBrackets = ['(', '[', '{', '<']
 
 const name = 'shikitor-bracket-matcher'
-export default definePlugin({
-  name,
-  onCursorChange(cursor) {
+export default () => {
+  let shikitorCursor: ResolvedCursor | undefined
+  function insertBracketHighlighting(this: Shikitor) {
+    const cursor = shikitorCursor
     const { decorations = [] } = this.options
     let newDecorations = [
       ...decorations.filter(d => !d.tagName?.includes(name))
@@ -70,4 +74,27 @@ export default definePlugin({
     }
     this.updateOptions({ decorations: newDecorations })
   }
-})
+  let isPressedDelete = false
+  return definePlugin({
+    name,
+    onCursorChange(cursor) {
+      shikitorCursor = cursor
+      insertBracketHighlighting.call(this)
+    },
+    onKeydown(e) {
+      if (e.key === 'Delete' && !isMultipleKey(e)) {
+        isPressedDelete = true
+      }
+    },
+    onKeyup(e) {
+      if (e.key === 'Delete') {
+        isPressedDelete = false
+      }
+    },
+    onChange() {
+      if (isPressedDelete) {
+        insertBracketHighlighting.call(this)
+      }
+    }
+  })
+}
