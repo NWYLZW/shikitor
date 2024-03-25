@@ -37,7 +37,6 @@ A simple and lightweight code editor for the web.
   - [ ] hint 菜单
   - [ ] 自定义快捷键
   - [ ] bugs
-    - [ ] delete、backspace 的时候光标丢了
     - [ ] cmd 左 的时候不是跳到最开始的位置，是先跳到当前行的视觉长度的最前面
     - [ ] tab 操作导致无法撤回
   - [x] tab、shift + tab
