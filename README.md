@@ -4,6 +4,21 @@ A simple and lightweight code editor for the web.
 
 ## Features
 
+- [ ] popup
+  - [ ] relative by cursor
+    - [ ] completion
+    - [ ] selection text utils, like markdown utils
+    - [ ] light bulb
+    - [ ] placement: top, bottom, left, right
+    - [ ] offset: line-start
+  - [ ] relative by mouse
+    - [ ] quick message
+    - [ ] code preview
+    - [ ] placement: top, bottom, left, right
+  - [ ] absolute
+    - [ ] tag text range quick access
+      - [ ] eslint error
+      - [ ] typo
 - [ ] 键盘交互
   - [ ] emmet
   - [ ] 根据上下文，当回车的时候自动算上 tab 宽度并插入
@@ -51,10 +66,6 @@ A simple and lightweight code editor for the web.
 - [ ] 水槽
   - [ ] 自定义可点击、展示的按钮 icon
   - [ ] 类似彩虹括号的功能
-- [ ] 浮层
-  - [ ] 任意位置的浮层，可以用来展示 eslint 统计错误
-  - [ ] 快速修复
-  - [ ] 建议
 - [ ] 插入区
   - [ ] 可以将文本拆分渲染，再在俩者之间插入节点
   - [ ] 快速查看定义
