@@ -125,7 +125,9 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   const changeValue = (value: string) => {
     setValue(value)
     options.value = value
-    options.onChange?.(getValue())
+    const getValueResult = getValue()
+    options.onChange?.(getValueResult)
+    callAllShikitorPlugins('onChange', getValueResult)
     renderOutput()
   }
   let prevOutputHoverElement: Element | null = null

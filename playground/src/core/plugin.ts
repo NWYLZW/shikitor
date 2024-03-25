@@ -21,6 +21,7 @@ interface Keyboards {
 export interface ShikitorPlugin extends Keyboards {
   name?: string
   install?: (this: Shikitor, editor: Shikitor) => void
+  onChange?: (this: Shikitor, value: string) => void
   onDispose?: (this: Shikitor) => void
   onCursorChange?: (this: Shikitor, cursor?: ResolvedPosition) => void
   onHoverElement?: (this: Shikitor, range: ResolvedTextRange, context: OnHoverElementContext) => void
