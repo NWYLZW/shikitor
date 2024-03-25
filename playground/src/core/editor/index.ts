@@ -2,9 +2,8 @@ import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import type { Awaitable } from '../../types'
-import type { TextRange } from '../base'
 import type { ShikitorPlugin } from '../plugin'
-import type { ResolvedCursor } from './base'
+import type { Cursor, ResolvedCursor } from './base'
 import type { ShikitorRegister } from './register'
 
 export interface ShikitorEvents {
@@ -47,7 +46,7 @@ export interface Shikitor extends ShikitorRegister {
   value: string
   language?: BundledLanguage
   options: Readonly<ShikitorOptions>
-  focus: (range?: Partial<TextRange>) => void
+  focus: (cursor?: Cursor) => void
   updateOptions: UpdateDispatcher<Shikitor['options']>
   updateLanguage: UpdateDispatcher<Shikitor['language']>
   dispose: () => void

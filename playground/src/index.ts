@@ -97,9 +97,7 @@ async function init() {
   languageSelector.value = config.language ?? 'plaintext'
   themeSelector.value = config.theme ?? 'nord'
   pluginsSelector.value = config.plugins?.map(plugin => plugin.name).join(',') ?? ''
-  shikitor.focus(!config.cursor ? undefined : {
-    start: config.cursor.offset, end: config.cursor.offset
-  })
+  shikitor.focus(config.cursor?.offset)
   if (hashType === 'gist') {
     shikitor.value = '// Loading from gist...'
     const [hash, filename, revision] = hashContent.split('/')
