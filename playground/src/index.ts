@@ -76,7 +76,6 @@ document
   .querySelector('img#fullscreen')!
   .addEventListener('click', function () {
     fullscreenCount = (fullscreenCount + 1) % 3
-    console.log('fullscreenCount', fullscreenCount)
     switch (fullscreenCount) {
       case 1:
         card.classList.add('fullscreen')
