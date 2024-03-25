@@ -1,7 +1,6 @@
 import type { DecorationItem, OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
-import type { TextRange } from './base'
 import type { ResolvedTextRange, TextRange } from './base'
 import type { ShikitorPlugin } from './plugin'
 
