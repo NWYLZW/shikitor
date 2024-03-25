@@ -15,11 +15,14 @@ config.plugins?.push({
     if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault()
       const code = this.value
-      if (code === DEFAULT_CODE) return
-
-      const zipCode = zipStr(code)
       const url = new URL(location.href)
-      url.hash = `zip-code/${zipCode}`
+
+      let newHashStr = ''
+      if (code !== DEFAULT_CODE) {
+        newHashStr = `zip-code/${zipStr(code)}`
+      }
+      url.hash = newHashStr
+
       const query = new URLSearchParams()
       this.options.language
         && query.set('language', this.options.language)
