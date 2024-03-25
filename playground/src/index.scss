@@ -30,8 +30,8 @@ body {
   .header {
     display: flex;
     justify-content: space-between;
-    gap: 10px;
     position: relative;
+    margin-top: 8px;
     padding: 8px 20px;
     border-bottom: var(--border-size) transparent;
     &::after {
