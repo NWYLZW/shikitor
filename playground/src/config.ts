@@ -2,8 +2,6 @@ import type { ResolvedPosition } from '@shikijs/core'
 
 import type { ShikitorOptions } from './core/editor'
 import type { ShikitorPlugin } from './core/plugin'
-import bracketMatcher from './plugins/bracket-matcher'
-import codeStyler from './plugins/code-styler'
 import { unzipStr } from './utils/zipStr'
 
 export const DEFAULT_CODE = `
@@ -65,10 +63,13 @@ const bundledPluginModules: Record<string, () => Promise<{
 }>> = import.meta.glob(['./plugins/*.ts', './plugins/*/index.ts'])
 export const bundledPluginsInfo = Object
   .entries(bundledPluginModules)
-  .map(([path, module]) => {
+  .map(([path, lazyModule]) => {
     const name = path.match(/\.\/plugins\/(.+?)(\/index)?\.ts$/)?.[1]
-    return { id: name, name, module }
+    return { id: name, name, lazyModule }
   })
+const DEFAULT_INSTALLED_PLUGINS = bundledPluginsInfo
+  .filter(({ id }) => id && ['bracket-matcher', 'code-styler'].includes(id))
+  .map(({ lazyModule }) => () => lazyModule().then(({ default: plugin }) => plugin))
 
 export default {
   get value() {
@@ -87,8 +88,5 @@ export default {
     cursor = newCursor
   },
   ...queryOptions,
-  plugins: [
-    bracketMatcher,
-    codeStyler
-  ]
+  plugins: DEFAULT_INSTALLED_PLUGINS
 } as ShikitorOptions
