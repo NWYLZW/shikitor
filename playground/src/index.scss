@@ -48,6 +48,7 @@ body {
     > .left {
       flex-grow: 1;
       display: flex;
+      align-items: center;
       gap: 10px;
     }
     > .right {
