@@ -1,5 +1,5 @@
 import type { Awaitable } from '../types'
-import type { IDisposable, LanguageSelector } from './editor'
+import type { IDisposable, LanguageSelector } from './editor.base'
 
 export type PopupPlacement =
   | 'top' | 'bottom'
