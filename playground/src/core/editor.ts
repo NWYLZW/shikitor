@@ -34,10 +34,6 @@ export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: 
   }
 }
 
-export interface IDisposable {
-  dispose(): void
-}
-
 export interface Shikitor {
   value: string
   language?: BundledLanguage
