@@ -4,11 +4,12 @@ import type { BundledLanguage, BundledTheme } from 'shiki'
 import type { Awaitable } from '../../types'
 import type { TextRange } from '../base'
 import type { ShikitorPlugin } from '../plugin'
+import type { ResolvedCursor } from './base'
 import type { ShikitorRegister } from './register'
 
 export interface ShikitorEvents {
   onChange?: (value: string) => void
-  onCursorChange?: (cursor?: ResolvedPosition) => void
+  onCursorChange?: (cursor?: ResolvedCursor) => void
   onDispose?: () => void
 }
 
