@@ -1,8 +1,8 @@
 import './index.scss'
 
-import type { ResolvedPosition } from '@shikijs/core'
 import { getHighlighter } from 'shiki'
 
+import type { TextRange } from '../core/base'
 import { callUpdateDispatcher, type Shikitor, type ShikitorOptions } from '../core/editor'
 import type { IDisposable, LanguageSelector } from '../core/editor/base'
 import type { Popup, PopupProvider } from '../core/editor/register'
@@ -184,30 +184,24 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     })
   }, 50))
 
-  let prevCursor: ResolvedPosition = options.cursor ?? { offset: 0, line: 0, character: 0 }
+  let prevCursor = options.cursor
   input.addEventListener('input', () => changeValue(input.value))
-  const prevSelection = { start: 0, end: 0 }
+  let prevSelection: TextRange | undefined
   function updateCursor() {
     const selection = { start: input.selectionStart, end: input.selectionEnd }
-    const offset = selection.start !== prevSelection.start
+    const offset = selection.start !== prevSelection?.start
       ? selection.start
       : selection.end
     const rawTextHelper = getRawTextHelper(getValue())
     const cursor = rawTextHelper.getResolvedPositions(offset)
-    if (cursor.offset !== prevCursor.offset) {
+    if (cursor.offset !== prevCursor?.offset) {
       options.onCursorChange?.(cursor)
       callAllShikitorPlugins('onCursorChange', cursor)
     }
     prevCursor = cursor
-    prevSelection.start = selection.start
-    prevSelection.end = selection.end
+    prevSelection = selection
   }
-  let resetCursorLock = false
   const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
-    if (resetCursorLock) {
-      resetCursorLock = false
-      return
-    }
     if (document.getSelection()?.focusNode === target) {
       updateCursor()
     }
@@ -215,7 +209,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   input.addEventListener('keydown', e => {
     callAllShikitorPlugins('onKeydown', e as _KeyboardEvent)
     if (e.key === 'Escape' && !isMultipleKey(e)) {
-      if (input.selectionStart !== input.selectionEnd) {
+      if (input.selectionStart !== input.selectionEnd && prevCursor) {
         e.preventDefault()
         input.setSelectionRange(prevCursor.offset, prevCursor.offset)
       }
@@ -284,7 +278,6 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
           ? resolvedStartPos.offset
           : getResolvedPositions(end).offset
       )
-      resetCursorLock = true
       input.focus()
     },
     dispose() {
