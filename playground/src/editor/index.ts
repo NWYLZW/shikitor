@@ -103,29 +103,35 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       const decoratedTokensLines: DecoratedThemedToken[][] = decorations.length > 0
         ? decorateTokens(code, tokensLines, decorations)
         : tokensLines
-      const lines = decoratedTokensLines.map((tokenLine, index) => (`<span
-        data-line="${index + 1}"
-        class="${classnames(
-          'shikitor-output-line',
-          !!cursor && (
-            cursor === index + 1 ? 'shikitor-output-line-cursor' : ''
-          )
-        )}"
-      >${
-				tokenLine
-					.map(token => `<span
+      const lines = decoratedTokensLines.map((tokenLine, index) => {
+        const tokens = tokenLine
+          .map(token => `<span
             class="${
-              classnames(
-                token.tagName,
-                `offset:${token.offset}`,
-                `position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length}`,
-                `font-style:${token.fontStyle}`
-              )
-            }"
+            classnames(
+              'shikitor-output-token',
+              token.tagName,
+              `offset:${token.offset}`,
+              `position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length}`,
+              `font-style:${token.fontStyle}`
+            )
+          }"
             style="color: ${token.color}">${token.content}</span>`)
-					.join('')
-			}</span>`))
-      return `<pre tabindex="0"><code class="shikitor-output-lines">${lines.join('<br />')}<br /></code></pre>`
+          .join('')
+        return `<span
+          data-line="${index + 1}"
+          class="${classnames(
+            'shikitor-output-line',
+            !!cursor && (
+              cursor === index + 1 ? 'shikitor-output-line-cursor' : ''
+            )
+          )}"
+        >${
+          tokens.length === 0
+            ? '<span class="shikitor-output-line-empty"> </span>'
+            : tokens
+        }</span>`
+      })
+      return `<pre tabindex="0"><code class="shikitor-output-lines">${lines.join('')}</code></pre>`
     }
     output.innerHTML = codeToHtml(input.value)
   }

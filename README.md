@@ -58,7 +58,7 @@ A simple and lightweight code editor for the web.
   - [ ] click
 - [ ] 样式
   - [ ] 高亮特定行（范围）
-    - [ ] 高亮当前行
+    - [x] 高亮当前行
   - [ ] 展示「空格、制表符」符号，当选择了某个范围的时候
   - [ ] 自定义指针样式
   - [ ] 行号宽度是固定的，太长了会有 bug

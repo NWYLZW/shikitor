@@ -51,9 +51,16 @@
     > pre {
       margin: 0;
     }
+    &-lines {
+      display: block;
+      width: 100%;
+    }
     &-line {
+      display: block;
       position: relative;
       width: calc(100% - var(--gutter-width));
+      height: auto;
+      white-space: pre-wrap;
       &::after {
         position: absolute;
         content: attr(data-line);
@@ -67,7 +74,7 @@
         content: '';
         top: -1px;
         left: calc(var(--gutter-width) * -1);
-        width: calc(100% + var(--gutter-width));
+        width: calc(100% + var(--gutter-width) * 2);
         height: calc(100% + 2px);
         background-color: var(--shikitor-fg-color);
         opacity: .1;
