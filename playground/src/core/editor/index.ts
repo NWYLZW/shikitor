@@ -3,7 +3,7 @@ import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import type { Awaitable } from '../../types'
 import type { ShikitorPlugin } from '../plugin'
-import type { Cursor, ResolvedCursor } from './base'
+import type { Cursor, ResolvedCursor, Selection } from './base'
 import type { ShikitorRegister } from './register'
 
 export interface ShikitorEvents {
@@ -32,7 +32,7 @@ export interface ShikitorOptions extends ShikitorEvents {
   )[]
 }
 
-export type UpdateDispatcher<T> = (value: T | ((value: T) => T)) => void
+export type UpdateDispatcher<T, Args extends unknown[] = []> = (...args: [...Args, value: T | ((value: T) => T)]) => void
 
 export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: T) {
   if (typeof value === 'function') {
@@ -48,7 +48,9 @@ export interface Shikitor extends ShikitorRegister {
   options: Readonly<ShikitorOptions>
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
+  readonly selections: readonly Selection[]
   updateOptions: UpdateDispatcher<Shikitor['options']>
   updateLanguage: UpdateDispatcher<Shikitor['language']>
+  updateSelection: UpdateDispatcher<Selection, [index: number]>
   dispose: () => void
 }

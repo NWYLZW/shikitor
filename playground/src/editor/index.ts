@@ -2,9 +2,8 @@ import './index.scss'
 
 import { getHighlighter } from 'shiki'
 
-import type { TextRange } from '../core/base'
 import { callUpdateDispatcher, type Shikitor, type ShikitorOptions } from '../core/editor'
-import type { IDisposable, LanguageSelector } from '../core/editor/base'
+import type { IDisposable, LanguageSelector, Selection } from '../core/editor/base'
 import type { Popup, PopupProvider } from '../core/editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
@@ -187,7 +186,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   input.addEventListener('input', () => changeValue(input.value))
 
   let prevCursor = options.cursor
-  let prevSelection: TextRange | undefined
+  let prevSelection: Selection | undefined
   function updateCursor() {
     const selection = { start: input.selectionStart, end: input.selectionEnd }
     const offset = selection.start !== prevSelection?.start
@@ -283,6 +282,42 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         resolvedStartPos.offset, resolvedStartPos.offset
       )
       input.focus()
+    },
+    get selections() {
+      if (prevSelection === undefined) {
+        updateCursor()
+      }
+      return [prevSelection!]
+    },
+    updateSelection(index, selectionOrGetSelection) {
+      const { selections } = this
+      if (index < 0 || index >= selections.length) {
+        return
+      }
+      const selectionT0 = selections[index]
+      const selectionT1 = callUpdateDispatcher(selectionOrGetSelection, selectionT0)
+      if (selectionT1 === undefined) {
+        return
+      }
+
+      const { getResolvedPositions } = getRawTextHelper(getValue())
+      const prevResolvedPrevSelection = {
+        start: getResolvedPositions(selectionT0.start),
+        end: getResolvedPositions(selectionT0.end)
+      }
+      const resolvedSelection = {
+        start: getResolvedPositions(selectionT1.start),
+        end: getResolvedPositions(selectionT1.end)
+      }
+      if ([
+        prevResolvedPrevSelection.start.offset !== resolvedSelection.start.offset,
+        prevResolvedPrevSelection.end.offset !== resolvedSelection.end.offset
+      ].some(Boolean)) {
+        // TODO
+        // options.onSelectionChange?.(selection)
+        // callAllShikitorPlugins('onSelectionChange', selection)
+        prevSelection = selectionT1
+      }
     },
     dispose() {
       offDocumentSelectionChange()
