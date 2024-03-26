@@ -31,8 +31,11 @@
     font-family: var(--font-family, monospace);
     font-size: inherit;
   }
-  &.line-numbers &-input, &-output {
+  &.line-numbers &-output {
     padding-left: var(--gutter-width);
+  }
+  &.line-numbers &-input {
+    margin-left: var(--gutter-width);
   }
   &-input {
     resize: none;
@@ -45,18 +48,30 @@
   }
   &-output {
     overflow: hidden;
-    pointer-events: none;
     > pre {
       margin: 0;
     }
-    &-line::before {
-      visibility: hidden;
-      content: attr(data-line);
-      position: absolute;
-      left: 0;
-      width: calc(var(--gutter-width) - 0.5em);
-      padding-right: 0.5em;
-      text-align: right;
+    &-line {
+      position: relative;
+      width: calc(100% - var(--gutter-width));
+      &::after {
+        position: absolute;
+        content: attr(data-line);
+        left: calc(var(--gutter-width) * -1);
+        width: calc(var(--gutter-width) - 0.5em);
+        padding-right: 0.5em;
+        text-align: right;
+      }
+      &-cursor::before {
+        position: absolute;
+        content: '';
+        top: -1px;
+        left: calc(var(--gutter-width) * -1);
+        width: calc(100% + var(--gutter-width));
+        height: calc(100% + 2px);
+        background-color: var(--shikitor-fg-color);
+        opacity: .1;
+      }
     }
   }
 }

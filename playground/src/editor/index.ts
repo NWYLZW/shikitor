@@ -78,6 +78,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       theme = 'github-light', language = 'javascript',
       decorations = []
     } = options
+    const cursor = prevCursor?.line
     const { codeToTokens } = await highlighter(theme, language)
 
     const codeToHtml = (code: string) => {
@@ -103,8 +104,13 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         ? decorateTokens(code, tokensLines, decorations)
         : tokensLines
       const lines = decoratedTokensLines.map((tokenLine, index) => (`<span
-        class="shikitor-output-line"
         data-line="${index + 1}"
+        class="${classnames(
+          'shikitor-output-line',
+          !!cursor && (
+            cursor === index + 1 ? 'shikitor-output-line-cursor' : ''
+          )
+        )}"
       >${
 				tokenLine
 					.map(token => `<span
@@ -119,7 +125,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
             style="color: ${token.color}">${token.content}</span>`)
 					.join('')
 			}</span>`))
-      return `<pre tabindex="0"><code>${lines.join('<br>')}</code></pre>`
+      return `<pre tabindex="0"><code class="shikitor-output-lines">${lines.join('<br />')}<br /></code></pre>`
     }
     output.innerHTML = codeToHtml(input.value)
   }
