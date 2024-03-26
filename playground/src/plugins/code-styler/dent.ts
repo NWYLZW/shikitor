@@ -199,16 +199,7 @@ export function getLineEnd(value: string, index: number) {
 }
 
 export function getLine(value: string, index: number) {
-  let i = index
-  while (i > 0 && value[i - 1] !== '\n') {
-    i--
-  }
-  const left = i
-  while (i < value.length && value[i] !== '\n') {
-    i++
-  }
-  const right = i
-  return value.slice(left, right)
+  return value.slice(getLineStart(value, index), getLineEnd(value, index))
 }
 
 export function isMultiLine(value: string, start: number, end: number) {
