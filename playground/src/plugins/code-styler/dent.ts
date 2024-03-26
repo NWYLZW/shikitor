@@ -180,14 +180,14 @@ export function outdent(
   }
 }
 
-function getLineStart(value: string, index: number) {
+export function getLineStart(value: string, index: number) {
   while (index > 0 && value[index - 1] !== '\n') {
     index--
   }
   return index
 }
 
-function getLineEnd(value: string, index: number) {
+export function getLineEnd(value: string, index: number) {
   if (index > 0 && value[index - 1] === '\n') {
     return index - 1
   }
@@ -198,7 +198,7 @@ function getLineEnd(value: string, index: number) {
   return index
 }
 
-function getLine(value: string, index: number) {
+export function getLine(value: string, index: number) {
   let i = index
   while (i > 0 && value[i - 1] !== '\n') {
     i--
@@ -211,7 +211,7 @@ function getLine(value: string, index: number) {
   return value.slice(left, right)
 }
 
-function isMultiLine(value: string, start: number, end: number) {
+export function isMultiLine(value: string, start: number, end: number) {
   for (let i = start; i < end; i++) {
     if (value[i] === '\n') {
       return true
@@ -220,7 +220,7 @@ function isMultiLine(value: string, start: number, end: number) {
   return false
 }
 
-function countLeadingSpaces(value: string, start: number, tabSize: number) {
+export function countLeadingSpaces(value: string, start: number, tabSize: number) {
   let count = 0
   for (let i = start; i < value.length; i++) {
     if (value[i] === ' ') {
