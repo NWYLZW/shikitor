@@ -91,6 +91,7 @@ body {
   padding: 10px 0;
   .shikitor-input, .shikitor-output {
     padding-top: 10px;
+    height: calc(100% - 10px);
   }
 }
 img#fullscreen {
