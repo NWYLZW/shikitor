@@ -7,6 +7,7 @@ import type { IDisposable, LanguageSelector, Selection } from '../core/editor/ba
 import type { Popup, PopupProvider } from '../core/editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../core/plugin'
 import type { PickByValue } from '../types'
+import { classnames } from '../utils/classnames'
 import { type DecoratedThemedToken, decorateTokens } from '../utils/decorateTokens'
 import { getRawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
@@ -101,14 +102,19 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       const decoratedTokensLines: DecoratedThemedToken[][] = decorations.length > 0
         ? decorateTokens(code, tokensLines, decorations)
         : tokensLines
-      const lines = decoratedTokensLines.map((tokenLine, index) => (`<span class="shikitor-output-line" data-line="${index + 1}">${
+      const lines = decoratedTokensLines.map((tokenLine, index) => (`<span
+        class="shikitor-output-line"
+        data-line="${index + 1}"
+      >${
 				tokenLine
 					.map(token => `<span
             class="${
-              (token.tagName ? `${token.tagName} ` : '') +
-              `offset:${token.offset} ` +
-              `position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length} ` +
-              `font-style:${token.fontStyle}`
+              classnames(
+                token.tagName,
+                `offset:${token.offset}`,
+                `position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length}`,
+                `font-style:${token.fontStyle}`
+              )
             }"
             style="color: ${token.color}">${token.content}</span>`)
 					.join('')
