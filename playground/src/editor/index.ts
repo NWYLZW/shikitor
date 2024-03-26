@@ -36,12 +36,13 @@ function initInputAndOutput(options: ShikitorOptions) {
 }
 
 async function resolveInputOptions(options: ShikitorOptions) {
+  const inputPlugins = options.plugins ?? []
+  const waitResolvedPlugins = await Promise.all(inputPlugins.map(Promise.resolve.bind(Promise)))
   return {
     ...options,
     plugins: await Promise.all(
-      (
-        await Promise.all(options.plugins ?? [])
-      ).map(plugin => typeof plugin === 'function' ? plugin() : plugin)
+      waitResolvedPlugins
+        .map(plugin => typeof plugin === 'function' ? plugin() : plugin)
     )
   }
 }
