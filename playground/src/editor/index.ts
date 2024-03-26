@@ -296,6 +296,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         }
       }
       if (provider.position === 'absolute') {
+        throw new Error('Not implemented')
       }
       throw new Error('Not implemented')
     }
