@@ -1,0 +1,51 @@
+{
+  "name": "@shikitor/core",
+  "version": "0.0.1",
+  "description": "Shikitor core",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NWYLZW/shikitor.git",
+    "directory": "packages/core",
+    "homepage": "https://github.com/NWYLZW/shikitor/tree/master/packages/core"
+  },
+  "dependencies": {
+    "@shikijs/core": "^1.2.0",
+    "shiki": "^1.2.0"
+  },
+  "files": ["dist"],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.esm.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.umd.js"
+      }
+    },
+    "./plugins/bracket-matcher": {
+      "import": {
+        "types": "./dist/plugins/bracket-matcher.d.ts",
+        "default": "./dist/plugins/bracket-matcher.esm.js"
+      },
+      "require": {
+        "types": "./dist/plugins/bracket-matcher.d.ts",
+        "default": "./dist/plugins/bracket-matcher.umd.js"
+      }
+    },
+    "./plugins/code-styler": {
+      "import": {
+        "types": "./dist/plugins/code-styler.d.ts",
+        "default": "./dist/plugins/code-styler.esm.js"
+      },
+      "require": {
+        "types": "./dist/plugins/code-styler.d.ts",
+        "default": "./dist/plugins/code-styler.umd.js"
+      }
+    }
+  }
+}

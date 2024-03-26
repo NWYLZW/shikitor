@@ -1,12 +1,14 @@
 import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
-import type { Awaitable } from '../../types'
 import type { ShikitorPlugin } from '../plugin'
+import type { Awaitable } from '../types'
 import type { Cursor, ResolvedCursor, Selection } from './base'
 import type { ShikitorRegister } from './register'
 
-export interface ShikitorEvents {
+export * from './base'
+
+interface ShikitorEvents {
   onChange?: (value: string) => void
   onCursorChange?: (cursor?: ResolvedCursor) => void
   onDispose?: () => void

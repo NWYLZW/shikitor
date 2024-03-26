@@ -1,11 +1,11 @@
 import './index.scss'
 import 'typed-query-selector'
 
+import type { Shikitor } from '@shikitor/core'
+import { create } from '@shikitor/core'
 import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
 
 import config, { bundledPluginsInfo, DEFAULT_CODE, hashContent, hashType } from './config'
-import type { Shikitor } from './core/editor'
-import { create } from './editor'
 import { getGist, type GistFile } from './utils/gist'
 import { zipStr } from './utils/zipStr'
 

@@ -7,7 +7,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@shikijs/core": "^1.2.0",
     "lz-string": "^1.5.0",
     "sass": "^1.72.0",
     "shiki": "^1.2.0",

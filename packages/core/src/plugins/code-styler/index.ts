@@ -1,4 +1,4 @@
-import { definePlugin } from '../../core/plugin'
+import { definePlugin } from '../../plugin'
 import { getLineEnd, getLineStart, indent, outdent } from './dent'
 
 interface CodeStylerOptions {

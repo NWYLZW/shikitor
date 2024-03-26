@@ -1,6 +1,6 @@
-import type { Shikitor } from '../core/editor'
-import type { ResolvedCursor } from '../core/editor/base'
-import { definePlugin } from '../core/plugin'
+import type { Shikitor } from '../editor'
+import type { ResolvedCursor } from '../editor/base'
+import { definePlugin } from '../plugin'
 import { isMultipleKey } from '../utils/isMultipleKey'
 
 const bracketMap: Record<string, string | undefined> = {

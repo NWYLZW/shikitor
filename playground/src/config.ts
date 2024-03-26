@@ -1,7 +1,5 @@
-import type { ResolvedPosition } from '@shikijs/core'
+import type { Cursor, ShikitorOptions, ShikitorPlugin } from '@shikitor/core'
 
-import type { ShikitorOptions } from './core/editor'
-import type { ShikitorPlugin } from './core/plugin'
 import { unzipStr } from './utils/zipStr'
 
 export const DEFAULT_CODE = `
@@ -13,7 +11,7 @@ function add(a, b) {
 `.trimStart()
 
 let code = DEFAULT_CODE
-let cursor: undefined | ResolvedPosition
+let cursor: undefined | Cursor
 
 const [type, content] = location.hash.slice(1).split('/')
 if (content === undefined) {
@@ -60,11 +58,11 @@ if (query.has('theme')) {
 // @ts-ignore
 const bundledPluginModules: Record<string, () => Promise<{
   default: ShikitorPlugin | (() => ShikitorPlugin)
-}>> = import.meta.glob(['./plugins/*.ts', './plugins/*/index.ts'])
+}>> = import.meta.glob(['../../packages/core/src/plugins/*.ts', '../../packages/core/src/plugins/*/index.ts'])
 export const bundledPluginsInfo = Object
   .entries(bundledPluginModules)
   .map(([path, lazyModule]) => {
-    const name = path.match(/\.\/plugins\/(.+?)(\/index)?\.ts$/)?.[1]
+    const name = path.match(/\/plugins\/(.+?)(\/index)?\.ts$/)?.[1]
     return { id: name, name, lazyModule }
   })
 const DEFAULT_INSTALLED_PLUGINS: (
