@@ -53,14 +53,12 @@
     }
     &-lines {
       display: block;
-      width: 100%;
     }
     &-line {
       display: block;
       position: relative;
-      width: calc(100% - var(--gutter-width));
+      min-width: calc(100% - var(--gutter-width));
       height: auto;
-      white-space: pre-wrap;
       &::after {
         position: absolute;
         content: attr(data-line);
