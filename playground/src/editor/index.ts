@@ -269,14 +269,17 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     updateLanguage(language) {
       this.language = callUpdateDispatcher(language, options.language)
     },
-    focus({ start, end } = {}) {
+    get cursor() {
+      if (prevCursor === undefined) {
+        updateCursor()
+      }
+      return prevCursor!
+    },
+    focus(cursor) {
       const { getResolvedPositions } = getRawTextHelper(getValue())
-      const resolvedStartPos = getResolvedPositions(start ?? 0)
+      const resolvedStartPos = getResolvedPositions(cursor ?? prevCursor?.offset ?? 0)
       input.setSelectionRange(
-        resolvedStartPos.offset,
-        end === undefined
-          ? resolvedStartPos.offset
-          : getResolvedPositions(end).offset
+        resolvedStartPos.offset, resolvedStartPos.offset
       )
       input.focus()
     },

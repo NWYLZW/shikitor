@@ -46,6 +46,7 @@ export interface Shikitor extends ShikitorRegister {
   value: string
   language?: BundledLanguage
   options: Readonly<ShikitorOptions>
+  readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
   updateOptions: UpdateDispatcher<Shikitor['options']>
   updateLanguage: UpdateDispatcher<Shikitor['language']>
