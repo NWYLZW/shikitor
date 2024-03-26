@@ -26,6 +26,7 @@ A simple and lightweight code editor for the web.
   - [ ] cmd x + select end 删除当前行
   - [ ] cmd [] 光标历史
   - [ ] cmd +- 折叠
+  - [x] cmd 左 的时候不是跳到最开始的位置，是先跳到当前行的视觉长度的最前面
   - [ ] 括号补全
     - [ ] 选择状态下自动给范围加上括号
   - [ ] cmd + f 搜索
@@ -37,7 +38,6 @@ A simple and lightweight code editor for the web.
   - [ ] hint 菜单
   - [ ] 自定义快捷键
   - [ ] bugs
-    - [ ] cmd 左 的时候不是跳到最开始的位置，是先跳到当前行的视觉长度的最前面
     - [ ] tab 操作导致无法撤回
   - [x] tab、shift + tab
 - [ ] 鼠标交互
