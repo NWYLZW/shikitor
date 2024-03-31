@@ -1,9 +1,14 @@
 {
   "name": "@shikitor/core",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Shikitor core",
   "jiek": {
-    "styled": true
+    "styled": true,
+    "inputs": [
+      "index.ts",
+      "plugins/*.ts",
+      "plugins/*/index.ts"
+    ]
   },
   "scripts": {
     "build": "jiek build"
