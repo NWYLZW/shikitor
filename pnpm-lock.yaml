@@ -15,8 +15,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0(vite@5.2.3)
       jiek:
-        specifier: ^0.1.10
-        version: 0.1.10(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
+        specifier: ^0.1.11
+        version: 0.1.11(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
       typescript:
         specifier: ^5.4.3
         version: 5.4.3
@@ -3219,8 +3219,8 @@ packages:
       set-function-name: 2.0.2
     dev: false
 
-  /jiek@0.1.10(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
-    resolution: {integrity: sha512-eCa8hZn1/x3TLHEoWW7KYmhxahsIEJi+TplKdmLmem0Vi4HVMOG/Mk6Q7uVAeE9rmSO/4UseP16i7CWdfnESVg==}
+  /jiek@0.1.11(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
+    resolution: {integrity: sha512-6TckNCsYawXPSgJ5UeoX6YV5vlGW8ph3kL4ibaDBuLJeyWsB/84RpAitR7/CJIOQ6kwaSrqVu1/Z0ghPJXyPbA==}
     hasBin: true
     dependencies:
       '@jiek/pkger': 0.1.8
