@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shikitor</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "shiki": "https://cdn.jsdelivr.net/npm/shiki@^1.2.0/+esm",
+        "@shikijs/core": "https://cdn.jsdelivr.net/npm/@shikijs/core@^1.2.0/+esm"
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      font-family: sans-serif;
+      font-size: 16px;
+    }
+    h1 {
+      margin: 0;
+      padding: 1rem;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+    }
+  </style>
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/@shikitor/core/dist/index.css'>
+</head>
+<body>
+  <h1>Shikitor</h1>
+  <div id="app" style="height: 100%"></div>
+  <script type='module'>
+    import * as shiki from 'shiki';
+    import * as ShikiCore from '@shikijs/core';
+    globalThis.shiki = shiki;
+    globalThis.ShikiCore = ShikiCore;
+  </script>
+  <script type='module' src="https://cdn.jsdelivr.net/npm/@shikitor/core"></script>
+  <script type='module'>
+    const { create } = ShikitorCore;
+    const shikitor = create(document.querySelector('#app'), {
+      theme: 'github-light',
+      lang: 'javascript',
+      value: `console.log('Hello, Shikitor!');`,
+      plugins: []
+    });
+  </script>
+</body>
+</html>
