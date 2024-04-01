@@ -84,8 +84,10 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
       const { line } = rawTextHelper.resolvePosition(oop, text)
       const computeLine = line === 0 ? 0 : line - 1
       const lineStart = rawTextHelper.lineStart({ line: computeLine, character: 1 }, text)
+      const lineText = rawTextHelper.line({ line: computeLine, character: 1 }, text)
       const leadingSpaces = rawTextHelper.countLeadingSpaces(lineStart, tabSize, text)
-      return leadingSpaces - leadingSpaces % tabSize
+      const isIncrease = line !== 0 && /[([{<]$/.test(lineText.trimEnd())
+      return leadingSpaces - leadingSpaces % tabSize + (isIncrease ? tabSize : 0)
     }
   }
   return rawTextHelper
