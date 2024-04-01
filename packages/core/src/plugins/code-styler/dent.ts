@@ -202,15 +202,6 @@ export function getLine(value: string, index: number) {
   return value.slice(getLineStart(value, index), getLineEnd(value, index))
 }
 
-export function isMultiLine(value: string, start: number, end: number) {
-  for (let i = start; i < end; i++) {
-    if (value[i] === '\n') {
-      return true
-    }
-  }
-  return false
-}
-
 export function countLeadingSpaces(value: string, start: number, tabSize: number) {
   let count = 0
   for (let i = start; i < value.length; i++) {
