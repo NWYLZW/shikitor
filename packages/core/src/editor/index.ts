@@ -39,7 +39,7 @@ export type UpdateDispatcher<T, Args extends unknown[] = []> = (...args: [...Arg
 
 export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: T) {
   if (typeof value === 'function') {
-    (value as Function)(oldValue)
+    return (value as Function)(oldValue)
   } else {
     return value
   }
