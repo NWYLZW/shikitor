@@ -270,16 +270,13 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       return options
     },
     set options(newOptions: ShikitorOptions) {
-      resolveInputOptions(newOptions)
-        .then(newOptions => {
-          options = newOptions
-          options.value && setValue(options.value)
-          renderOptions()
-          renderOutput()
-        })
+      this.updateOptions(newOptions)
     },
-    updateOptions(newOptions) {
-      shikitor.options = Object.assign(options, callUpdateDispatcher(newOptions, options) ?? {})
+    async updateOptions(newOptions) {
+      options = await resolveInputOptions(callUpdateDispatcher(newOptions, options) ?? {})
+      options.value && setValue(options.value)
+      renderOptions()
+      renderOutput()
     },
     get language() {
       return options.language
@@ -345,6 +342,18 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         prevSelection = resolvedSelection
       }
       input.setSelectionRange(resolvedSelection.start.offset, resolvedSelection.end.offset)
+    },
+    async upsertPlugin(plugin, index) {
+      const p = await Promise.resolve(typeof plugin === 'function' ? plugin() : plugin)
+      if (p === undefined) {
+        return
+      }
+      if (index === undefined) {
+        options.plugins?.push(p)
+      } else {
+        options.plugins?.splice(index, 1, p)
+      }
+      renderOutput()
     },
     dispose() {
       offDocumentSelectionChange()

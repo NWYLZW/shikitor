@@ -35,7 +35,7 @@ export interface ShikitorOptions extends ShikitorEvents {
   )[]
 }
 
-export type UpdateDispatcher<T, Args extends unknown[] = []> = (...args: [...Args, value: T | ((value: T) => T)]) => void
+export type UpdateDispatcher<T, Args extends unknown[] = [], RT = void> = (...args: [...Args, value: T | ((value: T) => T)]) => RT
 
 export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: T) {
   if (typeof value === 'function') {
@@ -53,8 +53,9 @@ export interface Shikitor extends ShikitorRegister {
   focus: (cursor?: Cursor) => void
   readonly selections: readonly ResolvedSelection[]
   readonly rawTextHelper: RawTextHelper
-  updateOptions: UpdateDispatcher<Shikitor['options']>
+  updateOptions: UpdateDispatcher<Shikitor['options'], [], Promise<void>>
   updateLanguage: UpdateDispatcher<Shikitor['language']>
   updateSelection: UpdateDispatcher<Selection, [index: number]>
+  upsertPlugin: (plugin: NonNullable<ShikitorOptions['plugins']>[number], index?: number) => Promise<void>
   dispose: () => void
 }

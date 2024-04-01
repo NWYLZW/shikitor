@@ -67,7 +67,7 @@ export function indent(
   options: DentOptions = {},
   rawTextHelper = getRawTextHelper(text)
 ): ReplacementRangeText {
-  const { lineStart, lineEnd, countLeadingSpaces } = rawTextHelper
+  const { lineStart, lineEnd, countLeadingSpaces, inferLineLeadingSpaces } = rawTextHelper
   const [start, end = start] = selection
   const {
     tabSize = 2,
@@ -89,6 +89,26 @@ export function indent(
     ? ' '.repeat(tabSize)
     : '\t'
   const insertStrItemLength = item.length
+  if (startAtLineStart && start === end) {
+    const leadingSpaces = inferLineLeadingSpaces(start, tabSize)
+    const tabCount = ~~(leadingSpaces / tabSize)
+    const tabCountRemainder = leadingSpaces % tabSize
+    const tabCountRemainderSpaces = tabCountRemainder < 1
+      ? ''
+      : ' '.repeat(tabCountRemainder)
+    const replacement = tabCount <= 0
+      ? tabCountRemainderSpaces
+      : tabCountRemainderSpaces + item.repeat(tabCount)
+    const range: [number, number] = [start, end]
+    return {
+      replacement, range,
+      selection: updateSelection(text, [start, end], 0, {
+        replacement,
+        range
+      }, rawTextHelper),
+      selectionMode: 'end'
+    }
+  }
 
   let replacement: string
   let range: [number, number]

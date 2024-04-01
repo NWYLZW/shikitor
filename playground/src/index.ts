@@ -9,32 +9,6 @@ import config, { bundledPluginsInfo, DEFAULT_CODE, hashContent, hashType } from 
 import { getGist, type GistFile } from './utils/gist'
 import { zipStr } from './utils/zipStr'
 
-config.plugins?.push({
-  name: 'shikitor-saver',
-  onKeydown(e) {
-    if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault()
-      const code = this.value
-      const url = new URL(location.href)
-
-      let newHashStr = ''
-      if (code !== DEFAULT_CODE) {
-        newHashStr = `zip-code/${zipStr(code)}`
-      }
-      url.hash = newHashStr
-
-      const query = new URLSearchParams()
-      this.options.language
-        && query.set('language', this.options.language)
-      this.options.theme
-        && query.set('theme', this.options.theme)
-      query.set('fullscreen', String(fullscreenCount))
-      url.search = query.toString()
-      history.pushState(null, '', url.toString())
-    }
-  }
-})
-
 const container = document.querySelector('div#container')!
 
 const languageSelector = document.querySelector('select#language-selector')!
@@ -57,7 +31,7 @@ languageSelector.addEventListener('change', () => {
 })
 themeSelector.addEventListener('change', () => {
   config.theme = themeSelector.value as typeof config.theme
-  shikitor.updateOptions({ theme: config.theme })
+  shikitor.updateOptions(old => ({ ...old, theme: config.theme }))
 })
 pluginsSelector.addEventListener('change', () => {
   // console.log(pluginsSelector, pluginsSelector.value)
@@ -98,6 +72,31 @@ async function init() {
   themeSelector.value = config.theme ?? 'nord'
   pluginsSelector.value = config.plugins?.map(plugin => plugin.name).join(',') ?? ''
   shikitor.focus(config.cursor?.offset)
+  await shikitor.upsertPlugin({
+    name: 'shikitor-saver',
+    onKeydown(e) {
+      if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        const code = this.value
+        const url = new URL(location.href)
+
+        let newHashStr = ''
+        if (code !== DEFAULT_CODE) {
+          newHashStr = `zip-code/${zipStr(code)}`
+        }
+        url.hash = newHashStr
+
+        const query = new URLSearchParams()
+        this.options.language
+        && query.set('language', this.options.language)
+        this.options.theme
+        && query.set('theme', this.options.theme)
+        query.set('fullscreen', String(fullscreenCount))
+        url.search = query.toString()
+        history.pushState(null, '', url.toString())
+      }
+    }
+  })
   if (hashType === 'gist') {
     shikitor.value = '// Loading from gist...'
     const [hash, filename, revision] = hashContent.split('/')
@@ -147,12 +146,12 @@ async function main() {
 main()
 
 if (import.meta.hot) {
-  import.meta.hot.accept('./config.ts', newModule => {
+  import.meta.hot.accept('./config.ts', async newModule => {
     if (!newModule) return
     const { default: newConfig } = newModule as unknown as { default: typeof config }
     console.log('Updating Shikitor options')
-    shikitor.options = newConfig
-    init()
+    await shikitor.updateOptions(newConfig)
+    await init()
   })
   import.meta.hot.accept('./editor/index.ts', async newModule => {
     if (!newModule) return

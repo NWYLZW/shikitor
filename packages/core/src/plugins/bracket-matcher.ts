@@ -25,7 +25,7 @@ export default () => {
       ...decorations.filter(d => !d.tagName?.includes(name))
     ]
     if (!cursor) {
-      this.updateOptions({ decorations: newDecorations })
+      this.updateOptions(old => ({ ...old, decorations: newDecorations }))
       return
     }
     const value = this.value
@@ -72,7 +72,7 @@ export default () => {
     } else {
       newDecorations = []
     }
-    this.updateOptions({ decorations: newDecorations })
+    this.updateOptions(old => ({ ...old, decorations: newDecorations }))
   }
   let isPressedDelete = false
   return definePlugin({
