@@ -210,12 +210,12 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   let prevCursor = options.cursor
   let prevSelection: ResolvedSelection | undefined
   function updateCursor() {
-    const { getResolvedPositions } = getRawTextHelper(getValue())
-    const selection = { start: getResolvedPositions(input.selectionStart), end: getResolvedPositions(input.selectionEnd) }
+    const { resolvePosition } = getRawTextHelper(getValue())
+    const selection = { start: resolvePosition(input.selectionStart), end: resolvePosition(input.selectionEnd) }
     const offset = selection.start.offset !== prevSelection?.start.offset
       ? selection.start
       : selection.end
-    const cursor = getResolvedPositions(offset)
+    const cursor = resolvePosition(offset)
     if (cursor.offset !== prevCursor?.offset) {
       options.onCursorChange?.(cursor)
       callAllShikitorPlugins('onCursorChange', cursor)
@@ -298,8 +298,8 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       return prevCursor!
     },
     focus(cursor) {
-      const { getResolvedPositions } = getRawTextHelper(getValue())
-      const resolvedStartPos = getResolvedPositions(cursor ?? prevCursor?.offset ?? 0)
+      const { resolvePosition } = getRawTextHelper(getValue())
+      const resolvedStartPos = resolvePosition(cursor ?? prevCursor?.offset ?? 0)
       input.setSelectionRange(
         resolvedStartPos.offset, resolvedStartPos.offset
       )
@@ -322,14 +322,14 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         return
       }
 
-      const { getResolvedPositions } = getRawTextHelper(getValue())
+      const { resolvePosition } = getRawTextHelper(getValue())
       const prevResolvedPrevSelection = {
-        start: getResolvedPositions(selectionT0.start),
-        end: getResolvedPositions(selectionT0.end)
+        start: resolvePosition(selectionT0.start),
+        end: resolvePosition(selectionT0.end)
       }
       const resolvedSelection = {
-        start: getResolvedPositions(selectionT1.start),
-        end: getResolvedPositions(selectionT1.end)
+        start: resolvePosition(selectionT1.start),
+        end: resolvePosition(selectionT1.end)
       }
       if ([
         prevResolvedPrevSelection.start.offset !== resolvedSelection.start.offset,

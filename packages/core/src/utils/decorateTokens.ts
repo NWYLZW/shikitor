@@ -18,12 +18,12 @@ export function decorateTokens(
   tokensLines: DecoratedThemedToken[][],
   decorations: Decoration[]
 ) {
-  const { getResolvedPositions } = getRawTextHelper(rawText)
+  const { resolvePosition } = getRawTextHelper(rawText)
   const tokenDecorationsMap = new Map<DecoratedThemedToken, ResolvedDecoration[]>()
   for (const decoration of decorations) {
     const { start, end, ...omitStartAndEndDecoration } = decoration
-    const startResolved = getResolvedPositions(start)
-    const endResolved = getResolvedPositions(end)
+    const startResolved = resolvePosition(start)
+    const endResolved = resolvePosition(end)
     const tokens = tokensLines[startResolved.line - 1]
     if (!tokens) {
       continue
