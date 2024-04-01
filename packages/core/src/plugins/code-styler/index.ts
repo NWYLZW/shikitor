@@ -5,6 +5,11 @@ interface CodeStylerOptions {
   tabSize?: number
   insertSpaces?: boolean
 }
+
+function isBracketKey(key: string) {
+  return key === '{' || key === '[' || key === '(' || key === '<'
+}
+
 export default ({
   tabSize: inputTabSize = 2,
   insertSpaces = true
@@ -13,6 +18,9 @@ export default ({
   async onKeydown(e) {
     if (inputTabSize < 1) return
     const tabSize = ~~inputTabSize
+    if (isBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
+      // TODO auto close bracket
+    }
     if (e.key === 'Tab' || e.key === 'Enter') {
       e.key === 'Tab' && e.preventDefault()
       if (e.key === 'Enter') {
