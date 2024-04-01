@@ -240,14 +240,16 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     // So we need to handle this case separately.
     // https://issues.chromium.org/41321247
     // https://issues.chromium.org/41399759
-    if (isWhatBrowser('chrome') && (e.key === 'Backspace' || e.key === 'Delete') && !isMultipleKey(e)) {
-      const s = { start: input.selectionStart, end: input.selectionEnd }
-      setTimeout(() => {
-        if (s.start !== input.selectionStart || s.end !== input.selectionEnd) {
-          input.setSelectionRange(input.selectionStart, input.selectionEnd)
-          document.dispatchEvent(new Event('selectionchange'))
-        }
-      }, 10)
+    if (isWhatBrowser('chrome')) {
+      if (['Backspace', 'Delete', 'Enter'].includes(e.key) && !isMultipleKey(e)) {
+        const s = { start: input.selectionStart, end: input.selectionEnd }
+        setTimeout(() => {
+          if (s.start !== input.selectionStart || s.end !== input.selectionEnd) {
+            input.setSelectionRange(input.selectionStart, input.selectionEnd)
+            document.dispatchEvent(new Event('selectionchange'))
+          }
+        }, 10)
+      }
     }
   })
   input.addEventListener('keyup', callAllShikitorPlugins.bind(null, 'onKeyup'))
