@@ -2,7 +2,7 @@ import type { OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
 
 import type { ResolvedTextRange, TextRange } from '../base'
 
-interface RawTextHelper {
+export interface RawTextHelper {
   resolvePosition(oop: OffsetOrPosition): ResolvedPosition
   resolveTextRange(tr: TextRange): ResolvedTextRange
 }

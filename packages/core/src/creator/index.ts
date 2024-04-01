@@ -311,6 +311,10 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       }
       return [prevSelection!]
     },
+    get rawTextHelper() {
+      // TODO lazy and function proxy
+      return getRawTextHelper(getValue())
+    },
     updateSelection(index, selectionOrGetSelection) {
       const { selections } = this
       if (index < 0 || index >= selections.length) {
