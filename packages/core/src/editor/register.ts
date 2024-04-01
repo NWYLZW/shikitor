@@ -1,5 +1,5 @@
-import type { Awaitable } from '../types'
 import type { ResolvedTextRange } from '../base'
+import type { Awaitable } from '../types'
 import type { IDisposable, LanguageSelector, ResolvedCursor } from './base'
 
 export type PopupPlacement =
