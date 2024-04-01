@@ -2,8 +2,8 @@ import './index.scss'
 
 import { getHighlighter } from 'shiki'
 
-import { callUpdateDispatcher, type Shikitor, type ShikitorOptions } from '../editor'
-import type { IDisposable, LanguageSelector, Selection } from '../editor/base'
+import { callUpdateDispatcher, type ResolvedSelection, type Shikitor, type ShikitorOptions } from '../editor'
+import type { IDisposable, LanguageSelector } from '../editor/base'
 import type { Popup, PopupProvider } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
@@ -208,14 +208,14 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   input.addEventListener('input', () => changeValue(input.value))
 
   let prevCursor = options.cursor
-  let prevSelection: Selection | undefined
+  let prevSelection: ResolvedSelection | undefined
   function updateCursor() {
-    const selection = { start: input.selectionStart, end: input.selectionEnd }
-    const offset = selection.start !== prevSelection?.start
+    const { getResolvedPositions } = getRawTextHelper(getValue())
+    const selection = { start: getResolvedPositions(input.selectionStart), end: getResolvedPositions(input.selectionEnd) }
+    const offset = selection.start.offset !== prevSelection?.start.offset
       ? selection.start
       : selection.end
-    const rawTextHelper = getRawTextHelper(getValue())
-    const cursor = rawTextHelper.getResolvedPositions(offset)
+    const cursor = getResolvedPositions(offset)
     if (cursor.offset !== prevCursor?.offset) {
       options.onCursorChange?.(cursor)
       callAllShikitorPlugins('onCursorChange', cursor)
@@ -338,7 +338,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         // TODO
         // options.onSelectionChange?.(selection)
         // callAllShikitorPlugins('onSelectionChange', selection)
-        prevSelection = selectionT1
+        prevSelection = resolvedSelection
       }
       input.setSelectionRange(resolvedSelection.start.offset, resolvedSelection.end.offset)
     },

@@ -3,7 +3,7 @@ import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import type { ShikitorPlugin } from '../plugin'
 import type { Awaitable } from '../types'
-import type { Cursor, ResolvedCursor, Selection } from './base'
+import type { Cursor, ResolvedCursor, ResolvedSelection, Selection } from './base'
 import type { ShikitorRegister } from './register'
 
 export * from './base'
@@ -50,7 +50,7 @@ export interface Shikitor extends ShikitorRegister {
   options: Readonly<ShikitorOptions>
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
-  readonly selections: readonly Selection[]
+  readonly selections: readonly ResolvedSelection[]
   updateOptions: UpdateDispatcher<Shikitor['options']>
   updateLanguage: UpdateDispatcher<Shikitor['language']>
   updateSelection: UpdateDispatcher<Selection, [index: number]>
