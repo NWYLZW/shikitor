@@ -31,5 +31,6 @@ describe('rawTextHelper', () => {
     expect(inferLineLeadingSpaces(6, 2, '    1\n')).toBe(4)
     expect(inferLineLeadingSpaces(2, 2, '[\n')).toBe(2)
     expect(inferLineLeadingSpaces(3, 2, '[ \n')).toBe(2)
+    expect(inferLineLeadingSpaces(3, 2, '[ \n]')).toBe(0)
   })
 })

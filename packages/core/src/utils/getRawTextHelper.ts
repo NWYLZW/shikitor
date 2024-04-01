@@ -81,12 +81,22 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
       return count
     },
     inferLineLeadingSpaces(oop, tabSize, text = originalText) {
-      const { line } = rawTextHelper.resolvePosition(oop, text)
+      const { offset, line } = rawTextHelper.resolvePosition(oop, text)
       const computeLine = line === 0 ? 0 : line - 1
       const lineStart = rawTextHelper.lineStart({ line: computeLine, character: 1 }, text)
       const lineText = rawTextHelper.line({ line: computeLine, character: 1 }, text)
       const leadingSpaces = rawTextHelper.countLeadingSpaces(lineStart, tabSize, text)
-      const isIncrease = line !== 0 && /[([{<]$/.test(lineText.trimEnd())
+      const bracketMapping: Record<string, string> = {
+        '(': ')',
+        '[': ']',
+        '{': '}',
+        '<': '>'
+      }
+      const trimedLineText = lineText.trimEnd()
+      const relativeBracket = bracketMapping[trimedLineText[trimedLineText.length - 1]]
+      const isIncrease = line !== 0
+        && relativeBracket
+        && text[offset] !== relativeBracket
       return leadingSpaces - leadingSpaces % tabSize + (isIncrease ? tabSize : 0)
     }
   }
