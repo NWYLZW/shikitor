@@ -56,7 +56,7 @@ You can use `Tab` to indent the current line or selected lines, and use `Shift +
 
 * plugin: `@shikitor/core/plugins/code-styler`
 * demo
-  ![tab](./.readme-res/Export-1711915650863.gif)
+  ![tab](./.readme-res/Export-1711914834555.gif)
 
 #### Quick Jump
 
