@@ -5,6 +5,10 @@ import type { ResolvedTextRange, TextRange } from '../base'
 export interface RawTextHelper {
   resolvePosition(oop: OffsetOrPosition): ResolvedPosition
   resolveTextRange(tr: TextRange): ResolvedTextRange
+  at(oop: OffsetOrPosition): string
+  line(oop: OffsetOrPosition): string
+  lineStart(oop: OffsetOrPosition): number
+  lineEnd(oop: OffsetOrPosition): number
 }
 
 export function getRawTextHelper(text: string): RawTextHelper {
@@ -39,6 +43,26 @@ export function getRawTextHelper(text: string): RawTextHelper {
       return {
         start: this.resolvePosition(tr.start), end: this.resolvePosition(tr.end)
       }
+    },
+    at(oop) {
+      return text[typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)]
+    },
+    lineStart(oop) {
+      let offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)
+      while (offset > 0 && text[offset - 1] !== '\n') {
+        offset--
+      }
+      return offset
+    },
+    lineEnd(oop) {
+      let offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)
+      while (offset < text.length && text[offset] !== '\n' && text[offset] !== '\r') {
+        offset++
+      }
+      return offset
+    },
+    line(oop) {
+      return text.slice(this.lineStart(oop), this.lineEnd(oop))
     }
   }
 }
