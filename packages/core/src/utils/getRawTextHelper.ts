@@ -9,6 +9,7 @@ export interface RawTextHelper {
   line(oop: OffsetOrPosition): string
   lineStart(oop: OffsetOrPosition): number
   lineEnd(oop: OffsetOrPosition): number
+  countLeadingSpaces(oop: OffsetOrPosition, tabSize: number): number
 }
 
 export function getRawTextHelper(text: string): RawTextHelper {
@@ -63,6 +64,20 @@ export function getRawTextHelper(text: string): RawTextHelper {
     },
     line(oop) {
       return text.slice(this.lineStart(oop), this.lineEnd(oop))
+    },
+    countLeadingSpaces(oop, tabSize) {
+      const offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)
+      let count = 0
+      for (let i = offset; i < text.length; i++) {
+        if (text[i] === ' ') {
+          count++
+        } else if (text[i] === '\t') {
+          count += tabSize
+        } else {
+          break
+        }
+      }
+      return count
     }
   }
 }
