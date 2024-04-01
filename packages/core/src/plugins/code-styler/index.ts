@@ -16,6 +16,7 @@ export default ({
     if (e.key === 'Tab') {
       e.preventDefault()
 
+      const { rawTextHelper } = this
       const textarea = e.target
       const { selectionStart, selectionEnd, value } = textarea
       const caller = e.shiftKey ? outdent : indent
@@ -23,7 +24,8 @@ export default ({
         const { replacement, range, selection, selectionMode } = caller(
           value,
           [selectionStart, selectionEnd],
-          { tabSize, insertSpaces }
+          { tabSize, insertSpaces },
+          rawTextHelper
         )
         textarea.setRangeText(replacement, ...range, selectionMode)
         textarea.setSelectionRange(...selection)

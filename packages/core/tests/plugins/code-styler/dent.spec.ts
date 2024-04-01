@@ -101,6 +101,18 @@ describe('outdent', () => {
       selection: [0, 0],
       selectionMode: 'end'
     })
+    expect(outdent('a\n b', [2])).toStrictEqual({
+      replacement: 'b',
+      range: [2, 'a\n b'.length],
+      selection: [2, 2],
+      selectionMode: 'end'
+    })
+    expect(outdent('a\n b', [3])).toStrictEqual({
+      replacement: 'b',
+      range: [2, 'a\n b'.length],
+      selection: [2, 2],
+      selectionMode: 'end'
+    })
   })
   test('outdent at the middle of the line', () => {
     expect(() => outdent('const a = 1', [1])).toThrow('No outdent')
