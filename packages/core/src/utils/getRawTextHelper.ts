@@ -3,21 +3,21 @@ import type { OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
 import type { ResolvedTextRange, TextRange } from '../base'
 
 export interface RawTextHelper {
-  resolvePosition(oop: OffsetOrPosition): ResolvedPosition
-  resolveTextRange(tr: TextRange): ResolvedTextRange
-  at(oop: OffsetOrPosition): string
-  line(oop: OffsetOrPosition): string
-  lineStart(oop: OffsetOrPosition): number
-  lineEnd(oop: OffsetOrPosition): number
-  countLeadingSpaces(oop: OffsetOrPosition, tabSize: number): number
+  resolvePosition(oop: OffsetOrPosition, text?: string): ResolvedPosition
+  resolveTextRange(tr: TextRange, text?: string): ResolvedTextRange
+  at(oop: OffsetOrPosition, text?: string): string
+  line(oop: OffsetOrPosition, text?: string): string
+  lineStart(oop: OffsetOrPosition, text?: string): number
+  lineEnd(oop: OffsetOrPosition, text?: string): number
+  countLeadingSpaces(oop: OffsetOrPosition, tabSize: number, text?: string): number
 }
 
-export function getRawTextHelper(text: string): RawTextHelper {
-  function getOffset(line: number, character: number) {
+export function getRawTextHelper(originalText: string): RawTextHelper {
+  function getOffset(line: number, character: number, text: string) {
     const lines = text.split('\n')
     return lines.slice(0, line - 1).reduce((acc, line) => acc + line.length + 1, 0) + character
   }
-  function getPosition(offset: number) {
+  function getPosition(offset: number, text: string) {
     const lines = text.split('\n')
     let line = 1
     let character = 1
@@ -32,41 +32,41 @@ export function getRawTextHelper(text: string): RawTextHelper {
     return { line, character }
   }
   return {
-    resolvePosition(oop) {
+    resolvePosition(oop, text = originalText) {
       return {
         offset: typeof oop === 'number'
           ? oop
-          : getOffset(oop.line, oop.character),
-        ...(typeof oop === 'number' ? getPosition(oop) : oop)
+          : getOffset(oop.line, oop.character, text),
+        ...(typeof oop === 'number' ? getPosition(oop, text) : oop)
       }
     },
-    resolveTextRange(tr) {
+    resolveTextRange(tr, text = originalText) {
       return {
         start: this.resolvePosition(tr.start), end: this.resolvePosition(tr.end)
       }
     },
-    at(oop) {
-      return text[typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)]
+    at(oop, text = originalText) {
+      return text[typeof oop === 'number' ? oop : getOffset(oop.line, oop.character, text)]
     },
-    lineStart(oop) {
-      let offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)
+    lineStart(oop, text = originalText) {
+      let offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character, text)
       while (offset > 0 && text[offset - 1] !== '\n') {
         offset--
       }
       return offset
     },
-    lineEnd(oop) {
-      let offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)
+    lineEnd(oop, text = originalText) {
+      let offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character, text)
       while (offset < text.length && text[offset] !== '\n' && text[offset] !== '\r') {
         offset++
       }
       return offset
     },
-    line(oop) {
+    line(oop, text = originalText) {
       return text.slice(this.lineStart(oop), this.lineEnd(oop))
     },
-    countLeadingSpaces(oop, tabSize) {
-      const offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character)
+    countLeadingSpaces(oop, tabSize, text = originalText) {
+      const offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character, text)
       let count = 0
       for (let i = offset; i < text.length; i++) {
         if (text[i] === ' ') {
