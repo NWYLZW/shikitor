@@ -5,21 +5,22 @@ import { trimIndent } from '../../../src/utils/trimIndent'
 
 describe('indent', () => {
   test('insert indent at the beginning of the line', () => {
-    const { replacement: r0, range: range0, selection: s0, selectionMode: m0 } = indent('const a = 1', [0])
-    expect(m0).toBe('end')
-    expect(r0).toBe('  ')
-    expect(range0).toStrictEqual([0, 0])
-    expect(s0).toStrictEqual([2, 2])
-
+    expect(indent('const a = 1', [0])).toStrictEqual({
+      replacement: '  ',
+      range: [0, 0],
+      selection: [2, 2],
+      selectionMode: 'end'
+    })
     const start = 'const a = 1\n '.length
-    const { replacement: r1, range: range1, selection: s1, selectionMode: m1 } = indent(trimIndent(`
+    expect(indent(trimIndent(`
       const a = 1
        const b = 2
-    `), [start])
-    expect(m1).toBe('end')
-    expect(r1).toBe(' ')
-    expect(range1).toStrictEqual([start, start])
-    expect(s1).toStrictEqual([start + 1, start + 1])
+    `), [start])).toStrictEqual({
+      replacement: ' ',
+      range: [start, start],
+      selection: [start + 1, start + 1],
+      selectionMode: 'end'
+    })
   })
   test('insert indent at the middle of the line', () => {
     const { replacement: r0, range: range0, selection: s0, selectionMode: m0 } = indent('const a = 1', [1])
