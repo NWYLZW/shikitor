@@ -336,6 +336,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         // callAllShikitorPlugins('onSelectionChange', selection)
         prevSelection = selectionT1
       }
+      input.setSelectionRange(resolvedSelection.start.offset, resolvedSelection.end.offset)
     },
     dispose() {
       offDocumentSelectionChange()
