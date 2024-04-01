@@ -16,20 +16,19 @@ export default ({
     if (e.key === 'Tab') {
       e.preventDefault()
 
-      const { rawTextHelper } = this
+      const { value, rawTextHelper, selections: [prevSelection] } = this
       const textarea = e.target
-      const { selectionStart, selectionEnd, value } = textarea
       const caller = e.shiftKey ? outdent : indent
       try {
-        const { replacement, range, selection, selectionMode } = caller(
+        const { replacement, range, selection: [start, end], selectionMode } = caller(
           value,
-          [selectionStart, selectionEnd],
+          [prevSelection.start.offset, prevSelection.end.offset],
           { tabSize, insertSpaces },
           rawTextHelper
         )
         textarea.setRangeText(replacement, ...range, selectionMode)
-        textarea.setSelectionRange(...selection)
         textarea.dispatchEvent(new Event('input'))
+        this.updateSelection(0, { start, end })
       } catch (e) {
         const error = e as any
         if ('message' in error && error.message !== 'No outdent') {
