@@ -32,7 +32,7 @@ export function getRawTextHelper(text: string): RawTextHelper {
     return { line, character }
   }
   return {
-    resolvePosition(oop: OffsetOrPosition) {
+    resolvePosition(oop) {
       return {
         offset: typeof oop === 'number'
           ? oop
@@ -40,7 +40,7 @@ export function getRawTextHelper(text: string): RawTextHelper {
         ...(typeof oop === 'number' ? getPosition(oop) : oop)
       }
     },
-    resolveTextRange(tr: TextRange) {
+    resolveTextRange(tr) {
       return {
         start: this.resolvePosition(tr.start), end: this.resolvePosition(tr.end)
       }
