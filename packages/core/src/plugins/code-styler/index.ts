@@ -10,11 +10,14 @@ export default ({
   insertSpaces = true
 }: CodeStylerOptions = {}) => definePlugin({
   name: 'shikitor-code-styler',
-  onKeydown(e) {
+  async onKeydown(e) {
     if (inputTabSize < 1) return
     const tabSize = ~~inputTabSize
-    if (e.key === 'Tab') {
-      e.preventDefault()
+    if (e.key === 'Tab' || e.key === 'Enter') {
+      e.key === 'Tab' && e.preventDefault()
+      if (e.key === 'Enter') {
+        await new Promise(r => setTimeout(r, 20))
+      }
 
       const { value, rawTextHelper, selections: [prevSelection] } = this
       const textarea = e.target
