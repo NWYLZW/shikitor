@@ -115,7 +115,11 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
               `font-style:${token.fontStyle}`
             )
           }"
-            style="color: ${token.color}">${token.content}</span>`)
+            style="color: ${token.color}">${
+            token.content
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+          }</span>`)
           .join('')
         return `<span
           data-line="${index + 1}"
