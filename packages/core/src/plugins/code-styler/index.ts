@@ -1,5 +1,5 @@
 import { definePlugin } from '../../plugin'
-import { getLineEnd, getLineStart, indent, outdent } from './dent'
+import { indent, outdent } from './dent'
 
 interface CodeStylerOptions {
   tabSize?: number
@@ -36,15 +36,15 @@ export default ({
       }
     }
     if (e.key === 'ArrowLeft' && (e.ctrlKey || e.metaKey)) {
-      const { value, cursor: { offset } } = this
+      const { value, rawTextHelper, selections: [{ end }] } = this
       const [
         lineStart, lineEnd
       ] = [
-        getLineStart(value, offset),
-        getLineEnd(value, offset)
+        rawTextHelper.lineStart(end.offset),
+        rawTextHelper.lineEnd(end.offset)
       ]
       const line = value.slice(lineStart, lineEnd)
-      const indent = line.match(/^\s+/)?.[0]
+      const indent = line.match(/^\s+/)?.[0] ?? ''
       // ```ts
       //   const a = 1
       // 1234
@@ -54,10 +54,14 @@ export default ({
       // 2 => 0
       // 3 => 2
       // 4 => 2
-      const cursorT0 = lineStart + (indent?.length ?? 0)
-      if (cursorT0 !== offset) {
+      const cursorT0 = lineStart + indent.length
+      if (cursorT0 !== end.offset) {
         e.preventDefault()
-        this.focus(cursorT0)
+        if (!e.shiftKey) {
+          this.focus(cursorT0)
+        } else {
+          this.updateSelection(0, { start: cursorT0, end: end.offset })
+        }
         return
       }
     }
