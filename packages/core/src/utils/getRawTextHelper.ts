@@ -10,6 +10,7 @@ export interface RawTextHelper {
   lineStart(oop: OffsetOrPosition, text?: string): number
   lineEnd(oop: OffsetOrPosition, text?: string): number
   countLeadingSpaces(oop: OffsetOrPosition, tabSize: number, text?: string): number
+  inferLineLeadingSpaces(oop: OffsetOrPosition, tabSize: number, text?: string): number
 }
 
 export function getRawTextHelper(originalText: string): RawTextHelper {
@@ -78,6 +79,13 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
         }
       }
       return count
+    },
+    inferLineLeadingSpaces(oop, tabSize, text = originalText) {
+      const { line } = rawTextHelper.resolvePosition(oop, text)
+      const computeLine = line === 0 ? 0 : line - 1
+      const lineStart = rawTextHelper.lineStart({ line: computeLine, character: 1 }, text)
+      const leadingSpaces = rawTextHelper.countLeadingSpaces(lineStart, tabSize, text)
+      return leadingSpaces - leadingSpaces % tabSize
     }
   }
   return rawTextHelper
