@@ -31,7 +31,7 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
     }
     return { line, character }
   }
-  return {
+  const rawTextHelper: RawTextHelper = {
     resolvePosition(oop, text = originalText) {
       return {
         offset: typeof oop === 'number'
@@ -42,7 +42,7 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
     },
     resolveTextRange(tr, text = originalText) {
       return {
-        start: this.resolvePosition(tr.start), end: this.resolvePosition(tr.end)
+        start: rawTextHelper.resolvePosition(tr.start, text), end: rawTextHelper.resolvePosition(tr.end, text)
       }
     },
     at(oop, text = originalText) {
@@ -63,7 +63,7 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
       return offset
     },
     line(oop, text = originalText) {
-      return text.slice(this.lineStart(oop), this.lineEnd(oop))
+      return text.slice(rawTextHelper.lineStart(oop, text), rawTextHelper.lineEnd(oop, text))
     },
     countLeadingSpaces(oop, tabSize, text = originalText) {
       const offset = typeof oop === 'number' ? oop : getOffset(oop.line, oop.character, text)
@@ -80,4 +80,5 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
       return count
     }
   }
+  return rawTextHelper
 }
