@@ -6,6 +6,13 @@ interface CodeStylerOptions {
   insertSpaces?: boolean
 }
 
+const bracketMapping: Record<string, string> = {
+  '(': ')',
+  '[': ']',
+  '{': '}',
+  '<': '>'
+}
+
 function isBracketKey(key: string) {
   return key === '{' || key === '[' || key === '(' || key === '<'
 }
@@ -18,8 +25,20 @@ export default ({
   async onKeydown(e) {
     if (inputTabSize < 1) return
     const tabSize = ~~inputTabSize
+    const textarea = e.target
     if (isBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
-      // TODO auto close bracket
+      const { value, selections: [prevSelection] } = this
+      const cursor = prevSelection.end.offset
+      const char = e.key
+      const bracket = bracketMapping[char]
+      const nextChar = value[cursor]
+      if (nextChar !== bracket) {
+        e.preventDefault()
+        textarea.setRangeText(char + bracket, cursor, cursor)
+        textarea.dispatchEvent(new Event('input'))
+        this.updateSelection(0, { start: cursor + 1, end: cursor + 1 })
+        return
+      }
     }
     if (e.key === 'Tab' || e.key === 'Enter') {
       e.key === 'Tab' && e.preventDefault()
