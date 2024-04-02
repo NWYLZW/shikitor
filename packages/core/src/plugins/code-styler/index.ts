@@ -19,6 +19,42 @@ function isBracketKey(key: string) {
   return key === '{' || key === '[' || key === '(' || key === '<'
 }
 
+function dentSelection(selection: ResolvedSelection, {
+  codeStyler: {
+    tabSize, insertSpaces
+  },
+  direction,
+  textarea,
+  value,
+  rawTextHelper,
+  updateSelection
+}: {
+  codeStyler: CodeStylerOptions
+  direction: boolean
+  textarea: HTMLTextAreaElement
+  value: string
+  rawTextHelper: RawTextHelper
+  updateSelection?: (start: number, end: number) => void
+}) {
+  const caller = direction ? indent : outdent
+  try {
+    const { replacement, range, selection: [start, end], selectionMode } = caller(
+      value,
+      [selection.start.offset, selection.end.offset],
+      { tabSize, insertSpaces },
+      rawTextHelper
+    )
+    textarea.setRangeText(replacement, ...range, selectionMode)
+    textarea.dispatchEvent(new Event('input'))
+    updateSelection?.(start, end)
+  } catch (e) {
+    const error = e as any
+    if ('message' in error && error.message !== 'No outdent') {
+      throw e
+    }
+  }
+}
+
 export default ({
   tabSize: inputTabSize = 2,
   insertSpaces = true
@@ -49,38 +85,8 @@ export default ({
       }
 
       const { value, rawTextHelper, selections: [selection] } = this
-      function dentSelection(selection: ResolvedSelection, {
-        direction,
-        textarea,
-        value,
-        rawTextHelper,
-        updateSelection
-      }: {
-        direction: boolean
-        textarea: HTMLTextAreaElement
-        value: string
-        rawTextHelper: RawTextHelper
-        updateSelection?: (start: number, end: number) => void
-      }) {
-        const caller = direction ? indent : outdent
-        try {
-          const { replacement, range, selection: [start, end], selectionMode } = caller(
-            value,
-            [selection.start.offset, selection.end.offset],
-            { tabSize, insertSpaces },
-            rawTextHelper
-          )
-          textarea.setRangeText(replacement, ...range, selectionMode)
-          textarea.dispatchEvent(new Event('input'))
-          updateSelection?.(start, end)
-        } catch (e) {
-          const error = e as any
-          if ('message' in error && error.message !== 'No outdent') {
-            throw e
-          }
-        }
-      }
       dentSelection(selection, {
+        codeStyler: { tabSize, insertSpaces },
         direction: !e.shiftKey,
         textarea,
         value,
