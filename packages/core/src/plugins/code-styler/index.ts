@@ -79,12 +79,19 @@ export default ({
       }
     }
     if (e.key === 'Tab' || e.key === 'Enter') {
-      e.key === 'Tab' && e.preventDefault()
+      e.preventDefault()
+      const { selections: [selection] } = this
       if (e.key === 'Enter') {
-        await new Promise(r => setTimeout(r, 20))
+        textarea.setRangeText('\n', selection.start.offset, selection.end.offset)
+        selection.start = {
+          offset: selection.start.offset + 1,
+          line: selection.start.line + 1,
+          character: 1
+        }
+        selection.end = selection.start
       }
 
-      const { value, rawTextHelper, selections: [selection] } = this
+      const { value, rawTextHelper } = this
       dentSelection(selection, {
         codeStyler: { tabSize, insertSpaces },
         direction: !e.shiftKey,
