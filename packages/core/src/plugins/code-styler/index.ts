@@ -1,4 +1,6 @@
+import type { ResolvedSelection } from '../../editor'
 import { definePlugin } from '../../plugin'
+import type { RawTextHelper } from '../../utils/getRawTextHelper'
 import { indent, outdent } from './dent'
 
 interface CodeStylerOptions {
@@ -46,25 +48,45 @@ export default ({
         await new Promise(r => setTimeout(r, 20))
       }
 
-      const { value, rawTextHelper, selections: [prevSelection] } = this
-      const textarea = e.target
-      const caller = e.shiftKey ? outdent : indent
-      try {
-        const { replacement, range, selection: [start, end], selectionMode } = caller(
-          value,
-          [prevSelection.start.offset, prevSelection.end.offset],
-          { tabSize, insertSpaces },
-          rawTextHelper
-        )
-        textarea.setRangeText(replacement, ...range, selectionMode)
-        textarea.dispatchEvent(new Event('input'))
-        this.updateSelection(0, { start, end })
-      } catch (e) {
-        const error = e as any
-        if ('message' in error && error.message !== 'No outdent') {
-          throw e
+      const { value, rawTextHelper, selections: [selection] } = this
+      function dentSelection(selection: ResolvedSelection, {
+        direction,
+        textarea,
+        value,
+        rawTextHelper,
+        updateSelection
+      }: {
+        direction: boolean
+        textarea: HTMLTextAreaElement
+        value: string
+        rawTextHelper: RawTextHelper
+        updateSelection?: (start: number, end: number) => void
+      }) {
+        const caller = direction ? indent : outdent
+        try {
+          const { replacement, range, selection: [start, end], selectionMode } = caller(
+            value,
+            [selection.start.offset, selection.end.offset],
+            { tabSize, insertSpaces },
+            rawTextHelper
+          )
+          textarea.setRangeText(replacement, ...range, selectionMode)
+          textarea.dispatchEvent(new Event('input'))
+          updateSelection?.(start, end)
+        } catch (e) {
+          const error = e as any
+          if ('message' in error && error.message !== 'No outdent') {
+            throw e
+          }
         }
       }
+      dentSelection(selection, {
+        direction: !e.shiftKey,
+        textarea,
+        value,
+        rawTextHelper,
+        updateSelection: (start, end) => this.updateSelection(0, { start, end })
+      })
     }
     if (e.key === 'ArrowLeft' && (e.ctrlKey || e.metaKey)) {
       const { value, rawTextHelper, selections: [{ end }] } = this
