@@ -35,7 +35,7 @@ export type RelativePopupProvider = {
 
 export type AbsolutePopupProvider = {
   position: 'absolute'
-  providePopupCards(): Awaitable<Popup[]>
+  providePopups(): Awaitable<Popup[]>
   offset: {
     x: number
     y: number
