@@ -68,6 +68,16 @@ describe('indent', () => {
       '  const a = 1\n  c'.length
     ])
   })
+  describe('auto indent', () => {
+    test('bracket', () => {
+      expect(indent('(\n\n)', [2])).toStrictEqual({
+        replacement: '  ',
+        range: [2, 2],
+        selection: [4, 4],
+        selectionMode: 'end'
+      })
+    })
+  })
 })
 describe('outdent', () => {
   test('outdent at the beginning of the line', () => {
