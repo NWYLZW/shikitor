@@ -8,15 +8,24 @@ interface CodeStylerOptions {
   insertSpaces?: boolean
 }
 
-const bracketMapping: Record<string, string> = {
+const prevBracketMapping: Record<string, string> = {
   '(': ')',
   '[': ']',
   '{': '}',
   '<': '>'
 }
+const nextBracketMapping: Record<string, string> = {
+  ')': '(',
+  ']': '[',
+  '}': '{',
+  '>': '<'
+}
 
-function isBracketKey(key: string) {
-  return key === '{' || key === '[' || key === '(' || key === '<'
+function isPrevBracketKey(key: string) {
+  return key in prevBracketMapping
+}
+function isNextBracketKey(key: string) {
+  return key in nextBracketMapping
 }
 
 function dentSelection(selection: ResolvedSelection, {
@@ -64,11 +73,11 @@ export default ({
     if (inputTabSize < 1) return
     const tabSize = ~~inputTabSize
     const textarea = e.target
-    if (isBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
+    if (isPrevBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
       const { value, selections: [prevSelection] } = this
       const cursor = prevSelection.end.offset
       const char = e.key
-      const bracket = bracketMapping[char]
+      const bracket = prevBracketMapping[char]
       const nextChar = value[cursor]
       if (nextChar !== bracket) {
         e.preventDefault()
@@ -76,6 +85,23 @@ export default ({
         textarea.dispatchEvent(new Event('input'))
         this.updateSelection(0, { start: cursor + 1, end: cursor + 1 })
         return
+      }
+    }
+    if (isNextBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
+      const { value, selections: [selection] } = this
+      const nextCharIndex = selection.end.offset
+      if (nextCharIndex > value.length) return
+
+      const nextChar = value[nextCharIndex]
+      if (nextChar === e.key) {
+        e.preventDefault()
+        // TODO ```
+        //      >
+        //      | // cursor
+        //      ```
+        //      insert `>` at the cursor
+        //      use stack
+        this.updateSelection(0, { start: nextCharIndex + 1, end: nextCharIndex + 1 })
       }
     }
     if (e.key === 'Tab' || e.key === 'Enter') {
