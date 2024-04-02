@@ -355,6 +355,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       } else {
         options.plugins?.splice(index, 1, p)
       }
+      p.install?.call(this, this)
       renderOutput()
     },
     dispose() {
