@@ -22,7 +22,13 @@ export default () => {
     const cursor = shikitorCursor
     const { decorations = [] } = this.options
     let newDecorations = [
-      ...decorations.filter(d => !d.tagName?.includes(name))
+      ...decorations.filter(d => {
+        const { class: className } = d.properties ?? {}
+        if (typeof className === 'string' || Array.isArray(className)) {
+          return !className.includes(name)
+        }
+        return false
+      })
     ]
     if (!cursor) {
       this.updateOptions(old => ({ ...old, decorations: newDecorations }))
@@ -44,7 +50,9 @@ export default () => {
       newDecorations.push({
         start: bracketOffset,
         end: bracketOffset + 1,
-        tagName: `shikitor-bg-lighting ${name}`
+        properties: {
+          class: `shikitor-bg-lighting ${name}`
+        }
       })
       const increase = lBrackets.includes(relativeBracket) ? -1 : 1
       const stack = []
@@ -62,7 +70,9 @@ export default () => {
             newDecorations.push({
               start: i,
               end: i + 1,
-              tagName: `shikitor-bg-lighting ${name}`
+              properties: {
+                class: `shikitor-bg-lighting ${name}`
+              }
             })
             break
           }

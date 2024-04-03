@@ -22,7 +22,7 @@ export interface ShikitorOptions extends ShikitorEvents {
   lineNumbers?: 'on' | 'off'
   readOnly?: boolean
   theme?: BundledTheme
-  decorations?: Pick<DecorationItem, 'start' | 'end' | 'tagName'>[]
+  decorations?: DecorationItem[]
   plugins?: (
     /**
      * [{}, Promise.resolve({}), import()]
