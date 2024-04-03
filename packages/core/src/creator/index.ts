@@ -70,6 +70,9 @@ export async function create(target: HTMLDivElement, {
   ...inputOptions
 }: ShikitorOptions): Promise<Shikitor> {
   const [input, output] = initInputAndOutput()
+  target.classList.add('shikitor')
+  target.innerHTML = ''
+  target.append(output, input)
 
   const optionsRef = proxy({ current: inputOptions })
 
@@ -112,10 +115,6 @@ export async function create(target: HTMLDivElement, {
 
   let prevCursor = options.cursor
   let prevSelection: ResolvedSelection | undefined
-
-  target.classList.add('shikitor')
-  target.innerHTML = ''
-  target.append(output, input)
 
   watch(get => {
     const {
