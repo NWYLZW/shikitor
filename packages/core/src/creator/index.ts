@@ -16,6 +16,7 @@ import type { Popup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import { classnames } from '../utils/classnames'
+import { debounce } from '../utils/debounce'
 import { getRawTextHelper, type RawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
 import { isWhatBrowser } from '../utils/isWhatBrowser'
@@ -24,6 +25,18 @@ import { throttle } from '../utils/throttle'
 
 interface RefObject<T> {
   current: T
+}
+
+type WatchParams = Parameters<typeof watch>
+type WatchCallback = WatchParams[0]
+type WatchOptions = WatchParams[1] & {
+  timeout?: number
+}
+function debounceWatch(
+  callback: WatchCallback,
+  { timeout = 5, ...options }: WatchOptions = {}
+) {
+  return watch(debounce(callback, timeout), options)
 }
 
 function cssvar(name: string) {
@@ -186,30 +199,34 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
   })
-  const highlighterRef = derive({
-    current: get => {
-      const { theme = 'github-light', language = 'javascript' } = get(optionsRef).current
-      return getHighlighter({ themes: [theme], langs: [language] })
-    }
+  let highlighter: ReturnType<typeof getHighlighter> | undefined
+  const highlighterDeps = derive({
+    theme: get => get(optionsRef).current.theme,
+    language: get => get(optionsRef).current.language
+  })
+  watch(async get => {
+    const {
+      theme = 'github-light',
+      language = 'javascript'
+    } = get(highlighterDeps)
+    highlighter = getHighlighter({ themes: [theme], langs: [language] })
   })
   const outputRenderDeps = derive({
     value: get => get(valueRef).current,
     cursor: get => get(cursorRef).current,
     theme: get => get(optionsRef).current.theme,
     language: get => get(optionsRef).current.language,
-    decorations: get => get(optionsRef).current.decorations,
-    highlighter: get => get(highlighterRef).current
+    decorations: get => get(optionsRef).current.decorations
   })
-  watch(async get => {
+  debounceWatch(async get => {
     const {
       value,
       cursor,
       theme = 'github-light',
       language = 'javascript',
-      decorations,
-      highlighter
+      decorations
     } = get(outputRenderDeps)
-    if (value === undefined) return
+    if (!highlighter || value === undefined) return
 
     const cursorLine = cursor?.line
     const { codeToHtml } = await highlighter
