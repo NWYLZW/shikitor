@@ -488,6 +488,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       }
       if (provider.position === 'absolute') {
         let providePopupsDispose: (() => void) | undefined
+        let removeNewPopups: (() => void) | undefined
         const disposeLanguageWatch = scopeWatch(async get => {
           const { current: currentLanguage } = get(languageRef)
           if (Array.isArray(language) && !language.includes(currentLanguage)) return
@@ -497,16 +498,22 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
           const { dispose, popups: newPopups } = await providePopups()
           providePopupsDispose = dispose
 
-          popups.splice(0, popups.length, ...newPopups.map(popup => ({
+          const mappedPopups = newPopups.map(popup => ({
             ...popup,
             ...meta,
             id: `${currentLanguage}:${popup.id}`
-          })))
+          }))
+          popups.splice(0, popups.length, ...mappedPopups)
+          removeNewPopups = () => {
+            const firstIndex = popups.indexOf(mappedPopups[0])
+            popups.splice(firstIndex, mappedPopups.length)
+          }
         })
         return {
           dispose() {
             disposeLanguageWatch()
             providePopupsDispose?.()
+            removeNewPopups?.()
           }
         }
       }
