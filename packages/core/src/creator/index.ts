@@ -4,16 +4,20 @@ import { getHighlighter } from 'shiki'
 import { derive, watch } from 'valtio/utils'
 import { proxy, subscribe } from 'valtio/vanilla'
 
-import { callUpdateDispatcher, type ResolvedSelection, type Shikitor, type ShikitorOptions } from '../editor'
+import {
+  callUpdateDispatcher,
+  type ResolvedCursor,
+  type ResolvedSelection,
+  type Shikitor,
+  type ShikitorOptions
+} from '../editor'
 import type { Popup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import { classnames } from '../utils/classnames'
-import { type DecoratedThemedToken, decorateTokens } from '../utils/decorateTokens'
 import { getRawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
 import { isWhatBrowser } from '../utils/isWhatBrowser'
-import { lazy } from '../utils/lazy'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
 
@@ -21,11 +25,10 @@ function cssvar(name: string) {
   return `--shikitor-${name}`
 }
 
-function initInputAndOutput(options: ShikitorOptions) {
+function initInputAndOutput() {
   const input = document.createElement('textarea')
   const output = document.createElement('div')
 
-  input.value = options.value ?? ''
   input.classList.add('shikitor-input')
   input.setAttribute('autocapitalize', 'off')
   input.setAttribute('autocomplete', 'off')
@@ -36,7 +39,7 @@ function initInputAndOutput(options: ShikitorOptions) {
   return [input, output] as const
 }
 
-async function resolveInputOptions(options: ShikitorOptions) {
+async function resolveInputOptions<T extends ShikitorOptions>(options: T) {
   return {
     ...options,
     plugins: await resolveInputPlugins(options.plugins ?? [])
@@ -59,21 +62,57 @@ function usePopups() {
   }
 }
 
-export async function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
-  const optionsRef = proxy({ current: inputOptions })
-  const plugins = proxy(await resolveInputPlugins(optionsRef.current.plugins ?? []))
+export async function create(target: HTMLDivElement, {
+  plugins: inputPlugins,
+  onChange,
+  onCursorChange,
+  onDispose,
+  ...inputOptions
+}: ShikitorOptions): Promise<Shikitor> {
+  const [input, output] = initInputAndOutput()
 
-  let options = await resolveInputOptions(inputOptions)
+  const optionsRef = proxy({ current: inputOptions })
+
+  const pluginsRef = proxy({ current: await resolveInputPlugins(inputPlugins) })
   function callAllShikitorPlugins<
     K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
-    return plugins?.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
+    return pluginsRef.current.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
       shikitor,
       // @ts-ignore
       ...args
     ))
   }
-  const [input, output] = initInputAndOutput(options)
+
+  const valueRef = proxy({ current: inputOptions.value ?? '' })
+  subscribe(valueRef, () => {
+    const value = valueRef.current
+    if (value !== input.value) {
+      input.value = value
+    }
+    onChange?.(value)
+    callAllShikitorPlugins('onChange', value)
+  })
+  input.addEventListener('input', () => valueRef.current = input.value)
+  input.value = valueRef.current
+  const rawTextHelperRef = derive({
+    current: get => getRawTextHelper(get(valueRef).current)
+  })
+
+  const changeCursor = (cursor: ResolvedCursor) => {
+    onCursorChange?.(cursor)
+    callAllShikitorPlugins('onCursorChange', cursor)
+  }
+  const dispose = () => {
+    onDispose?.()
+    callAllShikitorPlugins('onDispose')
+  }
+
+  const options = await resolveInputOptions(inputOptions)
+
+  let prevCursor = options.cursor
+  let prevSelection: ResolvedSelection | undefined
+
   target.classList.add('shikitor')
   target.innerHTML = ''
   target.append(output, input)
@@ -89,83 +128,86 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
   })
-  const highlighter = lazy((theme: string, language: string) => getHighlighter({ themes: [theme], langs: [language] }))
-  const renderOutput = async () => {
-    const {
-      theme = 'github-light', language = 'javascript',
-      decorations = []
-    } = options
-    const cursor = prevCursor?.line
-    const { codeToTokens } = await highlighter(theme, language)
-
-    const codeToHtml = (code: string) => {
-      const {
-        tokens: tokensLines,
-        fg = '',
-        bg = '',
-        themeName,
-        rootStyle = ''
-      } = codeToTokens(code, {
-        lang: language,
-        theme: theme
-      })
-      target.style.color = fg
-      target.style.setProperty(cssvar('fg-color'), fg)
-      target.style.setProperty(cssvar('bg-color'), bg)
-      target.style.setProperty(cssvar('caret-color'), fg)
-      target.style.backgroundColor = bg
-      target.style.cssText += rootStyle
-      themeName && target.classList.add(themeName)
-
-      const decoratedTokensLines: DecoratedThemedToken[][] = decorations.length > 0
-        ? decorateTokens(code, tokensLines, decorations)
-        : tokensLines
-      const lines = decoratedTokensLines.map((tokenLine, index) => {
-        const tokens = tokenLine
-          .map(token => `<span
-            class="${
-            classnames(
-              'shikitor-output-token',
-              token.tagName,
-              `offset:${token.offset}`,
-              `position:${index + 1}:${token.offset + 1},${token.offset + 1 + token.content.length}`,
-              `font-style:${token.fontStyle}`
-            )
-          }"
-            style="color: ${token.color}">${
-            token.content
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-          }</span>`)
-          .join('')
-        return `<span
-          data-line="${index + 1}"
-          class="${classnames(
-            'shikitor-output-line',
-            !!cursor && (
-              cursor === index + 1 ? 'shikitor-output-line-cursor' : ''
-            )
-          )}"
-        >${
-          tokens.length === 0
-            ? '<span class="shikitor-output-line-empty"> </span>'
-            : tokens
-        }</span>`
-      })
-      return `<pre tabindex="0"><code class="shikitor-output-lines">${lines.join('')}</code></pre>`
+  const highlighterRef = derive({
+    current: get => {
+      const { theme = 'github-light', language = 'javascript' } = get(optionsRef).current
+      return getHighlighter({ themes: [theme], langs: [language] })
     }
-    output.innerHTML = codeToHtml(input.value)
-  }
-  const getValue = () => input.value
-  const setValue = (value: string) => input.value = value
-  const changeValue = (value: string) => {
-    setValue(value)
-    options.value = value
-    const getValueResult = getValue()
-    options.onChange?.(getValueResult)
-    callAllShikitorPlugins('onChange', getValueResult)
-    renderOutput()
-  }
+  })
+  const outputRenderDeps = derive({
+    value: get => get(valueRef).current,
+    theme: get => get(optionsRef).current.theme,
+    language: get => get(optionsRef).current.language,
+    decorations: get => get(optionsRef).current.decorations,
+    highlighter: get => get(highlighterRef).current
+  })
+  watch(async get => {
+    const {
+      value,
+      theme = 'github-light',
+      language = 'javascript',
+      decorations,
+      highlighter
+    } = get(outputRenderDeps)
+    if (value === undefined) return
+
+    const cursor = prevCursor?.line
+    const { codeToHtml } = await highlighter
+    output.innerHTML = codeToHtml(value, {
+      lang: language,
+      theme: theme,
+      decorations,
+      transformers: [
+        {
+          name: 'shikitor',
+          pre(ele) {
+            const div = document.createElement('div')
+            div.style.cssText = (ele.properties.style as string | undefined) ?? ''
+            const bg = div.style.backgroundColor
+            const fg = div.style.color
+            target.style.setProperty(cssvar('fg-color'), fg)
+            target.style.setProperty(cssvar('bg-color'), bg)
+            target.style.setProperty(cssvar('caret-color'), fg)
+            target.style.color = fg
+            target.style.backgroundColor = bg
+            target.style.cssText += ele.properties.style
+          },
+          code(ele) {
+            const props = ele.properties as {
+              class?: string
+            }
+            props.class = classnames(props.class, 'shikitor-output-lines')
+          },
+          line(ele, line) {
+            const props = ele.properties as {
+              'data-line'?: string
+              class?: string
+            }
+            props.class = classnames(
+              props.class,
+              'shikitor-output-line',
+              !!cursor && (
+                cursor === line ? 'shikitor-output-line-cursor' : ''
+              )
+            )
+            props['data-line'] = String(line)
+          },
+          span(ele, line, col) {
+            const props = ele.properties as {
+              class?: string
+              style?: string
+            }
+            props.class = classnames(
+              props.class,
+              'shikitor-output-token',
+              `offset:${col}`,
+              `position:${line + 1}:${col + 1}`
+            )
+          }
+        }
+      ]
+    })
+  })
   let prevOutputHoverElement: Element | null = null
   input.addEventListener('mousemove', throttle(e => {
     input.style.pointerEvents = 'none'
@@ -219,20 +261,16 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       raw: input.value
     })
   }, 50))
-  input.addEventListener('input', () => changeValue(input.value))
 
-  let prevCursor = options.cursor
-  let prevSelection: ResolvedSelection | undefined
   function updateCursor() {
-    const { resolvePosition } = getRawTextHelper(getValue())
+    const { resolvePosition } = shikitor.rawTextHelper
     const selection = { start: resolvePosition(input.selectionStart), end: resolvePosition(input.selectionEnd) }
     const offset = selection.start.offset !== prevSelection?.start.offset
       ? selection.start
       : selection.end
     const cursor = resolvePosition(offset)
     if (cursor.offset !== prevCursor?.offset) {
-      options.onCursorChange?.(cursor)
-      callAllShikitorPlugins('onCursorChange', cursor)
+      changeCursor(cursor)
     }
     prevCursor = cursor
     prevSelection = selection
@@ -273,13 +311,12 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     output.scrollLeft = input.scrollLeft
   })
 
-  renderOutput()
   const shikitor: Shikitor = {
     get value() {
-      return getValue()
+      return valueRef.current
     },
     set value(value: string) {
-      changeValue(value)
+      valueRef.current = value
     },
     get options() {
       return options
@@ -288,17 +325,18 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       this.updateOptions(newOptions)
     },
     async updateOptions(newOptions) {
-      options = await resolveInputOptions(callUpdateDispatcher(newOptions, options) ?? {})
-      optionsRef.current = options
-      options.value && setValue(options.value)
-      renderOutput()
+      const {
+        plugins,
+        ...resolvedOptions
+      } = callUpdateDispatcher(newOptions, options) ?? {}
+      optionsRef.current = resolvedOptions
+      pluginsRef.current = await resolveInputPlugins(plugins)
     },
     get language() {
       return options.language
     },
     set language(language) {
       options.language = language
-      renderOutput()
     },
     updateLanguage(language) {
       this.language = callUpdateDispatcher(language, options.language)
@@ -310,7 +348,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       return prevCursor!
     },
     focus(cursor) {
-      const { resolvePosition } = getRawTextHelper(getValue())
+      const { resolvePosition } = this.rawTextHelper
       const resolvedStartPos = resolvePosition(cursor ?? prevCursor?.offset ?? 0)
       input.setSelectionRange(
         resolvedStartPos.offset, resolvedStartPos.offset
@@ -324,8 +362,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       return [prevSelection!]
     },
     get rawTextHelper() {
-      // TODO lazy and function proxy
-      return getRawTextHelper(getValue())
+      return rawTextHelperRef.current
     },
     updateSelection(index, selectionOrGetSelection) {
       const { selections } = this
@@ -338,7 +375,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         return
       }
 
-      const { resolvePosition } = getRawTextHelper(getValue())
+      const { resolvePosition } = this.rawTextHelper
       const prevResolvedPrevSelection = {
         start: resolvePosition(selectionT0.start),
         end: resolvePosition(selectionT0.end)
@@ -363,6 +400,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       if (p === undefined) {
         return
       }
+      const plugins = pluginsRef.current
       if (index === undefined) {
         plugins?.push(p)
       } else {
@@ -373,8 +411,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     dispose() {
       offDocumentSelectionChange()
       target.innerHTML = ''
-      options.onDispose?.()
-      callAllShikitorPlugins('onDispose')
+      dispose()
     },
     registerPopupProvider(language, provider) {
       if (provider.position === 'relative') {
