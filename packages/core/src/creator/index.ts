@@ -182,14 +182,16 @@ export async function create(target: HTMLDivElement, {
               'data-line'?: string
               class?: string
             }
+            const isCursor = !!cursor && cursor === line
             props.class = classnames(
               props.class,
               'shikitor-output-line',
-              !!cursor && (
-                cursor === line ? 'shikitor-output-line-cursor' : ''
-              )
+              isCursor && 'shikitor-output-line-highlighted'
             )
             props['data-line'] = String(line)
+            if (isCursor && ele.children.length === 0) {
+              ele.children.push({ type: 'text', value: ' ' })
+            }
           },
           span(ele, line, col) {
             const props = ele.properties as {
