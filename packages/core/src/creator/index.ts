@@ -132,20 +132,6 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     }
   })
 
-  const pluginsRef = derive({
-    current: get => get(optionsRef).current.plugins
-  })
-  function callAllShikitorPlugins<
-    K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
-  >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
-    const plugins = pluginsRef.current
-    return plugins.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
-      shikitor,
-      // @ts-ignore
-      ...args
-    ))
-  }
-
   const {
     dispose: disposePopupsControlled,
     popups
@@ -175,16 +161,58 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     disposeValueControlled,
     disposeCursorControlled
   ] as (() => void)[]
+  const scopeWatch: typeof debounceWatch = (get, options) => {
+    const dispose = debounceWatch(get, options)
+    disposes.push(dispose)
+    return dispose
+  }
+  const scopeSubscribe: typeof subscribe = (...args) => {
+    const dispose = subscribe(...args)
+    disposes.push(dispose)
+    return dispose
+  }
+
+  const pluginsRef = derive({
+    current: get => get(optionsRef).current.plugins
+  })
+  function callAllShikitorPlugins<
+    K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
+  >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
+    const plugins = pluginsRef.current
+    return plugins.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
+      shikitor,
+      // @ts-ignore
+      ...args
+    ))
+  }
+  let prevPlugins = snapshot(pluginsRef).current
+  scopeSubscribe(pluginsRef, async () => {
+    const pluginSnapshots = snapshot(pluginsRef).current
+    if (prevPlugins === pluginSnapshots) {
+      return
+    }
+    // diff
+    const newPlugins = pluginSnapshots.filter(p => !prevPlugins.includes(p))
+    await Promise.all(
+      newPlugins.map(async plugin => {
+        const dispose = await plugin.install?.call(shikitor, shikitor)
+        pluginsDisposes.push(dispose)
+      })
+    )
+    const removedPlugins = prevPlugins.filter(p => !pluginSnapshots.includes(p))
+    removedPlugins.forEach(p => {
+      const index = prevPlugins.indexOf(p)
+      pluginsDisposes[index]?.dispose()
+      p.onDispose?.call(shikitor)
+    })
+    prevPlugins = pluginSnapshots
+  })
+
   const dispose = () => {
     disposes.forEach(dispose => dispose())
     disposeAllPlugins()
     onDispose?.()
     callAllShikitorPlugins('onDispose')
-  }
-  const scopeWatch: typeof debounceWatch = (get, options) => {
-    const dispose = debounceWatch(get, options)
-    disposes.push(dispose)
-    return dispose
   }
 
   let prevSelection: ResolvedSelection | undefined
@@ -367,15 +395,10 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       if (cursor?.offset !== newCursor?.offset) {
         newCursor = cursor
       }
-      const resolvedPlugins = await resolveInputPlugins(plugins ?? [])
-      disposeAllPlugins()
-      pluginsDisposes = await Promise.all(
-        callAllShikitorPlugins('install', shikitor)
-      )
       optionsRef.current = {
         ...resolvedOptions,
         cursor: newCursor,
-        plugins: resolvedPlugins
+        plugins: await resolveInputPlugins(plugins ?? [])
       }
     },
     get language() {
