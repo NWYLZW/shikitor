@@ -1,6 +1,7 @@
 import './index.scss'
 
 import { getHighlighter } from 'shiki'
+import { proxy, subscribe } from 'valtio/vanilla'
 
 import { callUpdateDispatcher, type ResolvedSelection, type Shikitor, type ShikitorOptions } from '../editor'
 import type { IDisposable, LanguageSelector } from '../editor/base'
@@ -45,6 +46,14 @@ async function resolveInputOptions(options: ShikitorOptions) {
         .map(plugin => typeof plugin === 'function' ? plugin() : plugin)
     )
   }
+}
+
+function usePopups() {
+  const popups = proxy<Popup[]>([])
+  const update = () => {
+  }
+  subscribe(popups, update)
+  return [popups, update] as const
 }
 
 export async function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
@@ -138,9 +147,6 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       return `<pre tabindex="0"><code class="shikitor-output-lines">${lines.join('')}</code></pre>`
     }
     output.innerHTML = codeToHtml(input.value)
-  }
-  const popups: Popup[] = []
-  const renderPopups = async () => {
   }
   const getValue = () => input.value
   const setValue = (value: string) => input.value = value
@@ -366,12 +372,12 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     },
     registerPopupProvider(language: LanguageSelector, provider: PopupProvider): IDisposable {
       if (provider.position === 'relative') {
-        if (provider.target === 'cursor') {
-          return { dispose() {} }
-        }
+        throw new Error('Not implemented')
       }
       if (provider.position === 'absolute') {
-        throw new Error('Not implemented')
+        return {
+          dispose() {}
+        }
       }
       throw new Error('Not implemented')
     }
