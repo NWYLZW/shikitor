@@ -206,9 +206,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
   })
-  const highlighterRef = proxy({
-    current: undefined as Awaited<ReturnType<typeof getHighlighter>> | undefined
-  })
+  let highlighter: ReturnType<typeof getHighlighter> | undefined
   const highlighterDeps = derive({
     theme: get => get(optionsRef).current.theme,
     language: get => get(optionsRef).current.language
@@ -218,27 +216,25 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       theme = 'github-light',
       language = 'javascript'
     } = get(highlighterDeps)
-    highlighterRef.current = await getHighlighter({ themes: [theme], langs: [language] })
+    highlighter = getHighlighter({ themes: [theme], langs: [language] })
   })
   const outputRenderDeps = derive({
     theme: get => get(optionsRef).current.theme,
     language: get => get(optionsRef).current.language,
-    decorations: get => get(optionsRef).current.decorations,
-    highlighter: get => get(highlighterRef).current
+    decorations: get => get(optionsRef).current.decorations
   })
-  scopeWatch(get => {
+  scopeWatch(async get => {
     const value = get(valueRef).current
     const cursor = get(cursorRef).current
     const {
       theme = 'github-light',
       language = 'javascript',
-      decorations,
-      highlighter
+      decorations
     } = get(outputRenderDeps)
     if (!highlighter || value === undefined) return
 
     const cursorLine = cursor?.line
-    const { codeToHtml } = highlighter
+    const { codeToHtml } = await highlighter
     output.innerHTML = codeToHtml(value, {
       lang: language,
       theme: theme,
