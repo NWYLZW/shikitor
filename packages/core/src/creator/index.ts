@@ -62,6 +62,25 @@ function usePopups() {
   }
 }
 
+function valueControlled(input: HTMLTextAreaElement, value: string, onChange: ((value: string) => void) | undefined) {
+  const valueRef = proxy({ current: value ?? '' })
+  subscribe(valueRef, () => {
+    const value = valueRef.current
+    if (value !== input.value) {
+      input.value = value
+    }
+    onChange?.(value)
+  })
+  const rawTextHelperRef = derive({
+    current: get => getRawTextHelper(get(valueRef).current)
+  })
+  input.addEventListener('input', () => valueRef.current = input.value)
+  input.value = valueRef.current
+  return {
+    valueRef, rawTextHelperRef
+  }
+}
+
 export async function create(target: HTMLDivElement, {
   plugins: inputPlugins,
   onChange,
@@ -87,19 +106,9 @@ export async function create(target: HTMLDivElement, {
     ))
   }
 
-  const valueRef = proxy({ current: inputOptions.value ?? '' })
-  subscribe(valueRef, () => {
-    const value = valueRef.current
-    if (value !== input.value) {
-      input.value = value
-    }
+  const { valueRef, rawTextHelperRef } = valueControlled(input, inputOptions.value ?? '', value => {
     onChange?.(value)
     callAllShikitorPlugins('onChange', value)
-  })
-  input.addEventListener('input', () => valueRef.current = input.value)
-  input.value = valueRef.current
-  const rawTextHelperRef = derive({
-    current: get => getRawTextHelper(get(valueRef).current)
   })
 
   const changeCursor = (cursor: ResolvedCursor) => {
