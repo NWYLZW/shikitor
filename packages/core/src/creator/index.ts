@@ -177,7 +177,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   ] as (() => void)[]
   const dispose = () => {
     disposes.forEach(dispose => dispose())
-    pluginsDisposes.forEach(({ dispose } = { dispose: () => void 0 }) => dispose())
+    disposeAllPlugins()
     onDispose?.()
     callAllShikitorPlugins('onDispose')
   }
@@ -371,10 +371,15 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       if (cursor?.offset !== newCursor?.offset) {
         newCursor = cursor
       }
+      const resolvedPlugins = await resolveInputPlugins(plugins ?? [])
+      disposeAllPlugins()
+      pluginsDisposes = await Promise.all(
+        callAllShikitorPlugins('install', shikitor)
+      )
       optionsRef.current = {
         ...resolvedOptions,
         cursor: newCursor,
-        plugins: await resolveInputPlugins(plugins ?? [])
+        plugins: resolvedPlugins
       }
     },
     get language() {
@@ -508,8 +513,12 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       throw new Error('Not implemented')
     }
   }
-  const pluginsDisposes = await Promise.all(
+  let pluginsDisposes = await Promise.all(
     callAllShikitorPlugins('install', shikitor)
   )
+  function disposeAllPlugins() {
+    pluginsDisposes.forEach(({ dispose } = { dispose: () => void 0 }) => dispose())
+    pluginsDisposes = []
+  }
   return shikitor
 }
