@@ -1,5 +1,5 @@
 import type { ResolvedTextRange } from '../base'
-import type { Awaitable } from '../types'
+import type { Awaitable, RecursiveReadonly } from '../types'
 import type { IDisposable, LanguageSelector, ResolvedCursor } from './base'
 
 export type RelativePopupPlacement =
@@ -22,7 +22,10 @@ export interface Popup {
 }
 
 export type ResolvedPopup = Popup & (
-  | RelativePopup
+  | RelativePopup & {
+    cursors: RecursiveReadonly<ResolvedCursor[]>
+    selections: RecursiveReadonly<ResolvedTextRange[]>
+  }
   | AbsolutePopup
 )
 

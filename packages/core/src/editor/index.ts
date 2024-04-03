@@ -45,7 +45,14 @@ export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: 
   }
 }
 
-export interface Shikitor extends ShikitorRegister {
+interface InternalShikitor {
+  /**
+   * @internal
+   */
+  _getCursorAbsolutePosition: (cursor: ResolvedCursor) => { x: number, y: number }
+}
+
+export interface Shikitor extends InternalShikitor, ShikitorRegister {
   value: string
   language?: BundledLanguage
   options: RecursiveReadonly<ShikitorOptions>

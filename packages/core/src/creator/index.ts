@@ -12,6 +12,7 @@ import type {
   ShikitorOptions
 } from '../editor'
 import { callUpdateDispatcher } from '../editor'
+import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import { debounce } from '../utils/debounce'
@@ -135,7 +136,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   const {
     dispose: disposePopupsControlled,
     popups
-  } = popupsControlled(target)
+  } = popupsControlled(() => shikitor, target)
   const {
     dispose: disposeValueControlled,
     valueRef,
@@ -502,31 +503,62 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       dispose()
     },
     registerPopupProvider(language, provider) {
-      if (provider.position === 'relative') {
-        throw new Error('Not implemented')
+      let providePopupsDispose: (() => void) | undefined
+      let removeNewPopups: (() => void) | undefined
+      function addPopups(npopups: ResolvedPopup[]) {
+        popups.splice(0, popups.length, ...npopups)
+        removeNewPopups = () => {
+          const firstIndex = popups.indexOf(npopups[0])
+          popups.splice(firstIndex, npopups.length)
+        }
       }
-      if (provider.position === 'absolute') {
-        let providePopupsDispose: (() => void) | undefined
-        let removeNewPopups: (() => void) | undefined
-        const disposeLanguageWatch = scopeWatch(async get => {
-          const { current: currentLanguage } = get(languageRef)
+
+      if (provider.position === 'relative') {
+        const { providePopups, ...meta } = provider
+        const disposeCursorWatch = scopeWatch(async get => {
+          const currentLanguage = get(languageRef).current
+          const cursor = get(cursorRef).current
+          // TODO use proxy ref
+          const selection = prevSelection
           if (Array.isArray(language) && !language.includes(currentLanguage)) return
           if (typeof language === 'string' && language !== '*' && language === currentLanguage) return
 
-          const { providePopups, ...meta } = provider
+          providePopupsDispose?.()
+          const cursors = cursor ? [cursor] : []
+          const selections = selection ? [selection] : []
+          const { dispose, popups: newPopups } = await providePopups(cursors, selections)
+          providePopupsDispose = dispose
+
+          addPopups(newPopups.map(popup => ({
+            ...popup,
+            ...meta,
+            cursors,
+            selections,
+            id: `${currentLanguage}:${popup.id}`
+          })))
+        })
+        return {
+          dispose() {
+            disposeCursorWatch()
+          }
+        }
+      }
+      if (provider.position === 'absolute') {
+        const { providePopups, ...meta } = provider
+        const disposeLanguageWatch = scopeWatch(async get => {
+          const currentLanguage = get(languageRef).current
+          if (Array.isArray(language) && !language.includes(currentLanguage)) return
+          if (typeof language === 'string' && language !== '*' && language === currentLanguage) return
+
+          providePopupsDispose?.()
           const { dispose, popups: newPopups } = await providePopups()
           providePopupsDispose = dispose
 
-          const mappedPopups = newPopups.map(popup => ({
+          addPopups(newPopups.map(popup => ({
             ...popup,
             ...meta,
             id: `${currentLanguage}:${popup.id}`
-          }))
-          popups.splice(0, popups.length, ...mappedPopups)
-          removeNewPopups = () => {
-            const firstIndex = popups.indexOf(mappedPopups[0])
-            popups.splice(firstIndex, mappedPopups.length)
-          }
+          })))
         })
         return {
           dispose() {
@@ -537,6 +569,39 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         }
       }
       throw new Error('Not implemented')
+    },
+
+    _getCursorAbsolutePosition(cursor): { x: number, y: number } {
+      const { rawTextHelper: { line } } = this
+      const span = document.createElement('span')
+      span.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      `
+      const style = getComputedStyle(input);
+      ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'textTransform', 'letterSpacing'].forEach(prop => {
+        // @ts-ignore
+        span.style[prop] = style[prop]
+      })
+      const text = '\n'.repeat(cursor.line - 1) + line(cursor).substring(0, cursor.character)
+      const inTheLineStart = cursor.character === 0
+      span.textContent = inTheLineStart ? text + ' ' : text
+      document.body.appendChild(span)
+      const rect = span.getBoundingClientRect()
+      document.body.removeChild(span)
+      const inputStyle = getComputedStyle(input)
+      const left = parseInt(inputStyle.marginLeft) + parseInt(inputStyle.paddingLeft)
+      const top = parseInt(inputStyle.marginTop) + parseInt(inputStyle.paddingTop)
+      return {
+        x: (
+          inTheLineStart ? 0 : rect.right
+        ) + left,
+        y: rect.bottom + top
+      }
     }
   }
   let pluginsDisposes = await Promise.all(
