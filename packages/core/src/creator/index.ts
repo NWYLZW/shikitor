@@ -413,7 +413,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         ...resolvedOptions
       } = callUpdateDispatcher(newOptions, this.options) ?? {}
       let newCursor = optionsRef.current.cursor
-      if (cursor.offset !== newCursor?.offset) {
+      if (cursor?.offset !== newCursor?.offset) {
         newCursor = cursor
       }
       optionsRef.current = {
