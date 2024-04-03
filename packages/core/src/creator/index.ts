@@ -2,7 +2,7 @@ import './index.scss'
 
 import { getHighlighter } from 'shiki'
 import { derive, watch } from 'valtio/utils'
-import { proxy, subscribe } from 'valtio/vanilla'
+import { proxy, snapshot, subscribe } from 'valtio/vanilla'
 
 import type {
   Cursor,
@@ -40,12 +40,6 @@ function initInputAndOutput() {
   return [input, output] as const
 }
 
-async function resolveInputOptions<T extends ShikitorOptions>(options: T) {
-  return {
-    ...options,
-    plugins: await resolveInputPlugins(options.plugins ?? [])
-  }
-}
 async function resolveInputPlugins(plugins: ShikitorOptions['plugins']) {
   const waitResolvedPlugins = await Promise.all(plugins?.map(Promise.resolve.bind(Promise)) ?? [])
   return Promise.all(
@@ -105,24 +99,33 @@ function cursorControlled(
 export async function create(target: HTMLDivElement, {
   value: inputValue,
   cursor: inputCursor,
-  plugins: inputPlugins,
-  onChange,
-  onCursorChange,
-  onDispose,
   ...inputOptions
 }: ShikitorOptions): Promise<Shikitor> {
+  const {
+    onChange,
+    onCursorChange,
+    onDispose
+  } = inputOptions
   const [input, output] = initInputAndOutput()
   target.classList.add('shikitor')
   target.innerHTML = ''
   target.append(output, input)
 
-  const optionsRef = proxy({ current: inputOptions })
+  const optionsRef = proxy({
+    current: {
+      ...inputOptions,
+      plugins: await resolveInputPlugins(inputOptions.plugins)
+    }
+  })
 
-  const pluginsRef = proxy({ current: await resolveInputPlugins(inputPlugins) })
-  function callAllShikitorPlugins<
+  const pluginsRef = derive({
+    current: get => get(optionsRef).current.plugins
+  })
+  async function callAllShikitorPlugins<
     K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
-    return pluginsRef.current.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
+    const plugins = await pluginsRef.current
+    return plugins.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
       shikitor,
       // @ts-ignore
       ...args
@@ -155,8 +158,6 @@ export async function create(target: HTMLDivElement, {
     onDispose?.()
     callAllShikitorPlugins('onDispose')
   }
-
-  const options = await resolveInputOptions(inputOptions)
 
   let prevSelection: ResolvedSelection | undefined
 
@@ -363,27 +364,40 @@ export async function create(target: HTMLDivElement, {
       valueRef.current = value
     },
     get options() {
-      return options
+      return {
+        ...snapshot(optionsRef).current,
+        value: snapshot(valueRef).current,
+        cursor: snapshot(cursorRef).current
+      }
     },
     set options(newOptions) {
       this.updateOptions(newOptions)
     },
     async updateOptions(newOptions) {
       const {
+        value, cursor,
         plugins,
         ...resolvedOptions
-      } = callUpdateDispatcher(newOptions, options) ?? {}
-      optionsRef.current = resolvedOptions
-      pluginsRef.current = await resolveInputPlugins(plugins)
+      } = callUpdateDispatcher(newOptions, this.options) ?? {}
+      // valueRef.current = value ?? valueRef.current
+      // cursorRef.current = cursor ?? cursorRef.current
+      optionsRef.current = {
+        ...resolvedOptions,
+        plugins: await resolveInputPlugins(plugins ?? [])
+      }
     },
     get language() {
-      return options.language
+      return this.options.language
     },
     set language(language) {
-      options.language = language
+      this.updateLanguage(language)
     },
     updateLanguage(language) {
-      this.language = callUpdateDispatcher(language, options.language)
+      const newLanguage = callUpdateDispatcher(language, this.language)
+      if (newLanguage === undefined) {
+        return
+      }
+      optionsRef.current.language = newLanguage
     },
     get cursor() {
       return cursorRef.current!
