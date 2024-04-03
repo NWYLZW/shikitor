@@ -352,11 +352,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       optionsRef.current.value = value
     },
     get options() {
-      return {
-        ...snapshot(optionsRef).current,
-        value: snapshot(valueRef).current,
-        cursor: snapshot(cursorRef).current
-      }
+      return snapshot(optionsRef).current
     },
     set options(newOptions) {
       this.updateOptions(newOptions)
