@@ -10,9 +10,13 @@ export type PopupPlacement =
   // | 'left-top' | 'left-bottom'
   // | 'right-top' | 'right-bottom'
 
-export type Popup = {
+export interface Popup {
   id: string
   render(element: HTMLElement): void
+}
+
+export interface PopupList extends Partial<IDisposable> {
+  popups: Popup[]
 }
 
 type RelativeCursorPopupProvider = {
@@ -27,7 +31,7 @@ type RelativeSelectionPopupProvider = {
 export type RelativePopupProvider = {
   position: 'relative'
   placement: PopupPlacement
-  providePopups(cursors: ResolvedCursor[], selections: ResolvedTextRange[]): Awaitable<Popup[]>
+  providePopups(cursors: ResolvedCursor[], selections: ResolvedTextRange[]): Awaitable<PopupList>
 } & (
   | RelativeCursorPopupProvider
   | RelativeSelectionPopupProvider
@@ -35,7 +39,7 @@ export type RelativePopupProvider = {
 
 export type AbsolutePopupProvider = {
   position: 'absolute'
-  providePopups(): Awaitable<Popup[]>
+  providePopups(): Awaitable<PopupList>
   offset: {
     x: number
     y: number
