@@ -12,7 +12,7 @@ import type {
   ShikitorOptions
 } from '../editor'
 import { callUpdateDispatcher } from '../editor'
-import type { Popup } from '../editor/register'
+import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import { debounce } from '../utils/debounce'
@@ -21,6 +21,7 @@ import { isMultipleKey } from '../utils/isMultipleKey'
 import { isWhatBrowser } from '../utils/isWhatBrowser'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
+import { popupsControlled } from './controlled/popups-controlled'
 import { shikitorStructureTransformer } from './structure-transfomer'
 
 interface RefObject<T> {
@@ -59,15 +60,6 @@ async function resolveInputPlugins(plugins: ShikitorOptions['plugins']) {
     waitResolvedPlugins
       .map(plugin => typeof plugin === 'function' ? plugin() : plugin)
   )
-}
-
-function usePopups() {
-  const popups = proxy<Popup[]>([])
-  const render = () => {
-  }
-  return {
-    render, off: subscribe(popups, render)
-  }
 }
 
 // TODO use using refactor this
@@ -156,6 +148,10 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   }
 
   const {
+    dispose: disposePopupsControlled,
+    popups
+  } = popupsControlled(target)
+  const {
     dispose: disposeValueControlled,
     valueRef,
     rawTextHelperRef
@@ -175,11 +171,13 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     }
   )
 
-  const disposes = [] as (() => void)[]
+  const disposes = [
+    disposePopupsControlled,
+    disposeValueControlled,
+    disposeCursorControlled
+  ] as (() => void)[]
   const dispose = () => {
     disposes.forEach(dispose => dispose())
-    disposeValueControlled()
-    disposeCursorControlled()
     onDispose?.()
     callAllShikitorPlugins('onDispose')
   }
@@ -190,6 +188,10 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   }
 
   let prevSelection: ResolvedSelection | undefined
+
+  const languageRef = derive({
+    current: get => get(optionsRef).current.language
+  })
 
   scopeWatch(get => {
     const {
@@ -464,8 +466,27 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         throw new Error('Not implemented')
       }
       if (provider.position === 'absolute') {
+        let providePopupsDispose: (() => void) | undefined
+        const disposeLanguageWatch = scopeWatch(async get => {
+          const { current: currentLanguage } = get(languageRef)
+          if (Array.isArray(language) && !language.includes(currentLanguage)) return
+          if (typeof language === 'string' && language !== '*' && language === currentLanguage) return
+
+          const { providePopups, ...meta } = provider
+          const { dispose, popups: newPopups } = await providePopups()
+          providePopupsDispose = dispose
+
+          popups.splice(0, popups.length, ...newPopups.map(popup => ({
+            ...popup,
+            ...meta,
+            id: `${currentLanguage}:${popup.id}`
+          })))
+        })
         return {
-          dispose() {}
+          dispose() {
+            disposeLanguageWatch()
+            providePopupsDispose?.()
+          }
         }
       }
       throw new Error('Not implemented')

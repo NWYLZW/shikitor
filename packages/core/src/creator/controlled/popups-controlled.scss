@@ -1,0 +1,7 @@
+.shikitor-popup {
+  background-color: var(--shikitor-bg-color);
+  padding: 2px 4px;
+  &-absolute {
+    position: absolute;
+  }
+}

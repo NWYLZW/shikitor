@@ -2,7 +2,7 @@ import type { ResolvedTextRange } from '../base'
 import type { Awaitable } from '../types'
 import type { IDisposable, LanguageSelector, ResolvedCursor } from './base'
 
-export type PopupPlacement =
+export type RelativePopupPlacement =
   | 'top' | 'bottom'
   // | 'left' | 'right'
   // | 'top-left' | 'top-right'
@@ -10,46 +10,76 @@ export type PopupPlacement =
   // | 'left-top' | 'left-bottom'
   // | 'right-top' | 'right-bottom'
 
+export type AbsolutePopupPlacement =
+  | 'top-left' | 'top-right'
+  | 'bottom-left' | 'bottom-right'
+  | 'left-top' | 'left-bottom'
+  | 'right-top' | 'right-bottom'
+
 export interface Popup {
   id: string
   render(element: HTMLElement): void
 }
 
+export type ResolvedPopup = Popup & (
+  | RelativePopup
+  | AbsolutePopup
+)
+
 export interface PopupList extends Partial<IDisposable> {
   popups: Popup[]
 }
 
-type RelativeCursorPopupProvider = {
+export type BasePopup = {
+  /**
+   * The width of the popup.
+   * If not provided, the popup will be auto-sized.
+   */
+  width?: number
+  /**
+   * The height of the popup.
+   * If not provided, the popup will be auto-sized.
+   */
+  height?: number
+}
+
+type RelativeCursorPopup = {
   target: 'cursor'
   offset?: 'line-start'
 }
 
-type RelativeSelectionPopupProvider = {
+type RelativeSelectionPopup = {
   target: 'selection'
 }
 
-export type RelativePopupProvider = {
+export type RelativePopup = BasePopup & {
   position: 'relative'
-  placement: PopupPlacement
-  providePopups(cursors: ResolvedCursor[], selections: ResolvedTextRange[]): Awaitable<PopupList>
+  placement: RelativePopupPlacement
 } & (
-  | RelativeCursorPopupProvider
-  | RelativeSelectionPopupProvider
+  | RelativeCursorPopup
+  | RelativeSelectionPopup
 )
 
-export type AbsolutePopupProvider = {
+export type AbsolutePopup = BasePopup & {
   position: 'absolute'
-  providePopups(): Awaitable<PopupList>
   offset: {
-    x: number
-    y: number
+    top?: number
+    left?: number
+    right?: number
+    bottom?: number
   }
+  // TODO
+  // placement: AbsolutePopupPlacement
 }
 
 export type PopupProvider = {
 } & (
-  | RelativePopupProvider
-  | AbsolutePopupProvider
+  | (RelativePopup & {
+    providePopups(cursors: ResolvedCursor[], selections: ResolvedTextRange[]): Awaitable<PopupList>
+  })
+  | (AbsolutePopup & {
+    providePopups(): Awaitable<PopupList>
+  })
 )
 
 export interface ShikitorRegister {
