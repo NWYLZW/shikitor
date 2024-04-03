@@ -56,6 +56,7 @@ export interface Shikitor extends ShikitorRegister {
   updateOptions: UpdateDispatcher<Shikitor['options'], [], Promise<void>>
   updateLanguage: UpdateDispatcher<Shikitor['language']>
   updateSelection: UpdateDispatcher<Selection, [index: number]>
-  upsertPlugin: (plugin: NonNullable<ShikitorOptions['plugins']>[number], index?: number) => Promise<void>
+  upsertPlugin: (plugin: NonNullable<ShikitorOptions['plugins']>[number], index?: number) => Promise<number>
+  removePlugin: (index: number) => void
   dispose: () => void
 }

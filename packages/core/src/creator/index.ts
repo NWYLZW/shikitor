@@ -53,7 +53,7 @@ function initInputAndOutput() {
   return [input, output] as const
 }
 
-async function resolveInputPlugins(plugins: ShikitorOptions['plugins']) {
+async function resolveInputPlugins(plugins: ShikitorOptions['plugins']): Promise<ShikitorPlugin[]> {
   const waitResolvedPlugins = await Promise.all(plugins?.map(Promise.resolve.bind(Promise)) ?? [])
   return Promise.all(
     waitResolvedPlugins
@@ -135,10 +135,10 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   const pluginsRef = derive({
     current: get => get(optionsRef).current.plugins
   })
-  async function callAllShikitorPlugins<
+  function callAllShikitorPlugins<
     K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
-    const plugins = await pluginsRef.current
+    const plugins = pluginsRef.current
     return plugins.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
       shikitor,
       // @ts-ignore
@@ -177,6 +177,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   ] as (() => void)[]
   const dispose = () => {
     disposes.forEach(dispose => dispose())
+    pluginsDisposes.forEach(({ dispose } = { dispose: () => void 0 }) => dispose())
     onDispose?.()
     callAllShikitorPlugins('onDispose')
   }
@@ -445,15 +446,33 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     async upsertPlugin(plugin, index) {
       const p = await Promise.resolve(typeof plugin === 'function' ? plugin() : plugin)
       if (p === undefined) {
-        return
+        throw new Error('Not provided plugin')
       }
       const plugins = pluginsRef.current
+      const realIndex = index ?? plugins.length - 1
+      if (realIndex < 0 || realIndex >= plugins.length) {
+        throw new Error('Invalid index')
+      }
       if (index === undefined) {
         plugins?.push(p)
       } else {
+        plugins[realIndex]?.onDispose?.call(this)
+        pluginsDisposes[realIndex]?.dispose()
         plugins?.splice(index, 1, p)
       }
-      p.install?.call(this, this)
+      pluginsDisposes[realIndex] = await p.install?.call(this, this)
+      return realIndex
+    },
+    async removePlugin(index) {
+      const plugins = pluginsRef.current
+      const p = plugins[index]
+      if (p === undefined) {
+        throw new Error(`Not found plugin at index ${index}`)
+      }
+      p.onDispose?.call(this)
+      plugins[index]?.onDispose?.call(this)
+      pluginsDisposes[index]?.dispose()
+      plugins?.splice(index, 1)
     },
     dispose() {
       offDocumentSelectionChange()
@@ -491,6 +510,8 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       throw new Error('Not implemented')
     }
   }
-  callAllShikitorPlugins('install', shikitor)
+  const pluginsDisposes = await Promise.all(
+    callAllShikitorPlugins('install', shikitor)
+  )
   return shikitor
 }

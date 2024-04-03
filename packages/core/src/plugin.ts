@@ -1,7 +1,8 @@
 import type { ResolvedPosition } from '@shikijs/core'
 
 import type { ResolvedTextRange } from './base'
-import type { Shikitor } from './editor'
+import type { IDisposable, Shikitor } from './editor'
+import type { Awaitable } from './types'
 
 export interface OnHoverElementContext {
   content: string
@@ -20,7 +21,7 @@ interface Keyboards {
 
 export interface ShikitorPlugin extends Keyboards {
   name?: string
-  install?: (this: Shikitor, editor: Shikitor) => void
+  install?: (this: Shikitor, editor: Shikitor) => Awaitable<void | IDisposable>
   onChange?: (this: Shikitor, value: string) => void
   onDispose?: (this: Shikitor) => void
   onCursorChange?: (this: Shikitor, cursor?: ResolvedPosition) => void
