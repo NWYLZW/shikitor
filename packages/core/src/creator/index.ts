@@ -82,6 +82,8 @@ function valueControlled(input: HTMLTextAreaElement, value: string, onChange: ((
 }
 
 export async function create(target: HTMLDivElement, {
+  value: inputValue,
+  cursor: inputCursor,
   plugins: inputPlugins,
   onChange,
   onCursorChange,
@@ -106,11 +108,17 @@ export async function create(target: HTMLDivElement, {
     ))
   }
 
-  const { valueRef, rawTextHelperRef } = valueControlled(input, inputOptions.value ?? '', value => {
+  const { valueRef, rawTextHelperRef } = valueControlled(input, inputValue ?? '', value => {
     onChange?.(value)
     callAllShikitorPlugins('onChange', value)
   })
 
+  const cursorRef = proxy({ current: inputCursor })
+  subscribe(cursorRef, () => {
+    const cursor = cursorRef.current
+    if (cursor === undefined) return
+    changeCursor(cursor)
+  })
   const changeCursor = (cursor: ResolvedCursor) => {
     onCursorChange?.(cursor)
     callAllShikitorPlugins('onCursorChange', cursor)
@@ -122,7 +130,6 @@ export async function create(target: HTMLDivElement, {
 
   const options = await resolveInputOptions(inputOptions)
 
-  let prevCursor = options.cursor
   let prevSelection: ResolvedSelection | undefined
 
   watch(get => {
@@ -144,6 +151,7 @@ export async function create(target: HTMLDivElement, {
   })
   const outputRenderDeps = derive({
     value: get => get(valueRef).current,
+    cursor: get => get(cursorRef).current,
     theme: get => get(optionsRef).current.theme,
     language: get => get(optionsRef).current.language,
     decorations: get => get(optionsRef).current.decorations,
@@ -152,6 +160,7 @@ export async function create(target: HTMLDivElement, {
   watch(async get => {
     const {
       value,
+      cursor,
       theme = 'github-light',
       language = 'javascript',
       decorations,
@@ -159,7 +168,7 @@ export async function create(target: HTMLDivElement, {
     } = get(outputRenderDeps)
     if (value === undefined) return
 
-    const cursor = prevCursor?.line
+    const cursorLine = cursor?.line
     const { codeToHtml } = await highlighter
     output.innerHTML = codeToHtml(value, {
       lang: language,
@@ -191,7 +200,7 @@ export async function create(target: HTMLDivElement, {
               'data-line'?: string
               class?: string
             }
-            const isCursor = !!cursor && cursor === line
+            const isCursor = !!cursorLine && cursorLine === line
             props.class = classnames(
               props.class,
               'shikitor-output-line',
@@ -278,11 +287,7 @@ export async function create(target: HTMLDivElement, {
     const offset = selection.start.offset !== prevSelection?.start.offset
       ? selection.start
       : selection.end
-    const cursor = resolvePosition(offset)
-    if (cursor.offset !== prevCursor?.offset) {
-      changeCursor(cursor)
-    }
-    prevCursor = cursor
+    cursorRef.current = resolvePosition(offset)
     prevSelection = selection
   }
   const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
@@ -293,9 +298,10 @@ export async function create(target: HTMLDivElement, {
   input.addEventListener('keydown', e => {
     callAllShikitorPlugins('onKeydown', e as _KeyboardEvent)
     if (e.key === 'Escape' && !isMultipleKey(e)) {
-      if (input.selectionStart !== input.selectionEnd && prevCursor) {
+      const cursor = cursorRef.current
+      if (input.selectionStart !== input.selectionEnd && cursor) {
         e.preventDefault()
-        input.setSelectionRange(prevCursor.offset, prevCursor.offset)
+        input.setSelectionRange(cursor.offset, cursor.offset)
       }
     }
     // The Chrome browser never fires a selectionchange event when backspace or delete is pressed.
@@ -352,14 +358,11 @@ export async function create(target: HTMLDivElement, {
       this.language = callUpdateDispatcher(language, options.language)
     },
     get cursor() {
-      if (prevCursor === undefined) {
-        updateCursor()
-      }
-      return prevCursor!
+      return cursorRef.current!
     },
     focus(cursor) {
       const { resolvePosition } = this.rawTextHelper
-      const resolvedStartPos = resolvePosition(cursor ?? prevCursor?.offset ?? 0)
+      const resolvedStartPos = resolvePosition(cursor ?? 0)
       input.setSelectionRange(
         resolvedStartPos.offset, resolvedStartPos.offset
       )
