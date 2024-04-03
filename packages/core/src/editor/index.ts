@@ -2,7 +2,7 @@ import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import type { ShikitorPlugin } from '../plugin'
-import type { Awaitable } from '../types'
+import type { Awaitable, RecursiveReadonly } from '../types'
 import type { RawTextHelper } from '../utils/getRawTextHelper'
 import type { Cursor, ResolvedCursor, ResolvedSelection, Selection } from './base'
 import type { ShikitorRegister } from './register'
@@ -48,7 +48,7 @@ export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: 
 export interface Shikitor extends ShikitorRegister {
   value: string
   language?: BundledLanguage
-  options: Readonly<ShikitorOptions>
+  options: RecursiveReadonly<ShikitorOptions>
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
   readonly selections: readonly ResolvedSelection[]

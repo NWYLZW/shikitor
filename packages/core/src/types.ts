@@ -6,3 +6,7 @@ export type PickByValue<T, ValueType> = Pick<T, {
 }[keyof T]>
 
 export type Awaitable<T> = Awaited<T> extends infer U ? U | Promise<U> : never
+
+export type RecursiveReadonly<T> = T extends Record<string, any>
+  ? { readonly [K in keyof T]: RecursiveReadonly<T[K]> }
+  : T
