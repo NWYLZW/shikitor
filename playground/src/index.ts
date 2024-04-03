@@ -57,7 +57,6 @@ let shikitor: Shikitor
 async function init() {
   languageSelector.value = config.language ?? 'plaintext'
   themeSelector.value = config.theme ?? 'nord'
-  pluginsSelector.value = config.plugins?.map(plugin => plugin.name).join(',') ?? ''
   shikitor.focus(config.cursor?.offset)
   await shikitor.upsertPlugin({
     name: 'shikitor-saver',
