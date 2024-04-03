@@ -12,7 +12,6 @@ import type {
   ShikitorOptions
 } from '../editor'
 import { callUpdateDispatcher } from '../editor'
-import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import { debounce } from '../utils/debounce'
