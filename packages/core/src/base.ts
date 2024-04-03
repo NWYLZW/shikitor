@@ -8,3 +8,7 @@ export interface ResolvedTextRange {
   start: ResolvedPosition
   end: ResolvedPosition
 }
+
+export function cssvar(name: string) {
+  return `--shikitor-${name}`
+}

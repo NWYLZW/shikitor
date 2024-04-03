@@ -15,13 +15,13 @@ import { callUpdateDispatcher } from '../editor'
 import type { Popup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
-import { classnames } from '../utils/classnames'
 import { debounce } from '../utils/debounce'
 import { getRawTextHelper, type RawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
 import { isWhatBrowser } from '../utils/isWhatBrowser'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
+import { shikitorStructureTransformer } from './structure-transfomer'
 
 interface RefObject<T> {
   current: T
@@ -37,10 +37,6 @@ function debounceWatch(
   { timeout = 5, ...options }: WatchOptions = {}
 ) {
   return watch(debounce(callback, timeout), options)
-}
-
-function cssvar(name: string) {
-  return `--shikitor-${name}`
 }
 
 function initInputAndOutput() {
@@ -240,55 +236,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       theme: theme,
       decorations,
       transformers: [
-        {
-          name: 'shikitor',
-          pre(ele) {
-            const div = document.createElement('div')
-            div.style.cssText = (ele.properties.style as string | undefined) ?? ''
-            const bg = div.style.backgroundColor
-            const fg = div.style.color
-            target.style.setProperty(cssvar('fg-color'), fg)
-            target.style.setProperty(cssvar('bg-color'), bg)
-            target.style.setProperty(cssvar('caret-color'), fg)
-            target.style.color = fg
-            target.style.backgroundColor = bg
-            target.style.cssText += ele.properties.style
-          },
-          code(ele) {
-            const props = ele.properties as {
-              class?: string
-            }
-            props.class = classnames(props.class, 'shikitor-output-lines')
-          },
-          line(ele, line) {
-            const props = ele.properties as {
-              'data-line'?: string
-              class?: string
-            }
-            const isCursor = !!cursorLine && cursorLine === line
-            props.class = classnames(
-              props.class,
-              'shikitor-output-line',
-              isCursor && 'shikitor-output-line-highlighted'
-            )
-            props['data-line'] = String(line)
-            if (isCursor && ele.children.length === 0) {
-              ele.children.push({ type: 'text', value: ' ' })
-            }
-          },
-          span(ele, line, col) {
-            const props = ele.properties as {
-              class?: string
-              style?: string
-            }
-            props.class = classnames(
-              props.class,
-              'shikitor-output-token',
-              `offset:${col}`,
-              `position:${line + 1}:${col + 1}`
-            )
-          }
-        }
+        shikitorStructureTransformer(target, cursorLine)
       ]
     })
   })
