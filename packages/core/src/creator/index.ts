@@ -1,6 +1,7 @@
 import './index.scss'
 
 import { getHighlighter } from 'shiki'
+import { derive, watch } from 'valtio/utils'
 import { proxy, subscribe } from 'valtio/vanilla'
 
 import { callUpdateDispatcher, type ResolvedSelection, type Shikitor, type ShikitorOptions } from '../editor'
@@ -36,15 +37,17 @@ function initInputAndOutput(options: ShikitorOptions) {
 }
 
 async function resolveInputOptions(options: ShikitorOptions) {
-  const inputPlugins = options.plugins ?? []
-  const waitResolvedPlugins = await Promise.all(inputPlugins.map(Promise.resolve.bind(Promise)))
   return {
     ...options,
-    plugins: await Promise.all(
-      waitResolvedPlugins
-        .map(plugin => typeof plugin === 'function' ? plugin() : plugin)
-    )
+    plugins: await resolveInputPlugins(options.plugins ?? [])
   }
+}
+async function resolveInputPlugins(plugins: ShikitorOptions['plugins']) {
+  const waitResolvedPlugins = await Promise.all(plugins?.map(Promise.resolve.bind(Promise)) ?? [])
+  return Promise.all(
+    waitResolvedPlugins
+      .map(plugin => typeof plugin === 'function' ? plugin() : plugin)
+  )
 }
 
 function usePopups() {
@@ -56,12 +59,14 @@ function usePopups() {
 }
 
 export async function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
+  const optionsRef = proxy({ current: inputOptions })
+  const plugins = proxy(await resolveInputPlugins(optionsRef.current.plugins ?? []))
+
   let options = await resolveInputOptions(inputOptions)
-  const shikitorPluginsRef = { get current() { return options.plugins } }
   function callAllShikitorPlugins<
     K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
-    return shikitorPluginsRef.current?.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
+    return plugins?.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
       shikitor,
       // @ts-ignore
       ...args
@@ -72,14 +77,17 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
   target.innerHTML = ''
   target.append(output, input)
 
-  const renderOptions = () => {
+  watch(get => {
     const {
       readOnly,
       lineNumbers = 'on'
-    } = options
+    } = get(derive({
+      readOnly: get => get(optionsRef).current.readOnly,
+      lineNumbers: get => get(optionsRef).current.lineNumbers
+    }))
     target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
-  }
+  })
   const highlighter = lazy((theme: string, language: string) => getHighlighter({ themes: [theme], langs: [language] }))
   const renderOutput = async () => {
     const {
@@ -264,7 +272,6 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     output.scrollLeft = input.scrollLeft
   })
 
-  renderOptions()
   renderOutput()
   const shikitor: Shikitor = {
     get value() {
@@ -281,8 +288,8 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     },
     async updateOptions(newOptions) {
       options = await resolveInputOptions(callUpdateDispatcher(newOptions, options) ?? {})
+      optionsRef.current = options
       options.value && setValue(options.value)
-      renderOptions()
       renderOutput()
     },
     get language() {
@@ -356,12 +363,11 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
         return
       }
       if (index === undefined) {
-        options.plugins?.push(p)
+        plugins?.push(p)
       } else {
-        options.plugins?.splice(index, 1, p)
+        plugins?.splice(index, 1, p)
       }
       p.install?.call(this, this)
-      renderOutput()
     },
     dispose() {
       offDocumentSelectionChange()

@@ -32,6 +32,9 @@ importers:
       '@shikijs/core':
         specifier: ^1.2.0
         version: 1.2.0
+      derive-valtio:
+        specifier: ^0.1.0
+        version: 0.1.0(valtio@1.13.2)
       shiki:
         specifier: ^1.2.0
         version: 1.2.0
