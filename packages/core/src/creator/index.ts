@@ -179,16 +179,23 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     }
   )
 
+  const disposes = [] as (() => void)[]
   const dispose = () => {
+    disposes.forEach(dispose => dispose())
     disposeValueControlled()
     disposeCursorControlled()
     onDispose?.()
     callAllShikitorPlugins('onDispose')
   }
+  const scopeWatch: typeof debounceWatch = (get, options) => {
+    const dispose = debounceWatch(get, options)
+    disposes.push(dispose)
+    return dispose
+  }
 
   let prevSelection: ResolvedSelection | undefined
 
-  watch(get => {
+  scopeWatch(get => {
     const {
       readOnly,
       lineNumbers = 'on'
@@ -199,37 +206,39 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
   })
-  let highlighter: ReturnType<typeof getHighlighter> | undefined
+  const highlighterRef = proxy({
+    current: undefined as Awaited<ReturnType<typeof getHighlighter>> | undefined
+  })
   const highlighterDeps = derive({
     theme: get => get(optionsRef).current.theme,
     language: get => get(optionsRef).current.language
   })
-  watch(async get => {
+  scopeWatch(async get => {
     const {
       theme = 'github-light',
       language = 'javascript'
     } = get(highlighterDeps)
-    highlighter = getHighlighter({ themes: [theme], langs: [language] })
+    highlighterRef.current = await getHighlighter({ themes: [theme], langs: [language] })
   })
   const outputRenderDeps = derive({
-    value: get => get(valueRef).current,
-    cursor: get => get(cursorRef).current,
     theme: get => get(optionsRef).current.theme,
     language: get => get(optionsRef).current.language,
-    decorations: get => get(optionsRef).current.decorations
+    decorations: get => get(optionsRef).current.decorations,
+    highlighter: get => get(highlighterRef).current
   })
-  debounceWatch(async get => {
+  scopeWatch(get => {
+    const value = get(valueRef).current
+    const cursor = get(cursorRef).current
     const {
-      value,
-      cursor,
       theme = 'github-light',
       language = 'javascript',
-      decorations
+      decorations,
+      highlighter
     } = get(outputRenderDeps)
     if (!highlighter || value === undefined) return
 
     const cursorLine = cursor?.line
-    const { codeToHtml } = await highlighter
+    const { codeToHtml } = highlighter
     output.innerHTML = codeToHtml(value, {
       lang: language,
       theme: theme,
@@ -430,9 +439,11 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     },
     updateLanguage(language) {
       const newLanguage = callUpdateDispatcher(language, this.language)
+      console.log('newLanguage', newLanguage)
       if (newLanguage === undefined) {
         return
       }
+      console.log('updateLanguage', newLanguage)
       optionsRef.current.language = newLanguage
     },
     get cursor() {
