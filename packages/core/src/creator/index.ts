@@ -22,6 +22,10 @@ import { isWhatBrowser } from '../utils/isWhatBrowser'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
 
+interface RefObject<T> {
+  current: T
+}
+
 function cssvar(name: string) {
   return `--shikitor-${name}`
 }
@@ -58,8 +62,14 @@ function usePopups() {
 }
 
 // TODO use using refactor this
-function valueControlled(input: HTMLTextAreaElement, value: string, onChange: ((value: string) => void) | undefined) {
-  const valueRef = proxy({ current: value ?? '' })
+function valueControlled(
+  input: HTMLTextAreaElement,
+  ref: RefObject<{ value?: string }>,
+  onChange: ((value: string) => void) | undefined
+) {
+  const valueRef = derive({
+    current: get => get(ref).current.value ?? ''
+  })
   const unSub = subscribe(valueRef, () => {
     const value = valueRef.current
     if (value !== input.value) {
@@ -70,7 +80,7 @@ function valueControlled(input: HTMLTextAreaElement, value: string, onChange: ((
   const rawTextHelperRef = derive({
     current: get => getRawTextHelper(get(valueRef).current)
   })
-  const off = listen(input, 'input', () => valueRef.current = input.value)
+  const off = listen(input, 'input', () => ref.current.value = input.value)
   input.value = valueRef.current
   return {
     dispose() {
@@ -83,11 +93,19 @@ function valueControlled(input: HTMLTextAreaElement, value: string, onChange: ((
 }
 
 function cursorControlled(
-  { resolvePosition }: RawTextHelper,
-  cursor: Cursor,
+  rthRef: RefObject<RawTextHelper>,
+  ref: RefObject<{ cursor?: Cursor }>,
   onCursorChange: (cursor: ResolvedCursor) => void
 ) {
-  const cursorRef = proxy({ current: resolvePosition(cursor) })
+  const optionsCursorRef = derive({
+    current: get => get(ref).current.cursor
+  })
+  const cursorRef = derive({
+    current: get => {
+      const { resolvePosition } = get(rthRef).current
+      return resolvePosition(get(optionsCursorRef).current ?? 0)
+    }
+  })
   const dispose = subscribe(cursorRef, () => {
     const cursor = cursorRef.current
     if (cursor === undefined) return
@@ -96,11 +114,7 @@ function cursorControlled(
   return { cursorRef, dispose }
 }
 
-export async function create(target: HTMLDivElement, {
-  value: inputValue,
-  cursor: inputCursor,
-  ...inputOptions
-}: ShikitorOptions): Promise<Shikitor> {
+export async function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
   const {
     onChange,
     onCursorChange,
@@ -136,7 +150,7 @@ export async function create(target: HTMLDivElement, {
     dispose: disposeValueControlled,
     valueRef,
     rawTextHelperRef
-  } = valueControlled(input, inputValue ?? '', value => {
+  } = valueControlled(input, optionsRef, value => {
     onChange?.(value)
     callAllShikitorPlugins('onChange', value)
   })
@@ -144,8 +158,8 @@ export async function create(target: HTMLDivElement, {
     dispose: disposeCursorControlled,
     cursorRef
   } = cursorControlled(
-    rawTextHelperRef.current,
-    inputCursor ?? 0,
+    rawTextHelperRef,
+    optionsRef,
     cursor => {
       onCursorChange?.(cursor)
       callAllShikitorPlugins('onCursorChange', cursor)
@@ -313,10 +327,12 @@ export async function create(target: HTMLDivElement, {
   function updateCursor() {
     const { resolvePosition } = shikitor.rawTextHelper
     const selection = { start: resolvePosition(input.selectionStart), end: resolvePosition(input.selectionEnd) }
-    const offset = selection.start.offset !== prevSelection?.start.offset
+    const pos = selection.start.offset !== prevSelection?.start.offset
       ? selection.start
       : selection.end
-    cursorRef.current = resolvePosition(offset)
+    if (optionsRef.current.cursor?.offset !== pos.offset) {
+      optionsRef.current.cursor = resolvePosition(pos)
+    }
     prevSelection = selection
   }
   const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
@@ -360,8 +376,8 @@ export async function create(target: HTMLDivElement, {
     get value() {
       return valueRef.current
     },
-    set value(value: string) {
-      valueRef.current = value
+    set value(value) {
+      optionsRef.current.value = value
     },
     get options() {
       return {
@@ -375,14 +391,17 @@ export async function create(target: HTMLDivElement, {
     },
     async updateOptions(newOptions) {
       const {
-        value, cursor,
+        cursor,
         plugins,
         ...resolvedOptions
       } = callUpdateDispatcher(newOptions, this.options) ?? {}
-      // valueRef.current = value ?? valueRef.current
-      // cursorRef.current = cursor ?? cursorRef.current
+      let newCursor = optionsRef.current.cursor
+      if (cursor.offset !== newCursor?.offset) {
+        newCursor = cursor
+      }
       optionsRef.current = {
         ...resolvedOptions,
+        cursor: newCursor,
         plugins: await resolveInputPlugins(plugins ?? [])
       }
     },
