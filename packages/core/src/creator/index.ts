@@ -52,10 +52,11 @@ async function resolveInputPlugins(plugins: ShikitorOptions['plugins']) {
 
 function usePopups() {
   const popups = proxy<Popup[]>([])
-  const update = () => {
+  const render = () => {
   }
-  subscribe(popups, update)
-  return [popups, update] as const
+  return {
+    render, off: subscribe(popups, render)
+  }
 }
 
 export async function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
