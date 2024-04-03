@@ -4,8 +4,7 @@ import { getHighlighter } from 'shiki'
 import { proxy, subscribe } from 'valtio/vanilla'
 
 import { callUpdateDispatcher, type ResolvedSelection, type Shikitor, type ShikitorOptions } from '../editor'
-import type { IDisposable, LanguageSelector } from '../editor/base'
-import type { Popup, PopupProvider } from '../editor/register'
+import type { Popup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import { classnames } from '../utils/classnames'
@@ -277,7 +276,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     get options() {
       return options
     },
-    set options(newOptions: ShikitorOptions) {
+    set options(newOptions) {
       this.updateOptions(newOptions)
     },
     async updateOptions(newOptions) {
@@ -370,7 +369,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       options.onDispose?.()
       callAllShikitorPlugins('onDispose')
     },
-    registerPopupProvider(language: LanguageSelector, provider: PopupProvider): IDisposable {
+    registerPopupProvider(language, provider) {
       if (provider.position === 'relative') {
         throw new Error('Not implemented')
       }
