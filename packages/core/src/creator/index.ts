@@ -385,11 +385,9 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     },
     updateLanguage(language) {
       const newLanguage = callUpdateDispatcher(language, this.language)
-      console.log('newLanguage', newLanguage)
       if (newLanguage === undefined) {
         return
       }
-      console.log('updateLanguage', newLanguage)
       optionsRef.current.language = newLanguage
     },
     get cursor() {
