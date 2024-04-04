@@ -516,6 +516,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     registerPopupProvider(language, provider) {
       let providePopupsDispose: (() => void) | undefined
       let removeNewPopups: (() => void) | undefined
+      let removeWatch: (() => void) | undefined
       function addPopups(npopups: ResolvedPopup[]) {
         popups.splice(0, popups.length, ...npopups)
         removeNewPopups = () => {
@@ -526,7 +527,7 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
 
       if (provider.position === 'relative') {
         const { providePopups, ...meta } = provider
-        const disposeCursorWatch = scopeWatch(async get => {
+        removeWatch = scopeWatch(async get => {
           const currentLanguage = get(languageRef).current
           const cursor = get(cursorRef).current
           // TODO use proxy ref
@@ -548,15 +549,10 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
             id: `${currentLanguage}:${popup.id}`
           })))
         })
-        return {
-          dispose() {
-            disposeCursorWatch()
-          }
-        }
       }
       if (provider.position === 'absolute') {
         const { providePopups, ...meta } = provider
-        const disposeLanguageWatch = scopeWatch(async get => {
+        removeWatch = scopeWatch(async get => {
           const currentLanguage = get(languageRef).current
           if (Array.isArray(language) && !language.includes(currentLanguage)) return
           if (typeof language === 'string' && language !== '*' && language === currentLanguage) return
@@ -571,15 +567,14 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
             id: `${currentLanguage}:${popup.id}`
           })))
         })
-        return {
-          dispose() {
-            disposeLanguageWatch()
-            providePopupsDispose?.()
-            removeNewPopups?.()
-          }
+      }
+      return {
+        dispose() {
+          removeWatch?.()
+          providePopupsDispose?.()
+          removeNewPopups?.()
         }
       }
-      throw new Error('Not implemented')
     },
 
     _getCursorAbsolutePosition(cursor): { x: number, y: number } {
