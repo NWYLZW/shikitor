@@ -18,7 +18,7 @@ export type AbsolutePopupPlacement =
 
 export interface Popup {
   id: string
-  render(element: HTMLElement): void
+  render(element: HTMLDivElement): void
 }
 
 export type ResolvedPopup = Popup & (
