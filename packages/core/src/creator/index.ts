@@ -528,8 +528,8 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       if (provider.position === 'relative') {
         const { providePopups, ...meta } = provider
         removeWatch = scopeWatch(async get => {
-          const currentLanguage = get(languageRef).current
-          const cursor = get(cursorRef).current
+          const currentLanguage = snapshot(get(languageRef)).current
+          const cursor = snapshot(get(cursorRef)).current
           // TODO use proxy ref
           const selection = prevSelection
           if (Array.isArray(language) && !language.includes(currentLanguage)) return
