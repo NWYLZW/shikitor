@@ -40,6 +40,17 @@ function debounceWatch(
   return watch(debounce(callback, timeout), options)
 }
 
+function isSameSnapshot(a: unknown, b: unknown) {
+  if (a === b) return true
+
+  if (typeof a !== 'object' || typeof b !== 'object') return false
+  if (a === null || b === null) return false
+  const aKeys = Object.keys(a) as (keyof typeof a)[]
+  const bKeys = Object.keys(b) as (keyof typeof b)[]
+  if (aKeys.length !== bKeys.length) return false
+  return aKeys.every(key => a[key] === b[key])
+}
+
 function initInputAndOutput() {
   const input = document.createElement('textarea')
   const output = document.createElement('div')
@@ -186,27 +197,27 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       ...args
     ))
   }
-  let prevPlugins = snapshot(pluginsRef).current
+  let prevPluginSnapshots = snapshot(pluginsRef).current
   scopeSubscribe(pluginsRef, async () => {
     const pluginSnapshots = snapshot(pluginsRef).current
-    if (prevPlugins === pluginSnapshots) {
+    if (prevPluginSnapshots === pluginSnapshots) {
       return
     }
-    // diff
-    const newPlugins = pluginSnapshots.filter(p => !prevPlugins.includes(p))
+    const removedPlugins = prevPluginSnapshots.filter(p => !pluginSnapshots.find(pp => isSameSnapshot(p, pp)))
+    removedPlugins.forEach(p => {
+      const index = prevPluginSnapshots.indexOf(p)
+      pluginsDisposes[index]?.dispose()
+      pluginsDisposes.splice(index, 1)
+      p.onDispose?.call(shikitor)
+    })
+    const newPlugins = pluginSnapshots.filter(p => !prevPluginSnapshots.find(pp => isSameSnapshot(p, pp)))
     await Promise.all(
       newPlugins.map(async plugin => {
         const dispose = await plugin.install?.call(shikitor, shikitor)
         pluginsDisposes.push(dispose)
       })
     )
-    const removedPlugins = prevPlugins.filter(p => !pluginSnapshots.includes(p))
-    removedPlugins.forEach(p => {
-      const index = prevPlugins.indexOf(p)
-      pluginsDisposes[index]?.dispose()
-      p.onDispose?.call(shikitor)
-    })
-    prevPlugins = pluginSnapshots
+    prevPluginSnapshots = pluginSnapshots
   })
 
   const dispose = () => {
