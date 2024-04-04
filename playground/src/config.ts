@@ -68,7 +68,11 @@ export const bundledPluginsInfo = Object
 const DEFAULT_INSTALLED_PLUGINS: (
   () => Promise<ShikitorPlugin>
 )[] = bundledPluginsInfo
-  .filter(({ id }) => id && ['bracket-matcher', 'code-styler'].includes(id))
+  .filter(({ id }) => id && [
+    'bracket-matcher',
+    'code-styler',
+    'provide-completions'
+  ].includes(id))
   .map(({ lazyModule }) => () => lazyModule().then(({ default: plugin }) => {
     if (typeof plugin === 'function') {
       return plugin()
