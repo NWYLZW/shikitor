@@ -71,6 +71,9 @@ importers:
       lz-string:
         specifier: ^1.5.0
         version: 1.5.0
+      rollup-plugin-unbundled-reexport:
+        specifier: ^0.2.0
+        version: 0.2.0
       sass:
         specifier: ^1.72.0
         version: 1.72.0
@@ -4500,6 +4503,10 @@ packages:
       style-inject: 0.3.0
     transitivePeerDependencies:
       - ts-node
+    dev: true
+
+  /rollup-plugin-unbundled-reexport@0.2.0:
+    resolution: {integrity: sha512-XQU5MZQWA5PzQWQRLghrlx6Nnjn2B/BR47CujEP1j6Jj+xViV+6eIOe5AFx5bdJmy6IdaU9U/8KHnH1Ckba4Pg==}
     dev: true
 
   /rollup-pluginutils@2.8.2:
