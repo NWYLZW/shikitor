@@ -1,7 +1,7 @@
 import './index.scss'
 
 import { getHighlighter } from 'shiki'
-import { derive, watch } from 'valtio/utils'
+import { derive } from 'valtio/utils'
 import { proxy, snapshot, subscribe } from 'valtio/vanilla'
 
 import type {
@@ -13,38 +13,16 @@ import { callUpdateDispatcher } from '../editor'
 import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
-import { debounce } from '../utils/debounce'
 import { isMultipleKey } from '../utils/isMultipleKey'
 import { isWhatBrowser } from '../utils/isWhatBrowser'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
+import { debounceWatch } from '../utils/valtio/debounceWatch'
+import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { cursorControlled } from './controlled/cursor-controlled'
 import { popupsControlled } from './controlled/popups-controlled'
 import { valueControlled } from './controlled/value-controlled'
 import { shikitorStructureTransformer } from './structure-transfomer'
-
-type WatchParams = Parameters<typeof watch>
-type WatchCallback = WatchParams[0]
-type WatchOptions = WatchParams[1] & {
-  timeout?: number
-}
-function debounceWatch(
-  callback: WatchCallback,
-  { timeout = 5, ...options }: WatchOptions = {}
-) {
-  return watch(debounce(callback, timeout), options)
-}
-
-function isSameSnapshot(a: unknown, b: unknown) {
-  if (a === b) return true
-
-  if (typeof a !== 'object' || typeof b !== 'object') return false
-  if (a === null || b === null) return false
-  const aKeys = Object.keys(a) as (keyof typeof a)[]
-  const bKeys = Object.keys(b) as (keyof typeof b)[]
-  if (aKeys.length !== bKeys.length) return false
-  return aKeys.every(key => a[key] === b[key])
-}
 
 function initInputAndOutput() {
   const input = document.createElement('textarea')
