@@ -277,9 +277,6 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       input.focus()
     },
     get selections() {
-      if (prevSelection === undefined) {
-        updateCursor()
-      }
       return [prevSelection!]
     },
     get rawTextHelper() {
@@ -511,21 +508,19 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
     })
   }, 50))
 
-  function updateCursor() {
-    const { resolvePosition } = shikitor.rawTextHelper
-    const [start, end] = [input.selectionStart, input.selectionEnd]
-    const selection = { start: resolvePosition(start), end: resolvePosition(end) }
-    const pos = selection.start.offset !== prevSelection?.start.offset
-      ? selection.start
-      : selection.end
-    if (optionsRef.current.cursor?.offset !== pos.offset) {
-      optionsRef.current.cursor = resolvePosition(pos)
-    }
-    prevSelection = selection
-  }
   const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
     if (document.getSelection()?.focusNode === target) {
-      updateCursor()
+      const { resolvePosition } = shikitor.rawTextHelper
+      const [start, end] = [input.selectionStart, input.selectionEnd]
+      const selection = { start: resolvePosition(start), end: resolvePosition(end) }
+      const pos = selection.start.offset !== prevSelection?.start.offset
+        ? selection.start
+        : selection.end
+      if (optionsRef.current.cursor?.offset !== pos.offset) {
+        optionsRef.current.cursor = resolvePosition(pos)
+      }
+      prevSelection = selection
+      return
     }
   })
   input.addEventListener('keydown', e => callAllShikitorPlugins('onKeydown', e as _KeyboardEvent))
