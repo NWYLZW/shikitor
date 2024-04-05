@@ -43,6 +43,29 @@ function initDom(target: HTMLElement) {
     output.scrollTop = input.scrollTop
     output.scrollLeft = input.scrollLeft
   })
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !isMultipleKey(e)) {
+      if (input.selectionStart !== input.selectionEnd) {
+        e.preventDefault()
+        input.setSelectionRange(input.selectionStart, input.selectionStart)
+      }
+    }
+    // The Chrome browser never fires a selectionchange event when backspace or delete is pressed.
+    // So we need to handle this case separately.
+    // https://issues.chromium.org/41321247
+    // https://issues.chromium.org/41399759
+    if (isWhatBrowser('chrome')) {
+      if (['Backspace', 'Delete', 'Enter'].includes(e.key) && !isMultipleKey(e)) {
+        const s = { start: input.selectionStart, end: input.selectionEnd }
+        setTimeout(() => {
+          if (s.start !== input.selectionStart || s.end !== input.selectionEnd) {
+            input.setSelectionRange(input.selectionStart, input.selectionEnd)
+            document.dispatchEvent(new Event('selectionchange'))
+          }
+        }, 10)
+      }
+    }
+  })
 
   target.append(output, input)
   return [input, output] as const
@@ -270,33 +293,9 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       updateCursor()
     }
   })
-  input.addEventListener('keydown', e => {
-    callAllShikitorPlugins('onKeydown', e as _KeyboardEvent)
-    if (e.key === 'Escape' && !isMultipleKey(e)) {
-      const cursor = cursorRef.current
-      if (input.selectionStart !== input.selectionEnd && cursor) {
-        e.preventDefault()
-        input.setSelectionRange(cursor.offset, cursor.offset)
-      }
-    }
-    // The Chrome browser never fires a selectionchange event when backspace or delete is pressed.
-    // So we need to handle this case separately.
-    // https://issues.chromium.org/41321247
-    // https://issues.chromium.org/41399759
-    if (isWhatBrowser('chrome')) {
-      if (['Backspace', 'Delete', 'Enter'].includes(e.key) && !isMultipleKey(e)) {
-        const s = { start: input.selectionStart, end: input.selectionEnd }
-        setTimeout(() => {
-          if (s.start !== input.selectionStart || s.end !== input.selectionEnd) {
-            input.setSelectionRange(input.selectionStart, input.selectionEnd)
-            document.dispatchEvent(new Event('selectionchange'))
-          }
-        }, 10)
-      }
-    }
-  })
-  input.addEventListener('keyup', callAllShikitorPlugins.bind(null, 'onKeyup'))
-  input.addEventListener('keypress', callAllShikitorPlugins.bind(null, 'onKeypress'))
+  input.addEventListener('keydown', e => callAllShikitorPlugins('onKeydown', e as _KeyboardEvent))
+  input.addEventListener('keyup', e => callAllShikitorPlugins('onKeyup', e as _KeyboardEvent))
+  input.addEventListener('keypress', e => callAllShikitorPlugins('onKeypress', e as _KeyboardEvent))
 
   const shikitor: Shikitor = {
     get value() {
