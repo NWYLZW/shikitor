@@ -39,6 +39,10 @@ function initDom(target: HTMLElement) {
   input.setAttribute('spellcheck', 'false')
 
   output.classList.add('shikitor-output')
+  input.addEventListener('scroll', () => {
+    output.scrollTop = input.scrollTop
+    output.scrollLeft = input.scrollLeft
+  })
 
   target.append(output, input)
   return [input, output] as const
@@ -293,10 +297,6 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
   })
   input.addEventListener('keyup', callAllShikitorPlugins.bind(null, 'onKeyup'))
   input.addEventListener('keypress', callAllShikitorPlugins.bind(null, 'onKeypress'))
-  input.addEventListener('scroll', () => {
-    output.scrollTop = input.scrollTop
-    output.scrollLeft = input.scrollLeft
-  })
 
   const shikitor: Shikitor = {
     get value() {
