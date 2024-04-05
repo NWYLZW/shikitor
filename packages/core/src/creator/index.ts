@@ -5,8 +5,6 @@ import { derive, watch } from 'valtio/utils'
 import { proxy, snapshot, subscribe } from 'valtio/vanilla'
 
 import type {
-  Cursor,
-  ResolvedCursor,
   ResolvedSelection,
   Shikitor,
   ShikitorOptions
@@ -16,17 +14,14 @@ import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import { debounce } from '../utils/debounce'
-import { getRawTextHelper, type RawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
 import { isWhatBrowser } from '../utils/isWhatBrowser'
 import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
+import { cursorControlled } from './controlled/cursor-controlled'
 import { popupsControlled } from './controlled/popups-controlled'
+import { valueControlled } from './controlled/value-controlled'
 import { shikitorStructureTransformer } from './structure-transfomer'
-
-interface RefObject<T> {
-  current: T
-}
 
 type WatchParams = Parameters<typeof watch>
 type WatchCallback = WatchParams[0]
@@ -71,59 +66,6 @@ async function resolveInputPlugins(plugins: ShikitorOptions['plugins']): Promise
     waitResolvedPlugins
       .map(plugin => typeof plugin === 'function' ? plugin() : plugin)
   )
-}
-
-// TODO use using refactor this
-function valueControlled(
-  input: HTMLTextAreaElement,
-  ref: RefObject<{ value?: string }>,
-  onChange: ((value: string) => void) | undefined
-) {
-  const valueRef = derive({
-    current: get => get(ref).current.value ?? ''
-  })
-  const unSub = subscribe(valueRef, () => {
-    const value = valueRef.current
-    if (value !== input.value) {
-      input.value = value
-    }
-    onChange?.(value)
-  })
-  const rawTextHelperRef = derive({
-    current: get => getRawTextHelper(get(valueRef).current)
-  })
-  const off = listen(input, 'input', () => ref.current.value = input.value)
-  input.value = valueRef.current
-  return {
-    dispose() {
-      unSub()
-      off()
-    },
-    valueRef,
-    rawTextHelperRef
-  }
-}
-
-function cursorControlled(
-  rthRef: RefObject<RawTextHelper>,
-  ref: RefObject<{ cursor?: Cursor }>,
-  onCursorChange: (cursor: ResolvedCursor) => void
-) {
-  const optionsCursorRef = derive({
-    current: get => get(ref).current.cursor
-  })
-  const cursorRef = derive({
-    current: get => {
-      const { resolvePosition } = get(rthRef).current
-      return resolvePosition(get(optionsCursorRef).current ?? 0)
-    }
-  })
-  const dispose = subscribe(cursorRef, () => {
-    const cursor = cursorRef.current
-    if (cursor === undefined) return
-    onCursorChange(cursor)
-  })
-  return { cursorRef, dispose }
 }
 
 export async function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
@@ -336,7 +278,8 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
 
   function updateCursor() {
     const { resolvePosition } = shikitor.rawTextHelper
-    const selection = { start: resolvePosition(input.selectionStart), end: resolvePosition(input.selectionEnd) }
+    const [start, end] = [input.selectionStart, input.selectionEnd]
+    const selection = { start: resolvePosition(start), end: resolvePosition(end) }
     const pos = selection.start.offset !== prevSelection?.start.offset
       ? selection.start
       : selection.end
