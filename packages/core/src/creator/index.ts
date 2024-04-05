@@ -9,10 +9,10 @@ import type {
   Shikitor,
   ShikitorOptions
 } from '../editor'
-import { callUpdateDispatcher } from '../editor'
 import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
+import { callUpdateDispatcher } from '../utils/callUpdateDispatcher'
 import { isMultipleKey } from '../utils/isMultipleKey'
 import { isWhatBrowser } from '../utils/isWhatBrowser'
 import { listen } from '../utils/listen'

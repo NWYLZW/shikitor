@@ -3,6 +3,7 @@ import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import type { ShikitorPlugin } from '../plugin'
 import type { Awaitable, RecursiveReadonly } from '../types'
+import type { UpdateDispatcher } from '../utils/callUpdateDispatcher'
 import type { RawTextHelper } from '../utils/getRawTextHelper'
 import type { Cursor, ResolvedCursor, ResolvedSelection, Selection } from './base'
 import type { ShikitorRegister } from './register'
@@ -33,16 +34,6 @@ export interface ShikitorOptions extends ShikitorEvents {
      */
     | (() => Awaitable<ShikitorPlugin>)
   )[]
-}
-
-export type UpdateDispatcher<T, Args extends unknown[] = [], RT = void> = (...args: [...Args, value: T | ((value: T) => T)]) => RT
-
-export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: T) {
-  if (typeof value === 'function') {
-    return (value as Function)(oldValue)
-  } else {
-    return value
-  }
 }
 
 interface InternalShikitor {
