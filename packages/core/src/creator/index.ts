@@ -167,6 +167,10 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
       callAllShikitorPlugins('onCursorChange', cursor)
     }
   )
+  let prevSelection: ResolvedSelection | undefined
+  const languageRef = derive({
+    current: get => get(optionsRef).current.language
+  })
 
   const disposes = [
     disposePopupsControlled,
@@ -226,12 +230,6 @@ export async function create(target: HTMLDivElement, inputOptions: ShikitorOptio
     onDispose?.()
     callAllShikitorPlugins('onDispose')
   }
-
-  let prevSelection: ResolvedSelection | undefined
-
-  const languageRef = derive({
-    current: get => get(optionsRef).current.language
-  })
 
   scopeWatch(get => {
     const {
