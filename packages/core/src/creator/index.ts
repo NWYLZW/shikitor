@@ -22,9 +22,13 @@ import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { cursorControlled } from './controlled/cursorControlled'
 import { popupsControlled } from './controlled/popupsControlled'
 import { valueControlled } from './controlled/valueControlled'
+import { resolveInputPlugins } from './resolveInputPlugins'
 import { shikitorStructureTransformer } from './structureTransfomer'
 
-function initInputAndOutput() {
+function initDom(target: HTMLElement) {
+  target.classList.add('shikitor')
+  target.innerHTML = ''
+
   const input = document.createElement('textarea')
   const output = document.createElement('div')
 
@@ -35,27 +39,18 @@ function initInputAndOutput() {
   input.setAttribute('spellcheck', 'false')
 
   output.classList.add('shikitor-output')
+
+  target.append(output, input)
   return [input, output] as const
 }
 
-async function resolveInputPlugins(plugins: ShikitorOptions['plugins']): Promise<ShikitorPlugin[]> {
-  const waitResolvedPlugins = await Promise.all(plugins?.map(Promise.resolve.bind(Promise)) ?? [])
-  return Promise.all(
-    waitResolvedPlugins
-      .map(plugin => typeof plugin === 'function' ? plugin() : plugin)
-  )
-}
-
-export async function create(target: HTMLDivElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
+export async function create(target: HTMLElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
   const {
     onChange,
     onCursorChange,
     onDispose
   } = inputOptions
-  const [input, output] = initInputAndOutput()
-  target.classList.add('shikitor')
-  target.innerHTML = ''
-  target.append(output, input)
+  const [input, output] = initDom(target)
 
   const optionsRef = proxy({
     current: {
