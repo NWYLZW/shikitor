@@ -12,11 +12,15 @@ import type {
 import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
-import { callUpdateDispatcher } from '../utils/callUpdateDispatcher'
-import { isMultipleKey } from '../utils/isMultipleKey'
-import { isWhatBrowser } from '../utils/isWhatBrowser'
-import { listen } from '../utils/listen'
-import { throttle } from '../utils/throttle'
+import {
+  callUpdateDispatcher,
+  isMultipleKey,
+  isWhatBrowser,
+  listen,
+  throttle
+  } from '../utils' with {
+  'unbundled-reexport': 'on'
+}
 import { debounceWatch } from '../utils/valtio/debounceWatch'
 import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { cursorControlled } from './controlled/cursorControlled'
