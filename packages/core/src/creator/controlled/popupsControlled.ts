@@ -1,4 +1,4 @@
-import './popups-controlled.scss'
+import './popupsControlled.scss'
 
 import { proxy, snapshot, subscribe } from 'valtio/vanilla'
 

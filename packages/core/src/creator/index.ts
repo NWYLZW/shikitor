@@ -19,10 +19,10 @@ import { listen } from '../utils/listen'
 import { throttle } from '../utils/throttle'
 import { debounceWatch } from '../utils/valtio/debounceWatch'
 import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
-import { cursorControlled } from './controlled/cursor-controlled'
-import { popupsControlled } from './controlled/popups-controlled'
-import { valueControlled } from './controlled/value-controlled'
-import { shikitorStructureTransformer } from './structure-transfomer'
+import { cursorControlled } from './controlled/cursorControlled'
+import { popupsControlled } from './controlled/popupsControlled'
+import { valueControlled } from './controlled/valueControlled'
+import { shikitorStructureTransformer } from './structureTransfomer'
 
 function initInputAndOutput() {
   const input = document.createElement('textarea')
