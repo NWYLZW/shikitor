@@ -1,10 +1,40 @@
 import './provide-completions.scss'
 
+import type { ResolvedPosition } from '@shikijs/core'
+import type { CompletionItemProvider, LanguageSelector } from '@shikitor/core'
 import { derive } from 'valtio/utils'
 import { proxy, ref, subscribe } from 'valtio/vanilla'
 
+import type { IDisposable, ProviderResult } from '../editor'
 import { definePlugin } from '../plugin'
+import type { RawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
+import { debounceWatch } from '../utils/valtio/debounceWatch'
+
+const name = 'provide-completions'
+
+interface ShikitorProvideCompletions {
+  registerCompletionItemProvider: (selector: LanguageSelector, provider: CompletionItemProvider) => IDisposable
+}
+
+declare module '@shikitor/core' {
+  export interface CompletionList extends Partial<IDisposable> {
+    suggestions: CompletionItem[]
+  }
+  export interface CompletionItemProvider {
+    triggerCharacters?: string[]
+    /**
+     * Provide completion items for the given position and document.
+     */
+    provideCompletionItems(
+      rawTextHelper: RawTextHelper,
+      position: ResolvedPosition
+    ): ProviderResult<CompletionList>
+  }
+  interface ShikitorExtends {
+    'provide-completions': ShikitorProvideCompletions
+  }
+}
 
 export enum CompletionItemKind {
   Method = 0,
@@ -90,6 +120,11 @@ export default () => {
     }
   })
 
+  const triggerCharacter = proxy({
+    current: undefined as string | undefined
+  })
+  const allTriggerCharacters = proxy<string[]>([])
+
   const completions = proxy<CompletionItem[]>([])
   const completionsDeps = derive({
     element: get => get(elementRef).current,
@@ -139,12 +174,67 @@ export default () => {
   })
   let providePopupsResolvers: PromiseWithResolvers<void> | undefined
   return definePlugin({
-    name: 'provide-completions',
+    name,
     onDispose() {
       disposes.forEach(dispose => dispose())
     },
     install() {
-      return this.registerPopupProvider('*', {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const shikitor = this
+      const { optionsRef } = shikitor
+      const languageRef = derive({
+        current: get => get(optionsRef).current.language
+      })
+      const disposes: (() => void)[] = []
+      const scopeWatch: typeof debounceWatch = (...args) => {
+        const dispose = debounceWatch(...args)
+        disposes.push(dispose)
+        return dispose
+      }
+      const disposeExtend = this.extend(name, {
+        registerCompletionItemProvider(selector, provider) {
+          let providerDispose: (() => void) | undefined
+          const { triggerCharacters, provideCompletionItems } = provider
+
+          const start = allTriggerCharacters.length
+          const end = allTriggerCharacters.push(...triggerCharacters ?? [])
+          let prevCompletions: CompletionItem[] = []
+          scopeWatch(async get => {
+            const char = get(triggerCharacter).current
+
+            const language = get(languageRef).current
+            if (selector !== '*' && selector !== language) return
+
+            if (!char || !triggerCharacters?.includes(char)) return
+
+            await providePopupsResolvers?.promise
+            const { rawTextHelper, cursor } = shikitor
+            providerDispose?.()
+            const { suggestions = [], dispose } = await Promise.resolve(provideCompletionItems(rawTextHelper, cursor)) ?? {}
+            providerDispose = dispose
+            if (suggestions.length === 0) return
+
+            const oldCompletionsIndexes = completions.reduce((indexes, completion, index) => {
+              if (prevCompletions.includes(completion)) {
+                return [...indexes, index]
+              }
+              return indexes
+            }, [] as number[])
+            const removedCompletions = completions
+              .filter((_, index) => !oldCompletionsIndexes.includes(index))
+            completions.length = 0
+            completions.push(...removedCompletions, ...suggestions)
+            prevCompletions = suggestions
+          })
+          return {
+            dispose() {
+              providerDispose?.()
+              allTriggerCharacters.splice(start, end - start)
+            }
+          }
+        }
+      })
+      const popupProviderDisposable = this.registerPopupProvider('*', {
         position: 'relative',
         placement: 'bottom',
         target: 'cursor',
@@ -161,6 +251,13 @@ export default () => {
           }
         }
       })
+      return {
+        dispose() {
+          disposeExtend()
+          popupProviderDisposable.dispose()
+          disposes.forEach(dispose => dispose())
+        }
+      }
     },
     onKeydown(e) {
       if (displayRef.current && ['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
@@ -176,35 +273,13 @@ export default () => {
         }
         return
       }
-      const triggerCharacters = [
-        '.'
-      ]
-      if (!triggerCharacters.includes(e.key) || isMultipleKey(e)) {
-        displayRef.current = false
+      if (allTriggerCharacters.includes(e.key) && !isMultipleKey(e)) {
+        displayRef.current = true
+        triggerCharacter.current = e.key
         return
       }
 
-      displayRef.current = true
-    },
-    async onChange(value) {
-      if (!displayRef.current) return
-
-      const { cursor } = this
-      const prevChar = value.charAt(cursor.offset - 1)
-      const editorHelperTriggerReg = /[\w\d?_()[\]'"`]/
-      if (editorHelperTriggerReg.test(prevChar)) {
-        await providePopupsResolvers?.promise
-        completions.push(...[
-          {
-            label: 'par',
-            detail: '(expr)'
-          },
-          {
-            label: 'var',
-            detail: 'var name = expr'
-          }
-        ])
-      }
+      displayRef.current = false
     }
   })
 }
