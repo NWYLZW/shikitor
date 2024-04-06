@@ -271,6 +271,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
     get options() {
       return snapshot(optionsRef).current
     },
+    optionsRef,
     set options(newOptions) {
       this.updateOptions(newOptions)
     },

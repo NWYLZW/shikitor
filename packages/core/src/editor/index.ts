@@ -1,6 +1,7 @@
 import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
+import type { RefObject } from '../base'
 import type { ShikitorPlugin } from '../plugin'
 import type { Awaitable, Pretty, RecursiveReadonly, U2I } from '../types'
 import type { UpdateDispatcher } from '../utils/callUpdateDispatcher'
@@ -80,6 +81,7 @@ export interface Shikitor<
   value: string
   language?: BundledLanguage
   options: RecursiveReadonly<ShikitorOptions>
+  optionsRef: RefObject<ShikitorOptions>
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
   readonly selections: readonly ResolvedSelection[]
