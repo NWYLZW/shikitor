@@ -39,6 +39,7 @@
     border: none;
   }
   .shikitor-completion-item {
+    // TODO performance item style, make it more compact
     position: relative;
     display: flex;
     align-items: center;
