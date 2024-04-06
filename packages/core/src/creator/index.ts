@@ -305,7 +305,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       optionsRef.current.language = newLanguage
     },
     get cursor() {
-      return cursorRef.current!
+      return snapshot(cursorRef).current
     },
     focus(cursor) {
       const { resolvePosition } = this.rawTextHelper
@@ -319,7 +319,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       return [prevSelection!]
     },
     get rawTextHelper() {
-      return rawTextHelperRef.current
+      return snapshot(rawTextHelperRef).current
     },
     updateSelection(index, selectionOrGetSelection) {
       const { selections } = this
