@@ -1,6 +1,8 @@
 type Listener = (...args: any[]) => unknown
 
-export class EventEmitter<Events extends Record<string, Listener>> {
+export type EventMap = Record<string, Listener>
+
+export class EventEmitter<Events extends EventMap> {
   #map = new Map<keyof Events, Set<Listener>>()
   on<K extends keyof Events>(event: K, listener: Events[K]) {
     const listeners = this.#map.get(event) ?? new Set([listener])
