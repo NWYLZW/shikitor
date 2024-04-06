@@ -3,6 +3,7 @@ import type { OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
 import type { ResolvedTextRange, TextRange } from '../base'
 
 export interface RawTextHelper {
+  value: string
   resolvePosition(oop: OffsetOrPosition, text?: string): ResolvedPosition
   resolveTextRange(tr: TextRange, text?: string): ResolvedTextRange
   at(oop: OffsetOrPosition, text?: string): string
@@ -33,6 +34,7 @@ export function getRawTextHelper(originalText: string): RawTextHelper {
     return { line, character }
   }
   const rawTextHelper: RawTextHelper = {
+    value: originalText,
     resolvePosition(oop, text = originalText) {
       return {
         offset: typeof oop === 'number'
