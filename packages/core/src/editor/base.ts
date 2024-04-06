@@ -2,6 +2,7 @@ import type { OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage } from 'shiki'
 
 import type { ResolvedTextRange, TextRange } from '../base'
+import type { Awaitable, Nullable } from '../types'
 
 export type Cursor = OffsetOrPosition
 export type Selection = TextRange
@@ -13,3 +14,5 @@ export type LanguageSelector = '*' | BundledLanguage | readonly BundledLanguage[
 export interface IDisposable {
   dispose(): void
 }
+
+export type ProviderResult<T> = Awaitable<Nullable<T>>
