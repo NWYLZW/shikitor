@@ -9,6 +9,7 @@ import type {
   Shikitor,
   ShikitorOptions
 } from '../editor'
+import { EventEmitter } from '../editor/base.eventEmitter'
 import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
@@ -142,11 +143,25 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
     K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
   >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
     const plugins = pluginsRef.current
-    return plugins.map(ShikitorPlugin => ShikitorPlugin[method]?.call(
-      shikitor,
-      // @ts-ignore
-      ...args
-    ))
+    return plugins.map(plugin => {
+      let funcRT = plugin[method]?.call(
+        shikitor,
+        // @ts-ignore
+        ...args
+      )
+      if (['install', 'onDispose'].includes(method)) {
+        funcRT = Promise.resolve(funcRT)
+          .then(rt => {
+            const eventName = {
+              install: 'install',
+              onDispose: 'dispose'
+            }[method as 'install' | 'onDispose']
+            shikitor.ee.emit(eventName, plugin.name, shikitor)
+            return rt
+          })
+      }
+      return funcRT
+    })
   }
   let prevPluginSnapshots = snapshot(pluginsRef).current
   scopeSubscribe(pluginsRef, async () => {
@@ -429,6 +444,40 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       }
     },
 
+    ee: new EventEmitter(),
+    extend(key, obj) {
+      const properties = Object.getOwnPropertyDescriptors(obj)
+      const newPropDescs: [string, PropertyDescriptor][] = []
+      for (const [prop, descriptor] of Object.entries(properties)) {
+        if (prop in this) {
+          throw new Error(`Property "${prop}" already exists`)
+        }
+        newPropDescs.push([prop, descriptor])
+        Object.defineProperty(this, prop, descriptor)
+      }
+      return () => {
+        for (const [prop] of newPropDescs) {
+          // @ts-ignore
+          delete this[prop]
+        }
+      }
+    },
+    depend(...keys) {
+      const resolvers = Promise.withResolvers<Shikitor>()
+      const installedPlugins = new Set<string>()
+      function allKeysInstalled() {
+        return keys.every(key => installedPlugins.has(key))
+      }
+      const off = this.ee.on('install', key => {
+        if (!key) return
+        installedPlugins.add(key)
+        if (allKeysInstalled()) {
+          off?.()
+          resolvers.resolve(this)
+        }
+      })
+      return resolvers.promise as Promise<any>
+    },
     _getCursorAbsolutePosition(cursor): { x: number, y: number } {
       const { rawTextHelper: { line } } = this
       const span = document.createElement('span')
