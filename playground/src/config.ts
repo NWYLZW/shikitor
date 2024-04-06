@@ -71,7 +71,8 @@ const DEFAULT_INSTALLED_PLUGINS: (
   .filter(({ id }) => id && [
     'bracket-matcher',
     'code-styler',
-    'provide-completions'
+    'provide-completions',
+    'expression-quick-completions'
   ].includes(id))
   .map(({ lazyModule }) => () => lazyModule().then(({ default: plugin }) => {
     if (typeof plugin === 'function') {
