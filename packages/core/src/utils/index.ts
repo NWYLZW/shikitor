@@ -1,6 +1,7 @@
 export { callUpdateDispatcher } from './callUpdateDispatcher'
 export { classnames } from './classnames'
 export { debounce } from './debounce'
+export { diffArray } from './diffArray'
 export { getRawTextHelper } from './getRawTextHelper'
 export { isMultipleKey } from './isMultipleKey'
 export { isWhatBrowser } from './isWhatBrowser'
