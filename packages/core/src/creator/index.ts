@@ -23,9 +23,8 @@ import {
   } from '../utils' with {
   'unbundled-reexport': 'on'
 }
-import { debounceSubscribe } from '../utils/valtio/debounceSubscribe'
-import { debounceWatch } from '../utils/valtio/debounceWatch'
 import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
+import { scoped } from '../utils/valtio/scoped'
 import { cursorControlled } from './controlled/cursorControlled'
 import { popupsControlled } from './controlled/popupsControlled'
 import { valueControlled } from './controlled/valueControlled'
@@ -126,16 +125,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
     disposeValueControlled,
     disposeCursorControlled
   ] as (() => void)[]
-  const scopeWatch: typeof debounceWatch = (get, options) => {
-    const dispose = debounceWatch(get, options)
-    disposes.push(dispose)
-    return dispose
-  }
-  const scopeSubscribe: typeof debounceSubscribe = (...args) => {
-    const dispose = debounceSubscribe(...args)
-    disposes.push(dispose)
-    return dispose
-  }
+  const { disposeScoped, scopeWatch, scopeSubscribe } = scoped()
 
   const pluginsRef = derive({
     current: get => get(optionsRef).current.plugins
@@ -205,6 +195,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
   })
 
   const dispose = () => {
+    disposeScoped()
     disposes.forEach(dispose => dispose())
     disposeAllPlugins()
     onDispose?.()

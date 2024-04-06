@@ -3,13 +3,13 @@ import './provide-completions.scss'
 import type { ResolvedPosition } from '@shikijs/core'
 import type { CompletionItemProvider, LanguageSelector } from '@shikitor/core'
 import { derive } from 'valtio/utils'
-import { proxy, ref, subscribe } from 'valtio/vanilla'
+import { proxy, ref } from 'valtio/vanilla'
 
 import type { IDisposable, ProviderResult } from '../editor'
 import { definePlugin } from '../plugin'
 import type { RawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
-import { debounceWatch } from '../utils/valtio/debounceWatch'
+import { scoped } from '../utils/valtio/scoped'
 
 const name = 'provide-completions'
 
@@ -94,12 +94,7 @@ function isUnset<T>(value: T | typeof UNSET): value is typeof UNSET {
   return value === UNSET
 }
 export default () => {
-  const disposes: (() => void)[] = []
-  const scopeSubscribe: typeof subscribe = (...args) => {
-    const dispose = subscribe(...args)
-    disposes.push(dispose)
-    return dispose
-  }
+  const { disposeScoped, scopeSubscribe } = scoped()
   const displayRef = proxy({ current: false })
   const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
 
@@ -176,7 +171,7 @@ export default () => {
   return definePlugin({
     name,
     onDispose() {
-      disposes.forEach(dispose => dispose())
+      disposeScoped()
     },
     install() {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -185,12 +180,7 @@ export default () => {
       const languageRef = derive({
         current: get => get(optionsRef).current.language
       })
-      const disposes: (() => void)[] = []
-      const scopeWatch: typeof debounceWatch = (...args) => {
-        const dispose = debounceWatch(...args)
-        disposes.push(dispose)
-        return dispose
-      }
+      const { disposeScoped, scopeWatch } = scoped()
       const disposeExtend = this.extend(name, {
         registerCompletionItemProvider(selector, provider) {
           let providerDispose: (() => void) | undefined
@@ -255,7 +245,7 @@ export default () => {
         dispose() {
           disposeExtend()
           popupProviderDisposable.dispose()
-          disposes.forEach(dispose => dispose())
+          disposeScoped()
         }
       }
     },
