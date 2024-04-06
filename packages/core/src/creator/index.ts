@@ -462,21 +462,38 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
         }
       }
     },
-    depend(...keys) {
-      const resolvers = Promise.withResolvers<Shikitor>()
-      const installedPlugins = new Set<string>()
+    depend(keys, listener) {
+      let installed = false
+      let installedPlugins = new Set<string>()
       function allKeysInstalled() {
         return keys.every(key => installedPlugins.has(key))
       }
-      const off = this.ee.on('install', key => {
+      const listenPluginsInstalled = () => {
+        installedPlugins = new Set<string>()
+        const offInstallListener = this.ee.on('install', key => {
+          if (!key) return
+          installedPlugins.add(key)
+          if (allKeysInstalled()) {
+            listener(this as any)
+            offInstallListener?.()
+            installed = true
+          }
+        })
+      }
+      listenPluginsInstalled()
+      const offDisposeListener = this.ee.on('dispose', key => {
         if (!key) return
-        installedPlugins.add(key)
-        if (allKeysInstalled()) {
-          off?.()
-          resolvers.resolve(this)
-        }
+        if (!(keys as string[]).includes(key)) return
+        if (!installed) return
+
+        installed = false
+        listenPluginsInstalled()
       })
-      return resolvers.promise as Promise<any>
+      return {
+        dispose() {
+          offDisposeListener?.()
+        }
+      }
     },
     _getCursorAbsolutePosition(cursor): { x: number, y: number } {
       const { rawTextHelper: { line } } = this

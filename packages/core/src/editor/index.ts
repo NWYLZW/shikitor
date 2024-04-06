@@ -5,7 +5,7 @@ import type { ShikitorPlugin } from '../plugin'
 import type { Awaitable, Pretty, RecursiveReadonly, U2I } from '../types'
 import type { UpdateDispatcher } from '../utils/callUpdateDispatcher'
 import type { RawTextHelper } from '../utils/getRawTextHelper'
-import type { Cursor, ResolvedCursor, ResolvedSelection, Selection } from './base'
+import type { Cursor, IDisposable, ResolvedCursor, ResolvedSelection, Selection } from './base'
 import type { EventEmitter, EventMap } from './base.eventEmitter'
 import type { ShikitorRegister } from './register'
 
@@ -25,10 +25,10 @@ type ShikitorExtend<Keys extends ShikitorExtendable> = Pretty<U2I<
 interface Depend<
   ThisKeys extends ShikitorExtendable
 > {
-  <Keys extends Exclude<ShikitorExtendable, ThisKeys>>(...keys: Keys[]): Promise<
+  <Keys extends Exclude<ShikitorExtendable, ThisKeys>>(keys: Keys[], listener: (shikitor:
     & Shikitor<ThisKeys>
     & ShikitorExtend<Keys>
-  >
+  ) => void | IDisposable): IDisposable
 }
 
 export interface ShikitorEventMap extends EventMap {
