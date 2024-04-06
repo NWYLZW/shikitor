@@ -16,6 +16,9 @@ export default defineConfig({
       include: ['**/tests/**/*.spec.ts']
     }
   },
+  esbuild: {
+    target: 'es2019'
+  },
   plugins: [
     tsconfigPaths()
   ]
