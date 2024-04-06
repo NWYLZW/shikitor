@@ -1,5 +1,5 @@
 interface Diff<T> {
-  added: T[]
+  added: [T, index: number][]
   removed: T[]
   reordered: [oldIndex: number, newIndex: number][]
 }
@@ -12,7 +12,7 @@ export function diffArray<T>(base: readonly T[], newA: readonly T[], isEqual: (a
   }
   if (base === newA) return diff
   if (base.length === 0) {
-    diff.added = [...newA]
+    diff.added = newA.map((item, index) => [item, index])
     return diff
   }
   if (newA.length === 0) {
@@ -34,7 +34,7 @@ export function diffArray<T>(base: readonly T[], newA: readonly T[], isEqual: (a
     const item = newA[i]
     const index = base.findIndex(baseItem => isEqual(item, baseItem))
     if (index === -1) {
-      diff.added.push(item)
+      diff.added.push([item, i])
     }
   }
   return diff
