@@ -4,7 +4,7 @@ interface Diff<T> {
   reordered: [oldIndex: number, newIndex: number][]
 }
 
-export function diffArray<T>(base: T[], newA: T[], isEqual: (a: T, b: T) => boolean = (a, b) => a === b): Diff<T> {
+export function diffArray<T>(base: readonly T[], newA: readonly T[], isEqual: (a: T, b: T) => boolean = (a, b) => a === b): Diff<T> {
   const diff: Diff<T> = {
     added: [],
     removed: [],
@@ -12,11 +12,11 @@ export function diffArray<T>(base: T[], newA: T[], isEqual: (a: T, b: T) => bool
   }
   if (base === newA) return diff
   if (base.length === 0) {
-    diff.added = newA
+    diff.added = [...newA]
     return diff
   }
   if (newA.length === 0) {
-    diff.removed = base
+    diff.removed = [...base]
     return diff
   }
 
