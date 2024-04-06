@@ -9,6 +9,9 @@ export default defineConfig({
       external: ['shiki']
     }
   },
+  esbuild: {
+    target: 'es2019'
+  },
   plugins: [
     unbundledReexport(),
     tsconfigPaths()
