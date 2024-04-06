@@ -19,3 +19,5 @@ export type U2I<U> = (U extends any ? (k: U) => void : never) extends ((k: infer
 export type Pretty<T> = T extends Record<string, any>
   ? { [K in keyof T]: T[K] }
   : T
+
+export type Nullable<T> = T | null | void | undefined
