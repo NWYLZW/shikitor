@@ -14,6 +14,7 @@ import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
 import {
   callUpdateDispatcher,
+  diffArray,
   isMultipleKey,
   isWhatBrowser,
   listen,
@@ -153,18 +154,35 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
     if (prevPluginSnapshots === pluginSnapshots) {
       return
     }
-    const removedPlugins = prevPluginSnapshots.filter(p => !pluginSnapshots.find(pp => isSameSnapshot(p, pp)))
-    removedPlugins.forEach(p => {
-      const index = prevPluginSnapshots.indexOf(p)
+    const { added, reordered, removed } = diffArray(prevPluginSnapshots, pluginSnapshots, isSameSnapshot)
+    for (const plugin of removed) {
+      const index = prevPluginSnapshots.indexOf(plugin)
+      if (index === -1) return
       pluginsDisposes[index]?.dispose()
+      plugin.onDispose?.call(shikitor)
+      shikitor.ee.emit('dispose', plugin.name)
+    }
+    for (const plugin of removed) {
+      const index = prevPluginSnapshots.indexOf(plugin)
+      if (index === -1) return
       pluginsDisposes.splice(index, 1)
-      p.onDispose?.call(shikitor)
-    })
-    const newPlugins = pluginSnapshots.filter(p => !prevPluginSnapshots.find(pp => isSameSnapshot(p, pp)))
+    }
+    for (const [oldI, newI] of reordered) {
+      const temp = pluginsDisposes[oldI]
+      pluginsDisposes[oldI] = pluginsDisposes[newI]
+      pluginsDisposes[newI] = temp
+    }
     await Promise.all(
-      newPlugins.map(async plugin => {
+      added.map(async ([plugin, index]) => {
         const dispose = await plugin.install?.call(shikitor, shikitor)
-        pluginsDisposes.push(dispose)
+        shikitor.ee.emit('install', plugin.name, shikitor)
+        if (index < pluginsDisposes.length) {
+          pluginsDisposes.splice(index, 0, dispose)
+        } else if (index === pluginsDisposes.length) {
+          pluginsDisposes.push(dispose)
+        } else {
+          pluginsDisposes[index] = dispose
+        }
       })
     )
     prevPluginSnapshots = pluginSnapshots
@@ -330,11 +348,8 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       if (index === undefined) {
         plugins?.push(p)
       } else {
-        plugins[realIndex]?.onDispose?.call(this)
-        pluginsDisposes[realIndex]?.dispose()
         plugins?.splice(index, 1, p)
       }
-      pluginsDisposes[realIndex] = await p.install?.call(this, this)
       return realIndex
     },
     async removePlugin(index) {
@@ -343,9 +358,6 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       if (p === undefined) {
         throw new Error(`Not found plugin at index ${index}`)
       }
-      p.onDispose?.call(this)
-      plugins[index]?.onDispose?.call(this)
-      pluginsDisposes[index]?.dispose()
       plugins?.splice(index, 1)
     },
     dispose() {
