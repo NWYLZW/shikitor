@@ -2,7 +2,7 @@ import './index.scss'
 
 import { getHighlighter } from 'shiki'
 import { derive } from 'valtio/utils'
-import { proxy, snapshot, subscribe } from 'valtio/vanilla'
+import { proxy, snapshot } from 'valtio/vanilla'
 
 import type {
   ResolvedSelection,
@@ -23,6 +23,7 @@ import {
   } from '../utils' with {
   'unbundled-reexport': 'on'
 }
+import { debounceSubscribe } from '../utils/valtio/debounceSubscribe'
 import { debounceWatch } from '../utils/valtio/debounceWatch'
 import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { cursorControlled } from './controlled/cursorControlled'
@@ -130,8 +131,8 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
     disposes.push(dispose)
     return dispose
   }
-  const scopeSubscribe: typeof subscribe = (...args) => {
-    const dispose = subscribe(...args)
+  const scopeSubscribe: typeof debounceSubscribe = (...args) => {
+    const dispose = debounceSubscribe(...args)
     disposes.push(dispose)
     return dispose
   }
