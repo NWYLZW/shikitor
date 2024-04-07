@@ -84,8 +84,8 @@ importers:
         specifier: ^5.2.8
         version: 5.2.8(@types/node@20.11.30)(sass@1.72.0)
       vite-plugin-replacer:
-        specifier: 0.2.0-alpha.3
-        version: 0.2.0-alpha.3(@types/node@20.11.30)(sass@1.72.0)
+        specifier: ^1.0.0
+        version: 1.0.0(@types/node@20.11.30)(sass@1.72.0)
 
 packages:
 
@@ -5052,8 +5052,8 @@ packages:
       - terser
     dev: true
 
-  /vite-plugin-replacer@0.2.0-alpha.3(@types/node@20.11.30)(sass@1.72.0):
-    resolution: {integrity: sha512-D1+yubvDmA7cNYQ5HsWmNx5kG47eYfQUNecDYVWMW3OMx91dN15Eup0DUC7mpLa185/flRL6utSrb00lXsa4nQ==}
+  /vite-plugin-replacer@1.0.0(@types/node@20.11.30)(sass@1.72.0):
+    resolution: {integrity: sha512-4UsmlgYbKlt+Oa7GNBazdaVB78GpOmb/F77yMQDNEXpunfOiXnG7NBhxeoh8KVJV2TcvW1z/VplvVY5AQp2JaQ==}
     dependencies:
       vite: 5.2.8(@types/node@20.11.30)(sass@1.72.0)
     transitivePeerDependencies:

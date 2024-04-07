@@ -13,6 +13,6 @@
     "shiki": "^1.2.0",
     "typed-query-selector": "^2.11.2",
     "vite": "^5.2.8",
-    "vite-plugin-replacer": "0.2.0-alpha.3"
+    "vite-plugin-replacer": "^1.0.0"
   }
 }
