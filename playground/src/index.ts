@@ -1,5 +1,6 @@
 import './index.scss'
 import 'typed-query-selector'
+import './polyfill'
 
 import type { Shikitor } from '@shikitor/core'
 import { create } from '@shikitor/core'
@@ -20,15 +21,6 @@ languageSelector.innerHTML = bundledLanguagesInfo
 themeSelector.innerHTML = bundledThemesInfo
   .map(theme => `<option value="${theme.id}">${theme.displayName}</option>`)
   .join('')
-
-languageSelector.addEventListener('change', () => {
-  config.language = languageSelector.value as typeof config.language
-  shikitor.updateLanguage(config.language)
-})
-themeSelector.addEventListener('change', () => {
-  config.theme = themeSelector.value as typeof config.theme
-  shikitor.updateOptions(old => ({ ...old, theme: config.theme }))
-})
 
 const fullscreenQueryCount = parseInt(new URLSearchParams(location.search).get('fullscreen') ?? '0')
 let fullscreenCount = isNaN(fullscreenQueryCount) ? 0 : fullscreenQueryCount % 3
@@ -53,8 +45,16 @@ document
     }
   })
 
-let shikitor: Shikitor
-async function init() {
+async function init(shikitor: Shikitor) {
+  languageSelector.addEventListener('change', () => {
+    config.language = languageSelector.value as typeof config.language
+    shikitor.updateLanguage(config.language)
+  })
+  themeSelector.addEventListener('change', () => {
+    config.theme = themeSelector.value as typeof config.theme
+    shikitor.updateOptions(old => ({ ...old, theme: config.theme }))
+  })
+
   languageSelector.value = config.language ?? 'plaintext'
   themeSelector.value = config.theme ?? 'nord'
   shikitor.focus(config.cursor?.offset)
@@ -124,28 +124,29 @@ async function init() {
   })
   observer.observe(container, { attributes: true, attributeFilter: ['style'] })
 }
-async function main() {
-  console.log('Creating Shikitor instance')
-  shikitor = await create(container, config)
-  init()
-}
-main()
 
-if (import.meta.hot) {
-  import.meta.hot.accept('./config.ts', async newModule => {
-    if (!newModule) return
-    const { default: newConfig } = newModule as unknown as { default: typeof config }
-    console.log('Updating Shikitor options')
-    await shikitor.updateOptions(newConfig)
-    await init()
-  })
-  import.meta.hot.accept('./editor/index.ts', async newModule => {
-    if (!newModule) return
-    const { create: newCreate } = newModule as unknown as { create: typeof create }
+async function mount(c = create) {
+  const uninstall = Promise.withResolvers<void>()
+  using shikitor = await c(container, config)
 
-    console.log('Recreating Shikitor instance')
-    shikitor.dispose()
-    shikitor = await newCreate(container, config)
-    init()
-  })
+  const shikitorInit = () => init(shikitor)
+  await shikitorInit()
+
+  if (import.meta.hot) {
+    import.meta.hot.accept('./config.ts', async newModule => {
+      if (!newModule) return
+      const { default: newConfig } = newModule as unknown as { default: typeof config }
+      console.log('Updating Shikitor options')
+      await shikitor.updateOptions(newConfig)
+      await shikitorInit()
+    })
+    import.meta.hot.accept('../../packages/core/src', async newModule => {
+      if (!newModule) return
+      const { create: newCreate } = newModule as unknown as { create: typeof create }
+      uninstall.resolve()
+      mount(newCreate)
+    })
+  }
+  await uninstall.promise
 }
+mount()

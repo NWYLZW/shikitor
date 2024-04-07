@@ -77,7 +77,7 @@ interface InternalShikitor {
 
 export interface Shikitor<
   Keys extends ShikitorExtendable = never
-> extends InternalShikitor, ShikitorRegister {
+> extends InternalShikitor, ShikitorRegister, Disposable {
   value: string
   language?: BundledLanguage
   options: RecursiveReadonly<ShikitorOptions>
@@ -91,7 +91,6 @@ export interface Shikitor<
   updateSelection: UpdateDispatcher<Selection, [index: number]>
   upsertPlugin: (plugin: InputShikitorPlugin, index?: number) => Promise<number>
   removePlugin: (index: number) => void
-  dispose: () => void
 
   depend: Depend<Keys>
   extend: <K extends ShikitorExtendable>(

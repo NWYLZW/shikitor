@@ -368,7 +368,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       }
       plugins?.splice(index, 1)
     },
-    dispose() {
+    [Symbol.dispose]() {
       offDocumentSelectionChange()
       target.innerHTML = ''
       dispose()
