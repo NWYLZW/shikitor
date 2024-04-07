@@ -263,7 +263,7 @@ export default () => {
         }
         return
       }
-      if (allTriggerCharacters.includes(e.key) && !isMultipleKey(e)) {
+      if (!isMultipleKey(e)) {
         displayRef.current = true
         triggerCharacter.current = e.key
         return
