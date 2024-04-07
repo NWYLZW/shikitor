@@ -268,7 +268,13 @@ export default () => {
         return
       }
       if (!isMultipleKey(e)) {
-        triggerCharacter.current = e.key
+        if (allTriggerCharacters.includes(e.key)) {
+          triggerCharacter.current = e.key
+          return
+        }
+        if (triggerCharacter.current) {
+          triggerCharacter.current = undefined
+        }
         return
       }
     }
