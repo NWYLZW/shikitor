@@ -95,25 +95,7 @@ function isUnset<T>(value: T | typeof UNSET): value is typeof UNSET {
 }
 export default () => {
   const { disposeScoped, scopeSubscribe } = scoped()
-  const displayRef = proxy({ current: false })
   const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
-
-  const displayDeps = derive({
-    element: get => get(elementRef).current,
-    display: get => get(displayRef).current
-  })
-  scopeSubscribe(displayDeps, () => {
-    const {
-      display, element
-    } = displayDeps
-    if (isUnset(element)) return
-
-    if (display) {
-      element.style.visibility = 'visible'
-    } else {
-      element.style.visibility = 'hidden'
-    }
-  })
 
   const triggerCharacter = proxy({
     current: undefined as string | undefined
@@ -147,6 +129,28 @@ export default () => {
       </div>
     `
   })
+
+  const displayRef = proxy({ current: false })
+  const displayDeps = derive({
+    element: get => get(elementRef).current,
+    display: get => get(displayRef).current,
+    completions: get => get(completions)
+  })
+  scopeSubscribe(displayDeps, () => {
+    const {
+      element,
+      display,
+      completions
+    } = displayDeps
+    if (isUnset(element)) return
+
+    if (display && completions.length > 0) {
+      element.style.visibility = 'visible'
+    } else {
+      element.style.visibility = 'hidden'
+    }
+  })
+
   const selectIndexRef = proxy({ current: 0 })
   const selectIndexDeps = derive({
     element: get => get(elementRef).current,
