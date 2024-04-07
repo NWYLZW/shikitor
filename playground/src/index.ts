@@ -1,3 +1,4 @@
+// @replacer.use.define.__WORKSPACE_DIR__
 import './index.scss'
 import 'typed-query-selector'
 import './polyfill'
@@ -140,7 +141,7 @@ async function mount(c = create) {
       await shikitor.updateOptions(newConfig)
       await shikitorInit()
     })
-    import.meta.hot.accept('../../packages/core/src', async newModule => {
+    import.meta.hot.accept('/@fs/__WORKSPACE_DIR__/packages/core/src/index.ts', async newModule => {
       if (!newModule) return
       const { create: newCreate } = newModule as unknown as { create: typeof create }
       uninstall.resolve()
