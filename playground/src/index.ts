@@ -127,6 +127,7 @@ async function init(shikitor: Shikitor) {
 }
 
 async function mount(c = create) {
+  const uninstalled = Promise.withResolvers<void>()
   const uninstall = Promise.withResolvers<void>()
   using shikitor = await c(container, config)
 
@@ -145,9 +146,11 @@ async function mount(c = create) {
       if (!newModule) return
       const { create: newCreate } = newModule as unknown as { create: typeof create }
       uninstall.resolve()
+      await uninstalled.promise
       mount(newCreate)
     })
   }
   await uninstall.promise
+  uninstalled.resolve()
 }
 mount()
