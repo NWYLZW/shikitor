@@ -130,21 +130,21 @@ export default () => {
     `
   })
 
-  const displayRef = proxy({ current: false })
+  const displayRef = derive({
+    current: get => get(completions).length > 0
+  })
   const displayDeps = derive({
     element: get => get(elementRef).current,
-    display: get => get(displayRef).current,
-    completions: get => get(completions)
+    display: get => get(displayRef).current
   })
   scopeSubscribe(displayDeps, () => {
     const {
       element,
-      display,
-      completions
+      display
     } = displayDeps
     if (isUnset(element)) return
 
-    if (display && completions.length > 0) {
+    if (display) {
       element.style.visibility = 'visible'
     } else {
       element.style.visibility = 'hidden'
@@ -268,12 +268,9 @@ export default () => {
         return
       }
       if (!isMultipleKey(e)) {
-        displayRef.current = true
         triggerCharacter.current = e.key
         return
       }
-
-      displayRef.current = false
     }
   })
 }
