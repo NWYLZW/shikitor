@@ -6,36 +6,30 @@ export default definePlugin({
   install() {
     const dependDisposable = this.depend(['provide-completions'], shikitor => shikitor.registerCompletionItemProvider('*', {
       triggerCharacters: ['.'],
-      provideCompletionItems({ value }, position) {
+      provideCompletionItems({ value, lineStart }, position) {
         const prevChar = value.charAt(position.offset - 2)
         const editorHelperTriggerReg = /[\w\d?_()[\]'"`]/
         if (!editorHelperTriggerReg.test(prevChar)) return
 
+        let viewStart = lineStart(position.offset)
+        // find the start of the line view width start
+        while (viewStart > 0 && ![
+          ' ',
+          '\t',
+          '\n'
+        ].includes(value[viewStart + 1])) viewStart++
+        const range = {
+          start: viewStart,
+          end: position.offset - 1
+        }
+        const lineStr = value.slice(range.start, range.end)
         return {
           suggestions: [
             {
               label: 'par',
-              detail: '(expr)'
-            },
-            {
-              label: 'var',
-              detail: 'var name = expr'
-            },
-            {
-              label: 'let',
-              detail: 'let name = expr'
-            },
-            {
-              label: 'const',
-              detail: 'const name = expr'
-            },
-            {
-              label: 'return',
-              detail: 'return expr'
-            },
-            {
-              label: 'throw',
-              detail: 'throw expr'
+              detail: '(expr)',
+              range,
+              insertText: `(${lineStr})`
             }
           ]
         }
