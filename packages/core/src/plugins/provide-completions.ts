@@ -213,6 +213,11 @@ export default () => {
     })
   })
   let providePopupsResolvers: PromiseWithResolvers<void> | undefined
+
+  function resetTriggerCharacter() {
+    triggerCharacter.current = undefined
+    triggerCharacter.offset = undefined
+  }
   return definePlugin({
     name,
     onDispose() {
@@ -298,8 +303,7 @@ export default () => {
     },
     onKeydown(e) {
       if (!isMultipleKey(e) && e.key === 'Escape') {
-        triggerCharacter.current = undefined
-        triggerCharacter.offset = undefined
+        resetTriggerCharacter()
 
         keywordRef.current = -1
         return
@@ -344,8 +348,7 @@ export default () => {
             if (e !== CalcExitError)
               throw e
           }
-          triggerCharacter.current = undefined
-          triggerCharacter.offset = undefined
+          resetTriggerCharacter()
         }
       }
     }
