@@ -3,12 +3,13 @@ import './provide-completions.scss'
 import type { ResolvedPosition } from '@shikijs/core'
 import type { LanguageSelector } from '@shikitor/core'
 import { derive } from 'valtio/utils'
-import { proxy, ref } from 'valtio/vanilla'
+import { proxy, ref, snapshot } from 'valtio/vanilla'
 
 import type { IDisposable, ProviderResult } from '../editor'
 import { definePlugin } from '../plugin'
 import type { RawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
+import { refProxy } from '../utils/valtio/refProxy'
 import { scoped } from '../utils/valtio/scoped'
 
 const name = 'provide-completions'
@@ -96,6 +97,7 @@ export default () => {
   const { disposeScoped, scopeSubscribe } = scoped()
   const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
 
+  const keywordRef = refProxy(undefined as string | undefined)
   const triggerCharacter = proxy({
     current: undefined as string | undefined
   })
@@ -111,11 +113,11 @@ export default () => {
       element, completions
     } = completionsDeps
     if (isUnset(element)) return
+    const completionsSnapshot = snapshot(completions)
 
-    const completionsContent = completions.length === 0
-      // TODO set display none?
+    const completionsContent = completionsSnapshot.length === 0
       ? 'No completions available'
-      : completions.map(completionItemTemplate).join('')
+      : completionsSnapshot.map(completionItemTemplate).join('')
     element.innerHTML = `
       ${completionsContent}
       <div class="${'shikitor'}-completions__footer">
@@ -235,7 +237,9 @@ export default () => {
           providePopupsResolvers = Promise.withResolvers()
           return {
             dispose() {
-              completions.length = 0
+              if (keywordRef.current === '') {
+                completions.length = 0
+              }
               providePopupsResolvers?.resolve()
             },
             popups: [{
@@ -266,16 +270,48 @@ export default () => {
         }
         return
       }
-      if (!isMultipleKey(e)) {
+      if (!isMultipleKey(e, false)) {
         if (allTriggerCharacters.includes(e.key)) {
+          keywordRef.current = ''
           triggerCharacter.current = e.key
           return
         }
         if (triggerCharacter.current) {
-          triggerCharacter.current = undefined
+          const keyword = keywordRef.current ?? ''
+          const { rawTextHelper: { value }, cursor } = this
+          const newKeyword = calcNewKeyword(keyword, e.key, value[cursor.offset + 1])
+          const filteredCompletions = filterCompletions(snapshot(completions), newKeyword)
+          if (filteredCompletions.length === 0) {
+            completions.length = 0
+            triggerCharacter.current = undefined
+          } else {
+            keywordRef.current = newKeyword
+            completions.length = 0
+            completions.push(...filteredCompletions)
+          }
         }
-        return
       }
     }
   })
+}
+
+function calcNewKeyword(keyword: string, key: string, nextChar = '') {
+  switch (key) {
+    case 'ArrowLeft':
+      return keyword.slice(0, keyword.length - 1)
+    case 'ArrowRight':
+      if ([
+        ' ', '\n', '\t'
+      ].includes(nextChar)) return keyword
+      return keyword + nextChar
+    case 'Backspace':
+      return keyword.slice(0, keyword.length - 1)
+  }
+  if (key.length === 1) {
+    return keyword + key
+  }
+  return keyword
+}
+function filterCompletions(completions: readonly CompletionItem[], keyword: string) {
+  return completions.filter(({ label }) => label.startsWith(keyword))
 }
