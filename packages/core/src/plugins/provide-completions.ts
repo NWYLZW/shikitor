@@ -299,8 +299,7 @@ export default () => {
               return
             }
           } catch (e) {
-            // @ts-expect-error
-            if (!('message' in e) || e.message !== 'keyword length is less than 0')
+            if (e !== CalcExitError)
               throw e
           }
           triggerCharacter.current = undefined
@@ -311,6 +310,7 @@ export default () => {
   })
 }
 
+const CalcExitError = Symbol('CalcExitError')
 function calcNewKeyword(keyword: string, key: string, nextChar = '') {
   switch (key) {
     case 'ArrowRight':
@@ -318,7 +318,7 @@ function calcNewKeyword(keyword: string, key: string, nextChar = '') {
     case 'ArrowLeft':
     case 'Backspace':
       if (keyword.length - 1 < 0)
-        throw new Error('keyword length is less than 0')
+        throw CalcExitError
       return keyword.slice(0, keyword.length - 1)
   }
   if (key.length === 1) {
