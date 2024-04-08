@@ -97,7 +97,7 @@ export default () => {
   const { disposeScoped, scopeSubscribe } = scoped()
   const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
 
-  const keywordRef = refProxy(undefined as string | undefined)
+  const keywordRef = refProxy(undefined as -1 | string | undefined)
   const triggerCharacter = proxy({
     current: undefined as string | undefined,
     offset: undefined as number | undefined
@@ -109,6 +109,8 @@ export default () => {
     current: get => {
       const keyword = get(keywordRef).current
       const cps = snapshot(get(completions))
+      if (keyword === -1) return []
+
       return filterCompletions(cps, keyword)
     }
   })
@@ -140,7 +142,7 @@ export default () => {
   })
 
   const displayRef = derive({
-    current: get => get(completions).length > 0
+    current: get => get(resolvedCompletions).current.length > 0
   })
   const displayDeps = derive({
     element: get => get(elementRef).current,
@@ -265,6 +267,13 @@ export default () => {
       }
     },
     onKeydown(e) {
+      if (!isMultipleKey(e) && e.key === 'Escape') {
+        triggerCharacter.current = undefined
+        triggerCharacter.offset = undefined
+
+        keywordRef.current = -1
+        return
+      }
       if (
         !isMultipleKey(e)
         && displayRef.current
@@ -293,7 +302,10 @@ export default () => {
           const { rawTextHelper: { value }, cursor: { offset } } = this
           const nextChar = value[offset + 1]
           try {
-            const newKeyword = calcNewKeyword(keywordRef.current ?? '', e.key, nextChar)
+            const keyword = keywordRef.current === -1
+              ? ''
+              : keywordRef.current ?? ''
+            const newKeyword = calcNewKeyword(keyword, e.key, nextChar)
             if (!/[\r|\n]$/.test(newKeyword)) {
               keywordRef.current = newKeyword
               return
