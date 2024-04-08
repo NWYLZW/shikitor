@@ -265,7 +265,11 @@ export default () => {
       }
     },
     onKeydown(e) {
-      if (displayRef.current && ['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
+      if (
+        !isMultipleKey(e)
+        && displayRef.current
+        && ['ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)
+      ) {
         e.preventDefault()
         if ([e.key === 'ArrowUp', e.key === 'ArrowDown'].some(Boolean)) {
           const selectIndex = selectIndexRef.current
