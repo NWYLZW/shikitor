@@ -1,4 +1,5 @@
 import { definePlugin } from '../plugin'
+import type {} from './provide-completions'
 
 export default definePlugin({
   name: 'expression-quick-completions',
