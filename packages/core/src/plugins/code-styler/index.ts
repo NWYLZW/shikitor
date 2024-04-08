@@ -1,6 +1,7 @@
 import type { ResolvedSelection } from '../../editor'
 import { definePlugin } from '../../plugin'
 import type { RawTextHelper } from '../../utils/getRawTextHelper'
+import { isMultipleKey } from '../../utils/isMultipleKey'
 import { indent, outdent } from './dent'
 
 interface CodeStylerOptions {
@@ -104,11 +105,12 @@ export default ({
         this.updateSelection(0, { start: nextCharIndex + 1, end: nextCharIndex + 1 })
       }
     }
-    if (e.key === 'Tab' || e.key === 'Enter') {
-      e.preventDefault()
+    if (['Tab', 'Enter'].includes(e.key) && !isMultipleKey(e)) {
       const { selections: [selection] } = this
       if (e.key === 'Enter') {
-        textarea.setRangeText('\n', selection.start.offset, selection.end.offset)
+        // TODO make timeout configurable for this plugin?
+        await new Promise(resolve => setTimeout(resolve, 0))
+        if (e.defaultPrevented) return
         selection.start = {
           offset: selection.start.offset + 1,
           line: selection.start.line + 1,
@@ -116,6 +118,7 @@ export default ({
         }
         selection.end = selection.start
       }
+      e.preventDefault()
 
       const { value, rawTextHelper } = this
       dentSelection(selection, {
