@@ -73,8 +73,32 @@ export interface CompletionItem {
   documentation?: string
 }
 
-function completionItemTemplate(item: CompletionItem) {
-  const prefix = `${'shikitor'}-completion-item`
+/**
+ * Split keyword by space, comma, dot and upper case.
+ * ```ts
+ * splitKeywords('a.b c, d') // ['a', 'b', 'c', 'd']
+ * splitKeywords('aBc') // ['a', 'b', 'c']
+ * ```
+ * @param keyword
+ */
+function splitKeywords(keyword: string) {
+  return keyword
+    .split(/(?=[A-Z])|[\s,.]/)
+    .filter(Boolean)
+    .map(s => s.toLowerCase())
+}
+
+const prefix = `${'shikitor'}-completion-item`
+
+function highlightingKeyword(text: string, keywordParts: string[]) {
+  return keywordParts.reduce((prev, keyword) => {
+    const index = prev.toLowerCase().indexOf(keyword)
+    if (index === -1) return prev
+    return prev.slice(0, index) + `<span class="${prefix}__keyword">${keyword}</span>` + prev.slice(index + keyword.length)
+  }, text)
+}
+
+function completionItemTemplate(keywordParts: string[], item: CompletionItem) {
   return `
     <div class="${prefix}">
       <div class="${prefix}__kind">${
@@ -82,7 +106,9 @@ function completionItemTemplate(item: CompletionItem) {
           ? CompletionItemKind[item.kind][0]
           : 'U'
       }</div>
-      <div class="${prefix}__label">${item.label}</div>
+      <div class="${prefix}__label">${
+        highlightingKeyword(item.label, keywordParts)
+      }</div>
       ${item.detail ? `<div class="${prefix}__detail">${item.detail}</div>` : ''}
       ${item.documentation ? `<div class="${prefix}__documentation">${item.documentation}</div>` : ''}
     </div>
@@ -115,19 +141,23 @@ export default () => {
     }
   })
   const completionsDeps = derive({
+    keyword: get => get(keywordRef).current,
     element: get => get(elementRef).current,
     completions: get => get(resolvedCompletions).current
   })
   scopeSubscribe(completionsDeps, () => {
     const {
+      keyword,
       element, completions
     } = completionsDeps
     if (isUnset(element)) return
     const completionsSnapshot = snapshot(completions)
 
+    const keywordStr = keyword === -1 ? '' : keyword ?? ''
+    const innerCompletionItemTemplate = completionItemTemplate.bind(null, splitKeywords(keywordStr))
     const completionsContent = completionsSnapshot.length === 0
       ? 'No completions available'
-      : completionsSnapshot.map(completionItemTemplate).join('')
+      : completionsSnapshot.map(innerCompletionItemTemplate).join('')
     element.innerHTML = `
       ${completionsContent}
       <div class="${'shikitor'}-completions__footer">

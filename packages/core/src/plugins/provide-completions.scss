@@ -62,6 +62,10 @@
       flex: 1;
       width: 0;
     }
+    &__keyword {
+      font-weight: bold;
+      filter: invert(1);
+    }
     &__detail {
       font-size: 0.8em;
       opacity: .65;
