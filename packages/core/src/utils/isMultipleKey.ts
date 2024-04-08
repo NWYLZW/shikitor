@@ -1,3 +1,3 @@
-export function isMultipleKey(e: KeyboardEvent) {
-  return e.ctrlKey || e.altKey || e.metaKey || e.shiftKey
+export function isMultipleKey(e: KeyboardEvent, checkShift = true) {
+  return e.ctrlKey || e.altKey || e.metaKey || (e.shiftKey && checkShift)
 }
