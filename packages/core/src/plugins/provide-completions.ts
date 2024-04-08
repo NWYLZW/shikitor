@@ -5,8 +5,10 @@ import type { LanguageSelector } from '@shikitor/core'
 import { derive } from 'valtio/utils'
 import { proxy, ref, snapshot } from 'valtio/vanilla'
 
+import type { TextRange } from '../base'
 import type { IDisposable, ProviderResult } from '../editor'
 import { definePlugin } from '../plugin'
+import type { RecursiveReadonly } from '../types'
 import type { RawTextHelper } from '../utils/getRawTextHelper'
 import { isMultipleKey } from '../utils/isMultipleKey'
 import { refProxy } from '../utils/valtio/refProxy'
@@ -71,6 +73,12 @@ export interface CompletionItem {
   kind?: CompletionItemKind
   detail?: string
   documentation?: string
+  range: TextRange
+  insertText: string
+  /**
+   * @internal
+   */
+  additionalTextEdits?: unknown[]
 }
 
 /**
@@ -98,7 +106,7 @@ function highlightingKeyword(text: string, keywordParts: string[]) {
   }, text)
 }
 
-function completionItemTemplate(keywordParts: string[], item: CompletionItem) {
+function completionItemTemplate(keywordParts: string[], item: RecursiveReadonly<CompletionItem>) {
   return `
     <div class="${prefix}">
       <div class="${prefix}__kind">${
@@ -323,6 +331,31 @@ export default () => {
             : deltaedIndex % completions.length
           return
         }
+        if (e.key === 'Enter') {
+          const completion = snapshot(completions[selectIndexRef.current])
+          if (completion) {
+            const keyword = keywordRef.current === -1
+              ? ''
+              : keywordRef.current ?? ''
+            const { range, insertText } = completion
+            const { rawTextHelper: { value, resolveTextRange } } = this
+            const resolvedRange = resolveTextRange(range)
+            const prefix = value.slice(0, resolvedRange.start.offset)
+            const suffix = value.slice(
+              resolvedRange.end.offset
+              // remove trigger character
+              + 1
+              // remove keyword
+              + keyword.length
+            )
+            this.value = prefix + insertText + suffix
+            resetTriggerCharacter()
+            setTimeout(() => {
+              this.focus(prefix.length + insertText.length)
+            }, 0)
+            return
+          }
+        }
         return
       }
       if (!isMultipleKey(e, false)) {
@@ -371,7 +404,7 @@ function calcNewKeyword(keyword: string, key: string, nextChar = '') {
   }
   return keyword
 }
-function filterCompletions(completions: readonly CompletionItem[], keyword?: string) {
+function filterCompletions(completions: readonly RecursiveReadonly<CompletionItem>[], keyword?: string) {
   if (!keyword || keyword === '') return completions
 
   return completions.filter(({ label }) => label.startsWith(keyword))
