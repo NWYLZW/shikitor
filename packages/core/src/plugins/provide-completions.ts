@@ -99,14 +99,22 @@ export default () => {
 
   const keywordRef = refProxy(undefined as string | undefined)
   const triggerCharacter = proxy({
-    current: undefined as string | undefined
+    current: undefined as string | undefined,
+    offset: undefined as number | undefined
   })
   const allTriggerCharacters = proxy<string[]>([])
 
   const completions = proxy<CompletionItem[]>([])
+  const resolvedCompletions = derive({
+    current: get => {
+      const keyword = get(keywordRef).current
+      const cps = snapshot(get(completions))
+      return filterCompletions(cps, keyword)
+    }
+  })
   const completionsDeps = derive({
     element: get => get(elementRef).current,
-    completions: get => get(completions)
+    completions: get => get(resolvedCompletions).current
   })
   scopeSubscribe(completionsDeps, () => {
     const {
@@ -237,7 +245,7 @@ export default () => {
           providePopupsResolvers = Promise.withResolvers()
           return {
             dispose() {
-              if (keywordRef.current === '') {
+              if (triggerCharacter.current === undefined) {
                 completions.length = 0
               }
               providePopupsResolvers?.resolve()
@@ -274,21 +282,25 @@ export default () => {
         if (allTriggerCharacters.includes(e.key)) {
           keywordRef.current = ''
           triggerCharacter.current = e.key
+          triggerCharacter.offset = this.cursor.offset + 1
           return
         }
         if (triggerCharacter.current) {
-          const keyword = keywordRef.current ?? ''
-          const { rawTextHelper: { value }, cursor } = this
-          const newKeyword = calcNewKeyword(keyword, e.key, value[cursor.offset + 1])
-          const filteredCompletions = filterCompletions(snapshot(completions), newKeyword)
-          if (filteredCompletions.length === 0) {
-            completions.length = 0
-            triggerCharacter.current = undefined
-          } else {
-            keywordRef.current = newKeyword
-            completions.length = 0
-            completions.push(...filteredCompletions)
+          const { rawTextHelper: { value }, cursor: { offset } } = this
+          const nextChar = value[offset + 1]
+          try {
+            const newKeyword = calcNewKeyword(keywordRef.current ?? '', e.key, nextChar)
+            if (!/[\r|\n]$/.test(newKeyword)) {
+              keywordRef.current = newKeyword
+              return
+            }
+          } catch (e) {
+            // @ts-expect-error
+            if (!('message' in e) || e.message !== 'keyword length is less than 0')
+              throw e
           }
+          triggerCharacter.current = undefined
+          triggerCharacter.offset = undefined
         }
       }
     }
@@ -297,14 +309,12 @@ export default () => {
 
 function calcNewKeyword(keyword: string, key: string, nextChar = '') {
   switch (key) {
-    case 'ArrowLeft':
-      return keyword.slice(0, keyword.length - 1)
     case 'ArrowRight':
-      if ([
-        ' ', '\n', '\t'
-      ].includes(nextChar)) return keyword
       return keyword + nextChar
+    case 'ArrowLeft':
     case 'Backspace':
+      if (keyword.length - 1 < 0)
+        throw new Error('keyword length is less than 0')
       return keyword.slice(0, keyword.length - 1)
   }
   if (key.length === 1) {
@@ -312,6 +322,8 @@ function calcNewKeyword(keyword: string, key: string, nextChar = '') {
   }
   return keyword
 }
-function filterCompletions(completions: readonly CompletionItem[], keyword: string) {
+function filterCompletions(completions: readonly CompletionItem[], keyword?: string) {
+  if (!keyword || keyword === '') return completions
+
   return completions.filter(({ label }) => label.startsWith(keyword))
 }
