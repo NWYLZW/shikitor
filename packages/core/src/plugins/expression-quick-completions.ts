@@ -20,6 +20,22 @@ export default definePlugin({
             {
               label: 'var',
               detail: 'var name = expr'
+            },
+            {
+              label: 'let',
+              detail: 'let name = expr'
+            },
+            {
+              label: 'const',
+              detail: 'const name = expr'
+            },
+            {
+              label: 'return',
+              detail: 'return expr'
+            },
+            {
+              label: 'throw',
+              detail: 'throw expr'
             }
           ]
         }
