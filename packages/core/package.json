@@ -3,15 +3,14 @@
   "version": "0.0.4",
   "description": "Shikitor core",
   "jiek": {
-    "styled": true,
-    "inputs": [
-      "index.ts",
-      "plugins/*.ts",
-      "plugins/*/index.ts"
-    ]
+    "styled": true
   },
   "scripts": {
     "build": "jiek build"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./plugins/*": ["./src/plugins/*.ts", "./src/*/index.ts"]
   },
   "repository": {
     "type": "git",
