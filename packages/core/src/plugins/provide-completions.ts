@@ -1,7 +1,7 @@
 import './provide-completions.scss'
 
 import type { ResolvedPosition } from '@shikijs/core'
-import type { CompletionItemProvider, LanguageSelector } from '@shikitor/core'
+import type { LanguageSelector } from '@shikitor/core'
 import { derive } from 'valtio/utils'
 import { proxy, ref } from 'valtio/vanilla'
 
@@ -12,10 +12,6 @@ import { isMultipleKey } from '../utils/isMultipleKey'
 import { scoped } from '../utils/valtio/scoped'
 
 const name = 'provide-completions'
-
-interface ShikitorProvideCompletions {
-  registerCompletionItemProvider: (selector: LanguageSelector, provider: CompletionItemProvider) => IDisposable
-}
 
 declare module '@shikitor/core' {
   export interface CompletionList extends Partial<IDisposable> {
@@ -30,6 +26,9 @@ declare module '@shikitor/core' {
       rawTextHelper: RawTextHelper,
       position: ResolvedPosition
     ): ProviderResult<CompletionList>
+  }
+  export interface ShikitorProvideCompletions {
+    registerCompletionItemProvider: (selector: LanguageSelector, provider: CompletionItemProvider) => IDisposable
   }
   interface ShikitorExtends {
     'provide-completions': ShikitorProvideCompletions
