@@ -9,8 +9,8 @@ import type { TextRange } from '../base'
 import type { IDisposable, ProviderResult } from '../editor'
 import { definePlugin } from '../plugin'
 import type { RecursiveReadonly } from '../types'
+import { classnames, isMultipleKey } from '../utils' with { 'unbundled-reexport': 'on' }
 import type { RawTextHelper } from '../utils/getRawTextHelper'
-import { isMultipleKey } from '../utils/isMultipleKey'
 import { refProxy } from '../utils/valtio/refProxy'
 import { scoped } from '../utils/valtio/scoped'
 
@@ -105,10 +105,15 @@ function highlightingKeyword(text: string, keywordParts: string[]) {
   }, text)
 }
 
-function completionItemTemplate(keywordParts: string[], item: RecursiveReadonly<CompletionItem>, index: number) {
+function completionItemTemplate(
+  keywordParts: string[],
+  selectedIndex: number,
+  item: RecursiveReadonly<CompletionItem>,
+  index: number
+) {
   const { prefix } = completionItemTemplate
   return `
-    <div class="${prefix}" data-index="${index}">
+    <div class="${classnames(prefix, selectedIndex === index && 'selected')}" data-index="${index}">
       <div class="${prefix}__kind">${
         item.kind
           ? CompletionItemKind[item.kind][0]
@@ -162,8 +167,9 @@ export default () => {
     if (isUnset(element)) return
     const completionsSnapshot = snapshot(completions)
 
+    const selected = selectIndexRef.current
     const keywordStr = keyword === -1 ? '' : keyword ?? ''
-    const innerCompletionItemTemplate = completionItemTemplate.bind(null, splitKeywords(keywordStr))
+    const innerCompletionItemTemplate = completionItemTemplate.bind(null, splitKeywords(keywordStr), selected)
     const completionsContent = completionsSnapshot.length === 0
       ? 'No completions available'
       : completionsSnapshot.map(innerCompletionItemTemplate).join('')
