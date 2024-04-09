@@ -1,10 +1,11 @@
 import './popupsControlled.scss'
 
-import { proxy, snapshot, subscribe } from 'valtio/vanilla'
+import { proxy } from 'valtio/vanilla'
 
 import type { Shikitor } from '../../editor'
 import type { ResolvedPopup } from '../../editor/register'
 import { classnames } from '../../utils/classnames'
+import { debounceSubscribe } from '../../utils/valtio/debounceSubscribe'
 
 const prefix = `${'shikitor'}-popup`
 
@@ -44,7 +45,7 @@ function mountPopup(shikitor: Shikitor, container: HTMLElement, popup: ResolvedP
 export function popupsControlled(getShikitor: () => Shikitor, container: HTMLElement) {
   const popups = proxy<ResolvedPopup[]>([])
   const prevPopupElements = new Map<ResolvedPopup, HTMLDivElement>()
-  const dispose = subscribe(popups, () => {
+  const dispose = debounceSubscribe(popups, () => {
     const shikitor = getShikitor()
     const newPopupElements = new Map<ResolvedPopup, HTMLDivElement>()
     for (const popup of popups) {
