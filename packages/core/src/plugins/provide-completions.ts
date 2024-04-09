@@ -229,7 +229,6 @@ export default () => {
     if (selectIndexRef.current >= resolvedCompletions.current.length)
       selectIndexRef.current = 0
   })
-  let providePopupsResolvers: PromiseWithResolvers<void> | undefined
 
   function resetTriggerCharacter() {
     triggerCharacter.current = undefined
@@ -271,6 +270,9 @@ export default () => {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const shikitor = this
       const { optionsRef } = shikitor
+      const cursorRef = derive({
+        current: get => get(optionsRef).current.cursor
+      })
       const languageRef = derive({
         current: get => get(optionsRef).current.language
       })
@@ -280,35 +282,44 @@ export default () => {
           let providerDispose: (() => void) | undefined
           const { triggerCharacters, provideCompletionItems } = provider
 
+          const completionSymbol = Symbol('completion')
           const start = allTriggerCharacters.length
           const end = allTriggerCharacters.push(...triggerCharacters ?? [])
-          let prevCompletions: CompletionItem[] = []
           scopeWatch(async get => {
             const char = get(triggerCharacter).current
-
             const language = get(languageRef).current
             if (selector !== '*' && selector !== language) return
 
-            if (!char || !triggerCharacters?.includes(char)) return
+            const cursor = cursorRef.current
+            if (cursor === undefined) return
+            let suggestions: CompletionItem[] = []
+            if (char && triggerCharacters?.includes(char)) {
+              const { rawTextHelper } = shikitor
+              providerDispose?.()
+              const { suggestions: newSugs = [], dispose } = await Promise.resolve(
+                provideCompletionItems(rawTextHelper, cursor)
+              ) ?? {}
+              suggestions = newSugs
+              providerDispose = dispose
+            }
 
-            await providePopupsResolvers?.promise
-            const { rawTextHelper, cursor } = shikitor
-            providerDispose?.()
-            const { suggestions = [], dispose } = await Promise.resolve(provideCompletionItems(rawTextHelper, cursor)) ?? {}
-            providerDispose = dispose
-            if (suggestions.length === 0) return
-
-            const oldCompletionsIndexes = completions.reduce((indexes, completion, index) => {
-              if (prevCompletions.includes(completion)) {
-                return [...indexes, index]
-              }
-              return indexes
-            }, [] as number[])
+            const oldCompletionsIndexes = completions
+              .reduce((indexes, completion, index) => {
+                // @ts-expect-error
+                return completion[completionSymbol]
+                  ? [...indexes, index]
+                  : indexes
+              }, [] as number[])
             const removedCompletions = completions
               .filter((_, index) => !oldCompletionsIndexes.includes(index))
             completions.length = 0
-            completions.push(...removedCompletions, ...suggestions)
-            prevCompletions = suggestions
+            completions.push(
+              ...removedCompletions,
+              ...suggestions.map(suggestion => ({
+                ...suggestion,
+                [completionSymbol]: true
+              }))
+            )
           })
           return {
             dispose() {
@@ -318,18 +329,16 @@ export default () => {
           }
         }
       })
-      const popupProviderDisposable = this.registerPopupProvider('*', {
+      const popupProviderDisposable = this.registerPopupProvider({
         position: 'relative',
         placement: 'bottom',
         target: 'cursor',
-        providePopups(cursors, selections) {
-          providePopupsResolvers = Promise.withResolvers()
+        providePopups() {
           return {
             dispose() {
               if (triggerCharacter.current === undefined) {
                 completions.length = 0
               }
-              providePopupsResolvers?.resolve()
             },
             popups: [{
               id: 'completions-board', render: ele => {

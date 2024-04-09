@@ -116,9 +116,6 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
     }
   )
   let prevSelection: ResolvedSelection | undefined
-  const languageRef = derive({
-    current: get => get(optionsRef).current.language
-  })
 
   const disposes = [
     disposePopupsControlled,
@@ -373,65 +370,50 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions)
       target.innerHTML = ''
       dispose()
     },
-    registerPopupProvider(language, provider) {
-      let providePopupsDispose: (() => void) | undefined
-      let removeNewPopups: (() => void) | undefined
-      let removeWatch: (() => void) | undefined
-      function addPopups(npopups: ResolvedPopup[]) {
-        popups.splice(0, popups.length, ...npopups)
-        removeNewPopups = () => {
-          const firstIndex = popups.indexOf(npopups[0])
-          popups.splice(firstIndex, npopups.length)
+    registerPopupProvider(provider) {
+      const { providePopups, ...meta } = provider
+      const popupsPromise = Promise.resolve(providePopups())
+
+      let pushedFirstPopupRef: ResolvedPopup | undefined
+      let pushedPopupsLength = 0
+      let popupsProvideDispose: (() => void) | undefined
+      popupsPromise.then(({ dispose, popups: newPopups }) => {
+        popupsProvideDispose = dispose
+        const resolvedPopups = newPopups.map(popup => ({
+          ...meta,
+          ...popup
+        })) as ResolvedPopup[]
+        popups.splice(0, popups.length, ...resolvedPopups)
+        pushedPopupsLength = resolvedPopups.length
+        pushedFirstPopupRef = popups[popups.length - pushedPopupsLength]
+      })
+      const removeNewPopups = () => {
+        if (pushedFirstPopupRef === undefined) return
+        const firstIndex = popups.indexOf(pushedFirstPopupRef)
+
+        popups.splice(firstIndex, pushedPopupsLength)
+      }
+      const disposePositionRerender = meta.position === 'relative' ? scopeWatch(async get => {
+        const cursor = get(cursorRef).current
+        if (pushedFirstPopupRef === undefined) return
+
+        const firstIndex = popups.indexOf(pushedFirstPopupRef)
+        for (let i = firstIndex; i < firstIndex + pushedPopupsLength; i++) {
+          const popup = popups[i]
+          if (popup.position === 'relative') {
+            popup.cursors = [cursor]
+            popup.selections = [prevSelection!]
+          }
         }
-      }
-
-      if (provider.position === 'relative') {
-        const { providePopups, ...meta } = provider
-        removeWatch = scopeWatch(async get => {
-          const currentLanguage = snapshot(get(languageRef)).current
-          const cursor = snapshot(get(cursorRef)).current
-          // TODO use proxy ref
-          const selection = prevSelection
-          if (Array.isArray(language) && !language.includes(currentLanguage)) return
-          if (typeof language === 'string' && language !== '*' && language === currentLanguage) return
-
-          providePopupsDispose?.()
-          const cursors = cursor ? [cursor] : []
-          const selections = selection ? [selection] : []
-          const { dispose, popups: newPopups } = await providePopups(cursors, selections)
-          providePopupsDispose = dispose
-
-          addPopups(newPopups.map(popup => ({
-            ...popup,
-            ...meta,
-            cursors,
-            selections,
-            id: `${currentLanguage}:${popup.id}`
-          })))
-        })
-      }
-      if (provider.position === 'absolute') {
-        const { providePopups, ...meta } = provider
-        removeWatch = scopeWatch(async get => {
-          const currentLanguage = get(languageRef).current
-          if (Array.isArray(language) && !language.includes(currentLanguage)) return
-          if (typeof language === 'string' && language !== '*' && language === currentLanguage) return
-
-          providePopupsDispose?.()
-          const { dispose, popups: newPopups } = await providePopups()
-          providePopupsDispose = dispose
-
-          addPopups(newPopups.map(popup => ({
-            ...popup,
-            ...meta,
-            id: `${currentLanguage}:${popup.id}`
-          })))
-        })
-      }
+      }) : undefined
       return {
         dispose() {
-          removeWatch?.()
-          providePopupsDispose?.()
+          if (popupsProvideDispose) {
+            popupsProvideDispose()
+          } else {
+            popupsPromise.then(({ dispose }) => dispose?.())
+          }
+          disposePositionRerender?.()
           removeNewPopups?.()
         }
       }

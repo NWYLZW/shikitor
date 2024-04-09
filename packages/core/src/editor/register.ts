@@ -1,6 +1,6 @@
 import type { ResolvedTextRange } from '../base'
 import type { Awaitable, RecursiveReadonly } from '../types'
-import type { IDisposable, LanguageSelector, ResolvedCursor } from './base'
+import type { IDisposable, ResolvedCursor } from './base'
 
 export type RelativePopupPlacement =
   | 'top' | 'bottom'
@@ -23,8 +23,8 @@ export interface Popup {
 
 export type ResolvedPopup = Popup & (
   | RelativePopup & {
-    cursors: RecursiveReadonly<ResolvedCursor[]>
-    selections: RecursiveReadonly<ResolvedTextRange[]>
+    cursors?: RecursiveReadonly<ResolvedCursor[]>
+    selections?: RecursiveReadonly<ResolvedTextRange[]>
   }
   | AbsolutePopup
 )
@@ -76,15 +76,12 @@ export type AbsolutePopup = BasePopup & {
 }
 
 export type PopupProvider = {
+  providePopups(): Awaitable<PopupList>
 } & (
-  | (RelativePopup & {
-    providePopups(cursors: ResolvedCursor[], selections: ResolvedTextRange[]): Awaitable<PopupList>
-  })
-  | (AbsolutePopup & {
-    providePopups(): Awaitable<PopupList>
-  })
+  | RelativePopup
+  | AbsolutePopup
 )
 
 export interface ShikitorRegister {
-  registerPopupProvider(language: LanguageSelector, provider: PopupProvider): IDisposable
+  registerPopupProvider(provider: PopupProvider): IDisposable
 }
