@@ -54,6 +54,7 @@ body {
       display: flex;
       align-items: center;
       gap: 10px;
+      filter: invert(.5);
     }
     select {
       height: 20px;
