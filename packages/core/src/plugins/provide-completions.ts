@@ -221,6 +221,14 @@ export default () => {
       }
     })
   })
+
+  const resetSelectIndexWhenResolvedCompletionsChangeDeps = derive({
+    length: get => get(resolvedCompletions).current.length
+  })
+  scopeSubscribe(resetSelectIndexWhenResolvedCompletionsChangeDeps, () => {
+    if (selectIndexRef.current >= resolvedCompletions.current.length)
+      selectIndexRef.current = 0
+  })
   let providePopupsResolvers: PromiseWithResolvers<void> | undefined
 
   function resetTriggerCharacter() {
