@@ -13,11 +13,11 @@ export default definePlugin({
 
         let viewStart = lineStart(position.offset)
         // find the start of the line view width start
-        while (viewStart > 0 && ![
+        while (viewStart > 0 && [
           ' ',
           '\t',
           '\n'
-        ].includes(value[viewStart + 1])) viewStart++
+        ].includes(value[viewStart])) viewStart++
         const range = {
           start: viewStart,
           end: position.offset - 1
