@@ -1,7 +1,7 @@
 import './provide-completions.scss'
 
 import type { ResolvedPosition } from '@shikijs/core'
-import type { LanguageSelector } from '@shikitor/core'
+import type { LanguageSelector, Shikitor } from '@shikitor/core'
 import { derive } from 'valtio/utils'
 import { proxy, ref, snapshot } from 'valtio/vanilla'
 
@@ -96,9 +96,8 @@ function splitKeywords(keyword: string) {
     .map(s => s.toLowerCase())
 }
 
-const prefix = `${'shikitor'}-completion-item`
-
 function highlightingKeyword(text: string, keywordParts: string[]) {
+  const { prefix } = completionItemTemplate
   return keywordParts.reduce((prev, keyword) => {
     const index = prev.toLowerCase().indexOf(keyword)
     if (index === -1) return prev
@@ -106,9 +105,10 @@ function highlightingKeyword(text: string, keywordParts: string[]) {
   }, text)
 }
 
-function completionItemTemplate(keywordParts: string[], item: RecursiveReadonly<CompletionItem>) {
+function completionItemTemplate(keywordParts: string[], item: RecursiveReadonly<CompletionItem>, index: number) {
+  const { prefix } = completionItemTemplate
   return `
-    <div class="${prefix}">
+    <div class="${prefix}" data-index="${index}">
       <div class="${prefix}__kind">${
         item.kind
           ? CompletionItemKind[item.kind][0]
@@ -122,6 +122,7 @@ function completionItemTemplate(keywordParts: string[], item: RecursiveReadonly<
     </div>
   `
 }
+completionItemTemplate.prefix = `${'shikitor'}-completion-item` as const
 
 const UNSET = { __: Symbol('unset') } as const
 function isUnset<T>(value: T | typeof UNSET): value is typeof UNSET {
@@ -226,6 +227,33 @@ export default () => {
     triggerCharacter.current = undefined
     triggerCharacter.offset = undefined
   }
+
+  function acceptCompletion(shikitor: Shikitor) {
+    const completion = snapshot(completions[selectIndexRef.current])
+    if (completion) {
+      const keyword = keywordRef.current === -1
+        ? ''
+        : keywordRef.current ?? ''
+      const { range, insertText } = completion
+      const { rawTextHelper: { value, resolveTextRange } } = shikitor
+      const resolvedRange = resolveTextRange(range)
+      const prefix = value.slice(0, resolvedRange.start.offset)
+      const suffix = value.slice(
+        resolvedRange.end.offset
+        // remove trigger character
+        + 1
+        // remove keyword
+        + keyword.length
+      )
+      shikitor.value = prefix + insertText + suffix
+      resetTriggerCharacter()
+      setTimeout(() => {
+        shikitor.focus(prefix.length + insertText.length)
+      }, 0)
+      return true
+    }
+    return false
+  }
   return definePlugin({
     name,
     onDispose() {
@@ -296,7 +324,21 @@ export default () => {
               providePopupsResolvers?.resolve()
             },
             popups: [{
-              id: 'completions-board', render: ele => elementRef.current = ref(ele)
+              id: 'completions-board', render: ele => {
+                elementRef.current = ref(ele)
+                ele.addEventListener('click', e => {
+                  if (!(e.target instanceof HTMLElement))
+                    return
+                  const item = e.target.closest(`div.${completionItemTemplate.prefix}`)
+                  if (!item) return
+
+                  const index = parseInt(item.dataset.index ?? '')
+                  if (Number.isInteger(index)) {
+                    selectIndexRef.current = index
+                  }
+                  if (item.classList.contains('selected')) acceptCompletion(shikitor)
+                })
+              }
             }]
           }
         }
@@ -331,31 +373,7 @@ export default () => {
             : deltaedIndex % completions.length
           return
         }
-        if (e.key === 'Enter') {
-          const completion = snapshot(completions[selectIndexRef.current])
-          if (completion) {
-            const keyword = keywordRef.current === -1
-              ? ''
-              : keywordRef.current ?? ''
-            const { range, insertText } = completion
-            const { rawTextHelper: { value, resolveTextRange } } = this
-            const resolvedRange = resolveTextRange(range)
-            const prefix = value.slice(0, resolvedRange.start.offset)
-            const suffix = value.slice(
-              resolvedRange.end.offset
-              // remove trigger character
-              + 1
-              // remove keyword
-              + keyword.length
-            )
-            this.value = prefix + insertText + suffix
-            resetTriggerCharacter()
-            setTimeout(() => {
-              this.focus(prefix.length + insertText.length)
-            }, 0)
-            return
-          }
-        }
+        if (e.key === 'Enter' && acceptCompletion(this)) return
         return
       }
       if (!isMultipleKey(e, false)) {
