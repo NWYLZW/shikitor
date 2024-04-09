@@ -229,7 +229,7 @@ export default () => {
   }
 
   function acceptCompletion(shikitor: Shikitor) {
-    const completion = snapshot(completions[selectIndexRef.current])
+    const completion = snapshot(resolvedCompletions.current[selectIndexRef.current])
     if (completion) {
       const keyword = keywordRef.current === -1
         ? ''
