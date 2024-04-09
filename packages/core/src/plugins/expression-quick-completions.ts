@@ -11,25 +11,32 @@ export default definePlugin({
         const editorHelperTriggerReg = /[\w\d?_()[\]'"`]/
         if (!editorHelperTriggerReg.test(prevChar)) return
 
-        let viewStart = lineStart(position.offset)
+        let expressionStart = position.offset - 1
         // find the start of the line view width start
-        while (viewStart > 0 && [
+        while (expressionStart > 0 && ![
           ' ',
           '\t',
+          '\r',
           '\n'
-        ].includes(value[viewStart])) viewStart++
+        ].includes(value[expressionStart - 1])) expressionStart--
         const range = {
-          start: viewStart,
+          start: expressionStart,
           end: position.offset - 1
         }
-        const lineStr = value.slice(range.start, range.end)
+        const expressionStr = value.slice(range.start, range.end)
         return {
           suggestions: [
             {
               label: 'par',
               detail: '(expr)',
               range,
-              insertText: `(${lineStr})`
+              insertText: `(${expressionStr})`
+            },
+            {
+              label: 'not',
+              detail: '!expr',
+              range,
+              insertText: `!${expressionStr}`
             }
           ]
         }
