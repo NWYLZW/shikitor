@@ -3,6 +3,8 @@
   "name": "shikitor-workspace",
   "version": "0.0.1",
   "description": "shikitor workspace",
+  "homepage": "https://nwylzw.github.io/shikitor",
+  "repository": "https://github.com/NWYLZW/shikitor",
   "devDependencies": {
     "@types/node": "^20.11.30",
     "jiek": "^0.2.2",
