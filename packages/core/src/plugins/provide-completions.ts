@@ -133,7 +133,17 @@ const UNSET = { __: Symbol('unset') } as const
 function isUnset<T>(value: T | typeof UNSET): value is typeof UNSET {
   return value === UNSET
 }
-export default () => {
+
+export interface ProvideCompletionsOptions {
+  /**
+   * @default 'need-confirm'
+   */
+  selectMode?: 'once' | 'need-confirm'
+}
+export default (options: ProvideCompletionsOptions = {}) => {
+  const {
+    selectMode = 'once'
+  } = options
   const { disposeScoped, scopeSubscribe } = scoped()
   const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
 
@@ -359,7 +369,10 @@ export default () => {
                   if (Number.isInteger(index)) {
                     selectIndexRef.current = index
                   }
-                  if (item.classList.contains('selected')) acceptCompletion(shikitor)
+                  if (
+                    selectMode === 'once' ||
+                    (selectMode === 'need-confirm' && item.classList.contains('selected'))
+                  ) acceptCompletion(shikitor)
                 })
               }
             }]
