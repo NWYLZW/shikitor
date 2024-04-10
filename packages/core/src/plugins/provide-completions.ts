@@ -369,10 +369,9 @@ export default (options: ProvideCompletionsOptions = {}) => {
                   if (Number.isInteger(index)) {
                     selectIndexRef.current = index
                   }
-                  if (
-                    selectMode === 'once' ||
-                    (selectMode === 'need-confirm' && item.classList.contains('selected'))
-                  ) acceptCompletion(shikitor)
+                  let accept = selectMode === 'once'
+                  accept ||= selectMode === 'need-confirm' && item.classList.contains('selected')
+                  if (accept) acceptCompletion(shikitor)
                 })
               }
             }]
