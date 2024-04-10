@@ -12,8 +12,8 @@ importers:
         specifier: ^20.11.30
         version: 20.11.30
       jiek:
-        specifier: ^0.2.2
-        version: 0.2.2(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
+        specifier: 0.2.3
+        version: 0.2.3(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
       typescript:
         specifier: ^5.4.3
         version: 5.4.3
@@ -38,6 +38,8 @@ importers:
       valtio:
         specifier: ^1.13.2
         version: 1.13.2(react@18.2.0)
+
+  packages/react: {}
 
   packages/standard:
     dependencies:
@@ -3434,8 +3436,8 @@ packages:
       set-function-name: 2.0.2
     dev: false
 
-  /jiek@0.2.2(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
-    resolution: {integrity: sha512-znQo5K+vWoXBWeW4+xJ6EpsNlj8z711XpNos050VL26PbQXZ5iS0+wR1NxpvH5bkDSTzadaYR4SNlKP95hHjDg==}
+  /jiek@0.2.3(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
+    resolution: {integrity: sha512-MtkG7WR314p7i9J262pfRBH2ZBnL/uwjlkz+zsp1v32i/XcSL1Cc3x2G/xGr8YqY0IcYmFxv81iBSqwzlzly9A==}
     hasBin: true
     dependencies:
       '@jiek/pkger': 0.1.8
