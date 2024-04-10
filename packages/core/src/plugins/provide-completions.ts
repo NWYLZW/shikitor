@@ -362,7 +362,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
                 ele.addEventListener('click', e => {
                   if (!(e.target instanceof HTMLElement))
                     return
-                  const item = e.target.closest(`div.${completionItemTemplate.prefix}`)
+                  const item = e.target.closest(`.${completionItemTemplate.prefix}`) as HTMLDivElement
                   if (!item) return
 
                   const index = parseInt(item.dataset.index ?? '')
