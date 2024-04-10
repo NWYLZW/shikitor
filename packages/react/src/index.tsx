@@ -1,4 +1,4 @@
-import type { Shikitor as CoreShikitor, ShikitorOptions } from '@shikitor/core'
+import type { Shikitor as ShikitorCore, ShikitorOptions } from '@shikitor/core'
 import { create } from '@shikitor/core'
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
@@ -6,7 +6,7 @@ export interface ShikitorProps {
   defaultOptions?: ShikitorOptions
 }
 
-export type ShikitorRef = CoreShikitor
+export type ShikitorRef = ShikitorCore
 
 function Shikitor(props: ShikitorProps, ref: React.Ref<ShikitorRef | undefined>) {
   const { defaultOptions } = props
