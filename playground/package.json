@@ -7,10 +7,18 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/react": "^18.2.75",
+    "@types/react-dom": "^18.2.24",
+    "@vitejs/plugin-react": "^4.2.1",
+    "less": "^4.2.0",
     "lz-string": "^1.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "rollup-plugin-unbundled-reexport": "^0.2.0",
     "sass": "^1.72.0",
     "shiki": "^1.2.0",
+    "tdesign-icons-react": "^0.3.2",
+    "tdesign-react": "^1.5.5",
     "typed-query-selector": "^2.11.2",
     "vite": "^5.2.8",
     "vite-plugin-replacer": "^1.0.0"

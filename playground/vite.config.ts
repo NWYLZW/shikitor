@@ -1,5 +1,6 @@
 import path from 'node:path'
 
+import react from '@vitejs/plugin-react'
 import unbundledReexport from 'rollup-plugin-unbundled-reexport'
 import { defineConfig } from 'vite'
 import replacer from 'vite-plugin-replacer'
@@ -16,6 +17,7 @@ export default defineConfig({
     target: 'es2019'
   },
   plugins: [
+    react(),
     replacer({
       exclude: [/.s?css$/],
       define: {
