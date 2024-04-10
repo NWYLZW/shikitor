@@ -1,10 +1,14 @@
-# Shikitor
+<p align="center">
+  <img src="./shikitor.svg" width='256' alt='Shikitor Logo'>
+</p>
+
+## 介绍
 
 轻量化、可扩展的 web 代码编辑器。
 
 |[en-US](./README.md)|中文｜
 
-## How to use
+## 如何使用
 
 ### CDN
 

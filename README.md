@@ -1,4 +1,8 @@
-# Shikitor
+<p align="center">
+  <img src="./shikitor.svg" width='256' alt='Shikitor Logo'>
+</p>
+
+## Description
 
 A simple and lightweight code editor for the web.
 
