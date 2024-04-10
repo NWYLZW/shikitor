@@ -5,6 +5,7 @@ import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
 
 import type {
+  IDisposable,
   ResolvedSelection,
   Shikitor,
   ShikitorOptions
@@ -77,12 +78,46 @@ function initDom(target: HTMLElement) {
   return [input, output] as const
 }
 
-export async function create(target: HTMLElement, inputOptions: ShikitorOptions = {}): Promise<Shikitor> {
+export interface CreateOptions {
+  abort?: AbortSignal
+}
+
+export async function create(
+  target: HTMLElement,
+  inputOptions: ShikitorOptions = {},
+  options: CreateOptions = {}
+): Promise<Shikitor> {
   const {
     onChange,
     onCursorChange,
     onDispose
   } = inputOptions
+  const {
+    abort
+  } = options
+
+  let pluginsDisposes: (void | IDisposable)[] = []
+  const disposes: (() => void)[] = []
+  const { disposeScoped, scopeWatch, scopeSubscribe } = scoped()
+
+  const dispose = () => {
+    disposeScoped()
+    disposes.forEach(dispose => dispose())
+    disposeAllPlugins()
+    onDispose?.()
+    try {
+      // plugins may not installed
+      callAllShikitorPlugins('onDispose')
+    } catch { /* empty */ }
+  }
+  const checkAborted = () => {
+    if (abort?.aborted) {
+      dispose()
+      throw new Error('Aborted')
+    }
+  }
+  checkAborted()
+
   const [input, output] = initDom(target)
 
   const optionsRef = proxy({
@@ -91,11 +126,13 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions 
       plugins: await resolveInputPlugins(inputOptions.plugins)
     }
   })
+  checkAborted()
 
   const {
     dispose: disposePopupsControlled,
     popups
   } = popupsControlled(() => shikitor, target)
+  disposes.push(disposePopupsControlled)
   const {
     dispose: disposeValueControlled,
     valueRef,
@@ -104,6 +141,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions 
     onChange?.(value)
     callAllShikitorPlugins('onChange', value)
   })
+  disposes.push(disposeValueControlled)
   const {
     dispose: disposeCursorControlled,
     cursorRef
@@ -115,14 +153,9 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions 
       callAllShikitorPlugins('onCursorChange', cursor)
     }
   )
-  let prevSelection: ResolvedSelection | undefined
+  disposes.push(disposeCursorControlled)
 
-  const disposes = [
-    disposePopupsControlled,
-    disposeValueControlled,
-    disposeCursorControlled
-  ] as (() => void)[]
-  const { disposeScoped, scopeWatch, scopeSubscribe } = scoped()
+  let prevSelection: ResolvedSelection | undefined
 
   const pluginsRef = derive({
     current: get => get(optionsRef).current.plugins
@@ -190,14 +223,6 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions 
     )
     prevPluginSnapshots = pluginSnapshots
   })
-
-  const dispose = () => {
-    disposeScoped()
-    disposes.forEach(dispose => dispose())
-    disposeAllPlugins()
-    onDispose?.()
-    callAllShikitorPlugins('onDispose')
-  }
 
   scopeWatch(get => {
     const {
@@ -503,9 +528,10 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions 
       }
     }
   }
-  let pluginsDisposes = await Promise.all(
+  pluginsDisposes = await Promise.all(
     callAllShikitorPlugins('install', shikitor)
   )
+  checkAborted()
   function disposeAllPlugins() {
     pluginsDisposes.forEach(({ dispose } = { dispose: () => void 0 }) => dispose())
     pluginsDisposes = []
