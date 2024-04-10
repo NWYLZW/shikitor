@@ -1,7 +1,6 @@
 import type { Shikitor as CoreShikitor, ShikitorOptions } from '@shikitor/core'
 import { create } from '@shikitor/core'
-import type { Ref } from 'react'
-import React, { forwardRef, useImperativeHandle, useRef } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
 export interface ShikitorProps {
   defaultOptions?: ShikitorOptions
@@ -9,10 +8,15 @@ export interface ShikitorProps {
 
 export type ShikitorRef = CoreShikitor
 
-function Shikitor(props: ShikitorProps, ref: Ref<ShikitorRef | undefined>) {
+function Shikitor(props: ShikitorProps, ref: React.Ref<ShikitorRef | undefined>) {
   const { defaultOptions } = props
   const shikitorRef = useRef<ShikitorRef>()
   useImperativeHandle(ref, () => shikitorRef.current, [])
+  useEffect(() => {
+    return () => {
+      shikitorRef.current?.[Symbol.dispose]()
+    }
+  }, [])
   return <div ref={async ele => {
     if (!ele) return
 
