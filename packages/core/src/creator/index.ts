@@ -77,7 +77,7 @@ function initDom(target: HTMLElement) {
   return [input, output] as const
 }
 
-export async function create(target: HTMLElement, inputOptions: ShikitorOptions): Promise<Shikitor> {
+export async function create(target: HTMLElement, inputOptions: ShikitorOptions = {}): Promise<Shikitor> {
   const {
     onChange,
     onCursorChange,
