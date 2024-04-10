@@ -1,8 +1,4 @@
 ### Node template
-# Editor
-.idea
-.vscode
-
 # Logs
 logs
 *.log
