@@ -3,16 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Shikitor</title>
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100vw;
-        height: 100vh;
-        font-family: sans-serif;
-        font-size: 16px;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="public/favicon.svg" type="image/x-icon">
     <script type="importmap">
       {
         "imports": {
@@ -23,23 +15,7 @@
     </script>
 </head>
 <body>
-    <div class="card">
-      <div class="header">
-        <div class="left">
-          <select name="language" id="language-selector">
-          </select>
-          <select name="theme" id="theme-selector">
-          </select>
-        </div>
-        <div class="right">
-          <img alt="fullscreen" title="fullscreen" id="fullscreen" src="public/fullscreen.svg" >
-          <a href="https://github.com/nwylzw/shikitor" target="_blank" rel="noopener noreferrer">
-            <img src="https://github.githubassets.com/favicons/favicon.svg" alt="github" width="20" height="20">
-          </a>
-        </div>
-      </div>
-      <div id="container"></div>
-    </div>
-    <script src="src/index.ts" type="module"></script>
+    <div id='app'></div>
+    <script src="src/index.tsx" type="module"></script>
 </body>
 </html>

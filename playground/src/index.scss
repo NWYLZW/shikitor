@@ -1,105 +1,11 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  font-family: sans-serif;
+  font-size: 16px;
+}
 body {
   background-color: var(--fg, white);
-}
-.card {
-  --border-size: 1px;
-
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  width: 80vw;
-  height: 80vh;
-  left: calc(10vw - var(--border-size) * 2);
-  top: calc(10vh - var(--border-size) * 2);
-
-  background-color: var(--bg, black);
-  border-radius: 4px;
-  border: var(--border-size) solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  transition: .1s;
-  &.fullscreen {
-    width: 100vw;
-    height: 100vh;
-    left: 0;
-    top: 0;
-    border-radius: 0;
-    box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
-    border: none;
-  }
-  .header {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    padding: 8px 20px;
-    border-bottom: var(--border-size) transparent;
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: calc(100% + var(--border-size) * 2);
-      height: var(--border-size);
-      background-color: var(--fg, white);
-      opacity: 0.2;
-    }
-    > .left {
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    > .right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      filter: invert(.5);
-    }
-    select {
-      height: 20px;
-      background-color: var(--bg, black);
-      color: var(--fg, white);
-      opacity: .8;
-      border: 1px solid transparent;
-      font-size: .8em;
-      cursor: pointer;
-      transition: .2s;
-      &:focus {
-        outline: none;
-        opacity: 1;
-        border: 1px solid var(--fg, white);
-      }
-      &:hover {
-        opacity: 1;
-      }
-    }
-    a {
-      display: flex;
-      color: var(--fg, white);
-      text-decoration: none;
-      opacity: .8;
-      transition: .2s;
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
-}
-#container {
-  flex-grow: 1;
-  height: 0;
-  padding: 10px 0;
-  .shikitor-input, .shikitor-output {
-    padding-top: 10px;
-    height: calc(100% - 10px);
-  }
-}
-img#fullscreen {
-  cursor: pointer;
-  opacity: .6;
-  transition: .2s;
-  &:hover {
-    opacity: 1;
-  }
 }
