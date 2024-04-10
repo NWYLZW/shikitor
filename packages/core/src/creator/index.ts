@@ -526,7 +526,7 @@ export async function create(target: HTMLElement, inputOptions: ShikitorOptions 
       return
     }
     if (
-      outputHoverElement.className.includes('shiki-editor')
+      outputHoverElement.className.includes('shikitor')
       && outputHoverElement.className.includes('output')
     ) {
       return

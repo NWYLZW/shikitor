@@ -10,7 +10,8 @@
     "strictNullChecks": true,
     "paths": {
       "@shikitor/*": ["./packages/*/src"]
-    }
+    },
+    "jsx": "react"
   },
   "exclude": ["node_modules", "**/dist"]
 }

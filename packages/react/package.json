@@ -1,0 +1,32 @@
+{
+  "name": "@shikitor/react",
+  "version": "0.0.1",
+  "description": "Shikitor for react",
+  "license": "MIT",
+  "files": ["dist"],
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+  },
+  "homepage": "https://github.com/NWYLZW/shikitor/blob/master/packages/react/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NWYLZW/shikitor",
+    "directory": "packages/react"
+  },
+  "bugs": "https://github.com/NWYLZW/shikitor/issues/new?template=bug_report.yml&labels=bug,scope:@shikitor/react",
+  "peerDependencies": {
+    "react": ">=16.13.1",
+    "react-dom": ">=16.13.1"
+  },
+  "dependencies": {
+    "@shikitor/core": "workspace:^*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.75",
+    "@types/react-dom": "^18.2.24"
+  }
+}
