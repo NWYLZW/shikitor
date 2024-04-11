@@ -75,6 +75,63 @@ export default function App() {
         language,
         theme
       }}
+      onMounted={shikitor => {
+        console.log('mounted', shikitor)
+        // await shikitor.upsertPlugin({
+        //   name: 'shikitor-saver',
+        //   onKeydown(e) {
+        //     if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+        //       e.preventDefault()
+        //       const code = this.value
+        //       const url = new URL(location.href)
+        //
+        //       let newHashStr = ''
+        //       if (code !== DEFAULT_CODE) {
+        //         newHashStr = `zip-code/${zipStr(code)}`
+        //       }
+        //       url.hash = newHashStr
+        //
+        //       const query = new URLSearchParams()
+        //       this.options.language
+        //       && query.set('language', this.options.language)
+        //       this.options.theme
+        //       && query.set('theme', this.options.theme)
+        //       query.set('fullscreen', String(fullscreenCount))
+        //       url.search = query.toString()
+        //       history.pushState(null, '', url.toString())
+        //     }
+        //   }
+        // })
+        // if (hashType === 'gist') {
+        //   shikitor.value = '// Loading from gist...'
+        //   const [hash, filename, revision] = hashContent.split('/')
+        //   let isNotFound = false
+        //   let files: GistFile[] | undefined
+        //   try {
+        //     const { file, files: getFiles } = await getGist(hash, filename, revision)
+        //     if (file?.content) {
+        //       shikitor.value = file?.content
+        //     } else {
+        //       isNotFound = true
+        //       files = Object.values(getFiles)
+        //     }
+        //   } catch (e) {
+        //     const error = e as Error
+        //     if ('message' in error && error.message === 'Not Found') {
+        //       isNotFound = true
+        //     } else {
+        //       throw e
+        //     }
+        //   }
+        //   if (isNotFound) {
+        //     if (files) {
+        //       console.error('File not found, available files are: ' + files.map(file => file.filename).join(', '))
+        //     } else {
+        //       console.error('Gist not found, the hash may be invalid or the gist is private')
+        //     }
+        //   }
+        // }
+      }}
     />
   </div>
 }
