@@ -1,4 +1,4 @@
-import type { create, Shikitor, ShikitorOptions } from '@shikitor/core'
+import type { Shikitor, ShikitorOptions } from '@shikitor/core'
 
 export interface EditorProps {
   options?: ShikitorOptions
