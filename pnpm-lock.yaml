@@ -84,6 +84,12 @@ importers:
 
   playground:
     devDependencies:
+      '@shikitor/core':
+        specifier: workspace:*
+        version: link:../packages/core
+      '@shikitor/react':
+        specifier: workspace:*
+        version: link:../packages/react
       '@types/react':
         specifier: ^18.2.75
         version: 18.2.75
