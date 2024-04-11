@@ -1,24 +1,16 @@
-import type { Shikitor, ShikitorOptions } from '@shikitor/core'
+import type { Shikitor } from '@shikitor/core'
 import type { create } from '@shikitor/core'
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
 
-export interface EditorProps {
-  options?: ShikitorOptions
-  defaultOptions?: ShikitorOptions
-  /**
-   * @internal
-   */
+import type { EditorProps, EditorRef } from './type'
+
+export interface WithoutCoreEditorProps extends EditorProps {
   create?: typeof create
-  onMounted?(shikitor: Shikitor): void
-  onColorChange?(color: {
-    bg: string
-    fg: string
-  }): void
 }
 
-export type EditorRef = Partial<Shikitor>
-
-export default forwardRef<EditorRef, EditorProps>(function Editor(props, ref) {
+export const WithoutCoreEditor = forwardRef<
+  EditorRef, WithoutCoreEditorProps
+>(function WithoutCoreEditor(props, ref) {
   const {
     options,
     defaultOptions,

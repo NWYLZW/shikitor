@@ -1,13 +1,13 @@
 import './App.scss'
 import 'tdesign-react/es/style/index.css'
 
+import { WithoutCoreEditor } from '@shikitor/react/WithoutCoreEditor'
 import React, { useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
 import { Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
 import { Button, Link, Select } from 'tdesign-react/esm'
 
-import Editor from './components/Editor'
 import { useShikitorCreate } from './hooks/useShikitorCreate'
 import type { GistFile } from './utils/gist'
 import { getGist } from './utils/gist'
@@ -72,7 +72,7 @@ export default function App() {
         </Link>
       </div>
     </div>
-    <Editor
+    <WithoutCoreEditor
       create={shikitorCreate}
       options={{
         theme,

@@ -5,7 +5,8 @@
   "license": "MIT",
   "files": ["dist"],
   "exports": {
-    ".": "./src/index.tsx"
+    ".": "./src/index.ts",
+    "./WithoutCoreEditor": "./src/WithoutCoreEditor.tsx"
   },
   "scripts": {
   },
