@@ -9,10 +9,13 @@ import { Button, Link, Select } from 'tdesign-react/esm'
 
 import Editor from './components/Editor'
 import { useShikitorCreate } from './hooks/useShikitorCreate'
+import type { GistFile } from './utils/gist'
+import { getGist } from './utils/gist'
+import { zipStr } from './utils/zipStr'
 
 export default function App() {
-  const [language, setLanguage] = useState<BundledLanguage>('typescript')
   const [theme, setTheme] = useState<BundledTheme>('github-dark')
+  const [language, setLanguage] = useState<BundledLanguage>('typescript')
 
   const [viewMode, setViewMode] = useState<'normal' | 'fullscreen-page' | 'fullscreen-screen'>('normal')
 
@@ -72,8 +75,12 @@ export default function App() {
     <Editor
       create={shikitorCreate}
       options={{
-        language,
-        theme
+        theme,
+        language
+      }}
+      onColorChange={({ bg, fg }) => {
+        document.documentElement.style.setProperty('--bg', bg)
+        document.documentElement.style.setProperty('--fg', fg)
       }}
       onMounted={shikitor => {
         console.log('mounted', shikitor)

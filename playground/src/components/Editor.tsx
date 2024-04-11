@@ -2,10 +2,6 @@ import type { Shikitor, ShikitorOptions } from '@shikitor/core'
 import type { create } from '@shikitor/core'
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
 
-import type { GistFile } from '../utils/gist'
-import { getGist } from '../utils/gist'
-import { zipStr } from '../utils/zipStr'
-
 export interface EditorProps {
   options?: ShikitorOptions
   defaultOptions?: ShikitorOptions
@@ -14,6 +10,10 @@ export interface EditorProps {
    */
   create?: typeof create
   onMounted?(shikitor: Shikitor): void
+  onColorChange?(color: {
+    bg: string
+    fg: string
+  }): void
 }
 
 export type EditorRef = Partial<Shikitor>
@@ -23,7 +23,8 @@ export default forwardRef<EditorRef, EditorProps>(function Editor(props, ref) {
     options,
     defaultOptions,
     create,
-    onMounted
+    onMounted,
+    onColorChange
   } = props
   const mount = useCallback((shikitor: Shikitor) => {
     shikitorRef.current = shikitor
@@ -54,8 +55,7 @@ export default forwardRef<EditorRef, EditorProps>(function Editor(props, ref) {
         if (mutation.attributeName === 'style') {
           const bg = getComputedStyle(ele).backgroundColor
           const fg = getComputedStyle(ele).color
-          document.documentElement.style.setProperty('--bg', bg)
-          document.documentElement.style.setProperty('--fg', fg)
+          onColorChange?.({ bg, fg })
         }
       }
     })
