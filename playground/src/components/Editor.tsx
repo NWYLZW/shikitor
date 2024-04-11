@@ -72,7 +72,7 @@ export default forwardRef<EditorRef, EditorProps>(function Editor(props, ref) {
       abortController.abort()
       shikitorRef.current?.[Symbol.dispose]()
     }
-  }, [create, mount])
+  }, [create, mount, onColorChange])
   useEffect(() => {
     const shikitor = shikitorRef.current
     if (!shikitor) return
