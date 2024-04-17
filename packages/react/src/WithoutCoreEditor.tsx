@@ -2,6 +2,7 @@ import type { create, Shikitor } from '@shikitor/core'
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
 
 import { useDefault } from './hooks/useDefault'
+import { useEvent } from './hooks/useEvent'
 import type { EditorProps, EditorRef } from './type'
 
 export interface WithoutCoreEditorProps extends EditorProps {
@@ -12,12 +13,17 @@ export const WithoutCoreEditor = forwardRef<
   EditorRef, WithoutCoreEditorProps
 >(function WithoutCoreEditor(props, ref) {
   const {
+    value,
+    defaultValue,
+    onChange,
     options,
     defaultOptions,
     create,
     onMounted,
     onColorChange
   } = props
+  const emitChange = useEvent(onChange)
+  const emitMounted = useEvent(onMounted)
   const shikitorRef = useRef<Shikitor | null>(null)
   const eleRef = useRef<HTMLDivElement>(null)
 
@@ -30,14 +36,24 @@ export const WithoutCoreEditor = forwardRef<
         ref.current = shikitor
       }
     }
-    onMounted?.(shikitor)
-  }, [onMounted, ref])
+    shikitor.ee.on('change', emitChange)
+    emitMounted?.(shikitor)
+  }, [emitChange, emitMounted, ref])
 
+  const { vRef: valueRef } = useDefault(value, defaultValue, v => {
+    const shikitor = shikitorRef.current
+    if (!shikitor) return
+
+    shikitor.value = v
+  })
   const { vRef: optionsRef } = useDefault(options, defaultOptions, opts => {
     const shikitor = shikitorRef.current
     if (!shikitor) return
 
-    shikitor.updateOptions(opts)
+    const overrideOpts = { ...opts }
+    if (valueRef.current)
+      overrideOpts.value = valueRef.current
+    shikitor.updateOptions(overrideOpts)
   })
 
   useEffect(() => {
@@ -61,7 +77,10 @@ export const WithoutCoreEditor = forwardRef<
 
     const abortController = new AbortController()
     const abortSignal = abortController.signal
-    create?.(ele, optionsRef.current, { abort: abortSignal })
+    const overrideOpts = { ...optionsRef.current }
+    if (valueRef.current)
+      overrideOpts.value = valueRef.current
+    create?.(ele, overrideOpts, { abort: abortSignal })
       .then(mount)
       .catch(e => {
         if (e instanceof Error && e.message === 'Aborted') return
