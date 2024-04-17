@@ -33,6 +33,7 @@ interface Depend<
 }
 
 export interface ShikitorEventMap extends EventMap {
+  change(value: string): Awaitable<void>
   install(name: string | undefined, shikitor: Shikitor): Awaitable<void>
   dispose(name: string | undefined): Awaitable<void>
 }
