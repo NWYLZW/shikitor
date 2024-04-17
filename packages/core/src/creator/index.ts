@@ -87,6 +87,7 @@ export async function create(
   inputOptions: ShikitorOptions = {},
   options: CreateOptions = {}
 ): Promise<Shikitor> {
+  const ee = new EventEmitter()
   const {
     onChange,
     onCursorChange,
@@ -275,6 +276,7 @@ export async function create(
   })
 
   const shikitor: Shikitor = {
+    ee,
     get value() {
       return valueRef.current
     },
@@ -443,8 +445,6 @@ export async function create(
         }
       }
     },
-
-    ee: new EventEmitter(),
     extend(key, obj) {
       const properties = Object.getOwnPropertyDescriptors(obj)
       const newPropDescs: [string, PropertyDescriptor][] = []
