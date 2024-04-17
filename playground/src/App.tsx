@@ -16,6 +16,7 @@ import { zipStr } from './utils/zipStr'
 const MemoEditor = memo(WithoutCoreEditor)
 
 export default function App() {
+  const [code, setCode] = useState<string>('// Hello, Shikitor!')
   const [theme, setTheme] = useState<BundledTheme>('github-dark')
   const [language, setLanguage] = useState<BundledLanguage>('typescript')
 
@@ -76,6 +77,8 @@ export default function App() {
     </div>
     <MemoEditor
       create={shikitorCreate}
+      value={code}
+      onChange={setCode}
       options={useMemo(() => ({
         theme,
         language
