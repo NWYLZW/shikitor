@@ -1,7 +1,7 @@
-import type { Shikitor } from '@shikitor/core'
-import type { create } from '@shikitor/core'
+import type { create, Shikitor } from '@shikitor/core'
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
 
+import { useDefault } from './hooks/useDefault'
 import type { EditorProps, EditorRef } from './type'
 
 export interface WithoutCoreEditorProps extends EditorProps {
@@ -18,6 +18,9 @@ export const WithoutCoreEditor = forwardRef<
     onMounted,
     onColorChange
   } = props
+  const shikitorRef = useRef<Shikitor | null>(null)
+  const eleRef = useRef<HTMLDivElement>(null)
+
   const mount = useCallback((shikitor: Shikitor) => {
     shikitorRef.current = shikitor
     if (ref) {
@@ -30,14 +33,13 @@ export const WithoutCoreEditor = forwardRef<
     onMounted?.(shikitor)
   }, [onMounted, ref])
 
-  const defaultOptionsRef = useRef(defaultOptions)
-  const initialOptionsRef = useRef(Object.assign({}, defaultOptions, options))
-  const shikitorRef = useRef<Shikitor | null>(null)
-  const eleRef = useRef<HTMLDivElement>(null)
+  const { vRef: optionsRef } = useDefault(options, defaultOptions, opts => {
+    const shikitor = shikitorRef.current
+    if (!shikitor) return
 
-  useEffect(() => {
-    initialOptionsRef.current = Object.assign({}, defaultOptionsRef.current, options)
-  }, [options])
+    shikitor.updateOptions(opts)
+  })
+
   useEffect(() => {
     if (!eleRef.current) return
     const ele = eleRef.current
@@ -54,7 +56,7 @@ export const WithoutCoreEditor = forwardRef<
     observer.observe(ele, { attributes: true, attributeFilter: ['style'] })
     const abortController = new AbortController()
     const abortSignal = abortController.signal
-    create?.(ele, initialOptionsRef.current, { abort: abortSignal })
+    create?.(ele, optionsRef.current, { abort: abortSignal })
       .then(mount)
       .catch(e => {
         if (e instanceof Error && e.message === 'Aborted') return
@@ -64,12 +66,6 @@ export const WithoutCoreEditor = forwardRef<
       abortController.abort()
       shikitorRef.current?.[Symbol.dispose]()
     }
-  }, [create, mount, onColorChange])
-  useEffect(() => {
-    const shikitor = shikitorRef.current
-    if (!shikitor) return
-
-    options && shikitor.updateOptions(options)
-  }, [options])
+  }, [create, mount, onColorChange, optionsRef])
   return <div ref={eleRef} />
 })

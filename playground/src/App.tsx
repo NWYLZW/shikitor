@@ -2,7 +2,7 @@ import './App.scss'
 import 'tdesign-react/es/style/index.css'
 
 import { WithoutCoreEditor } from '@shikitor/react/WithoutCoreEditor'
-import React, { useState } from 'react'
+import React, { memo, useMemo, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
 import { Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
@@ -12,6 +12,8 @@ import { useShikitorCreate } from './hooks/useShikitorCreate'
 import type { GistFile } from './utils/gist'
 import { getGist } from './utils/gist'
 import { zipStr } from './utils/zipStr'
+
+const MemoEditor = memo(WithoutCoreEditor)
 
 export default function App() {
   const [theme, setTheme] = useState<BundledTheme>('github-dark')
@@ -72,12 +74,12 @@ export default function App() {
         </Link>
       </div>
     </div>
-    <WithoutCoreEditor
+    <MemoEditor
       create={shikitorCreate}
-      options={{
+      options={useMemo(() => ({
         theme,
         language
-      }}
+      }), [theme, language])}
       onColorChange={({ bg, fg }) => {
         document.documentElement.style.setProperty('--bg', bg)
         document.documentElement.style.setProperty('--fg', fg)
