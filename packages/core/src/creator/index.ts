@@ -140,6 +140,7 @@ export async function create(
     rawTextHelperRef
   } = valueControlled(input, optionsRef, value => {
     onChange?.(value)
+    ee.emit('change', value)
     callAllShikitorPlugins('onChange', value)
   })
   disposes.push(disposeValueControlled)
