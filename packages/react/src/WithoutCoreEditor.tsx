@@ -54,6 +54,11 @@ export const WithoutCoreEditor = forwardRef<
       }
     })
     observer.observe(ele, { attributes: true, attributeFilter: ['style'] })
+  }, [onColorChange])
+  useEffect(() => {
+    if (!eleRef.current) return
+    const ele = eleRef.current
+
     const abortController = new AbortController()
     const abortSignal = abortController.signal
     create?.(ele, optionsRef.current, { abort: abortSignal })
@@ -66,6 +71,6 @@ export const WithoutCoreEditor = forwardRef<
       abortController.abort()
       shikitorRef.current?.[Symbol.dispose]()
     }
-  }, [create, mount, onColorChange, optionsRef])
+  }, [create, mount, optionsRef])
   return <div ref={eleRef} />
 })
