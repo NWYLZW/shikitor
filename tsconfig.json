@@ -9,7 +9,8 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "paths": {
-      "@shikitor/*": ["./packages/*/src"]
+      "@shikitor/*": ["./packages/*/src"],
+      "@shikitor/core/plugins/*": ["./packages/core/src/plugins/*"]
     },
     "jsx": "react"
   },
