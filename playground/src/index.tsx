@@ -6,8 +6,11 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 
 import App from './App'
+import { QueriesProvider } from './hooks/useQueries'
 
 createRoot(document.getElementById('app')!)
   .render(<React.StrictMode>
-    <App />
+    <QueriesProvider>
+      <App />
+    </QueriesProvider>
   </React.StrictMode>)
