@@ -9,7 +9,7 @@ import React, { memo, useMemo, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 import { bundledLanguagesInfo, bundledThemesInfo } from 'shiki'
 import { Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
-import { Button, Link, Select } from 'tdesign-react/esm'
+import { Button, Link, Select } from 'tdesign-react'
 
 import { useShikitorCreate } from './hooks/useShikitorCreate'
 import saver from './plugins/saver'
