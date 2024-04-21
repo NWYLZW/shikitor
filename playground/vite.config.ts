@@ -19,6 +19,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    globAccept(),
     replacer({
       exclude: [/.s?css$/],
       define: {
@@ -26,7 +27,6 @@ export default defineConfig({
       }
     }),
     unbundledReexport(),
-    tsconfigPaths(),
-    globAccept()
+    tsconfigPaths()
   ]
 })
