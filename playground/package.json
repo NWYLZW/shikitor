@@ -7,11 +7,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@shikitor/core": "workspace:*",
+    "@shikitor/react": "workspace:*",
     "@types/react": "^18.2.75",
     "@types/react-dom": "^18.2.24",
     "@vitejs/plugin-react": "^4.2.1",
-    "@shikitor/react": "workspace:*",
-    "@shikitor/core": "workspace:*",
     "lz-string": "^1.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -22,6 +22,7 @@
     "tdesign-react": "^1.5.5",
     "typed-query-selector": "^2.11.2",
     "vite": "^5.2.8",
+    "vite-plugin-glob-accept": "^0.0.4",
     "vite-plugin-replacer": "^1.0.0"
   }
 }
