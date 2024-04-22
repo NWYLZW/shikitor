@@ -1,6 +1,11 @@
-export type UpdateDispatcher<T, Args extends unknown[] = [], RT = void> = (...args: [...Args, value: T | ((value: T) => T)]) => RT
+export type UpdateDispatcher<
+  T,
+  Args extends unknown[] = [],
+  RT = void,
+  ResolvedValue = T
+> = (...args: [...Args, value: T | ((value: ResolvedValue) => T)]) => RT
 
-export function callUpdateDispatcher<T>(value: T | ((value: T) => T), oldValue: T) {
+export function callUpdateDispatcher<T, ResolvedValue = T>(value: T | ((value: ResolvedValue) => T), oldValue: ResolvedValue) {
   if (typeof value === 'function') {
     return (value as Function)(oldValue)
   } else {

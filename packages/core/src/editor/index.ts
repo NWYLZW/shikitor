@@ -89,7 +89,7 @@ export interface Shikitor<
   focus: (cursor?: Cursor) => void
   readonly selections: readonly ResolvedSelection[]
   readonly rawTextHelper: RawTextHelper
-  updateOptions: UpdateDispatcher<Shikitor['options'], [], Promise<void>>
+  updateOptions: UpdateDispatcher<RecursiveReadonly<ShikitorOptions>, [], Promise<void>, Shikitor['options']>
   updateLanguage: UpdateDispatcher<Shikitor['language']>
   updateSelection: UpdateDispatcher<Selection, [index: number]>
   upsertPlugin: (plugin: InputShikitorPlugin, index?: number) => Promise<number>
