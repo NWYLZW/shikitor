@@ -81,7 +81,9 @@ export interface Shikitor<
 > extends InternalShikitor, ShikitorRegister, Disposable {
   value: string
   language?: BundledLanguage
-  options: RecursiveReadonly<ShikitorOptions>
+  options: RecursiveReadonly<Omit<ShikitorOptions, 'plugins'>> & RecursiveReadonly<{
+    plugins: ShikitorPlugin[]
+  }>
   optionsRef: RefObject<ShikitorOptions>
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
