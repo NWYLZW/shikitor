@@ -75,9 +75,9 @@ export default function App() {
       onChange={setCode}
       options={useMemo(() => ({
         theme,
-        language,
-        plugins
+        language
       }), [theme, language])}
+      plugins={plugins}
       onColorChange={({ bg, fg }) => {
         document.documentElement.style.setProperty('--bg', bg)
         document.documentElement.style.setProperty('--fg', fg)

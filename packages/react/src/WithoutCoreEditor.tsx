@@ -18,6 +18,7 @@ export const WithoutCoreEditor = forwardRef<
     onChange,
     options,
     defaultOptions,
+    plugins,
     create,
     onMounted,
     onColorChange
@@ -49,10 +50,7 @@ export const WithoutCoreEditor = forwardRef<
     const shikitor = shikitorRef.current
     if (!shikitor) return
 
-    const overrideOpts = { ...opts }
-    if (valueRef.current)
-      overrideOpts.value = valueRef.current
-    shikitor.updateOptions(overrideOpts)
+    shikitor.updateOptions(old => ({ ...old, opts }))
   })
 
   useEffect(() => {
@@ -76,7 +74,10 @@ export const WithoutCoreEditor = forwardRef<
 
     const abortController = new AbortController()
     const abortSignal = abortController.signal
-    const overrideOpts = { ...optionsRef.current }
+    const overrideOpts = {
+      ...optionsRef.current,
+      plugins
+    }
     if (valueRef.current)
       overrideOpts.value = valueRef.current
     create?.(ele, overrideOpts, { abort: abortSignal })
@@ -89,6 +90,6 @@ export const WithoutCoreEditor = forwardRef<
       abortController.abort()
       shikitorRef.current?.[Symbol.dispose]()
     }
-  }, [create, mount, optionsRef, valueRef])
+  }, [create, mount, optionsRef, plugins, valueRef])
   return <div ref={eleRef} />
 })
