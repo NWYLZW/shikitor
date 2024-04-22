@@ -24,12 +24,12 @@ export function QueriesProvider({ children }: { children: React.ReactNode }) {
   })
   const set = useCallback((key: string, value: string) => {
     searchRef.current.set(key as string, value)
-    history.pushState(null, '', searchRef.current.toString())
+    history.pushState(null, '', `?${searchRef.current}`)
     setValue(queries => ({ ...queries, [key]: value }))
   }, [])
   const del = useCallback((key: string) => {
     searchRef.current.delete(key as string)
-    history.pushState(null, '', searchRef.current.toString())
+    history.pushState(null, '', `?${searchRef.current}`)
     setValue(queries => {
       const { [key]: _, ...rest } = queries
       return rest
