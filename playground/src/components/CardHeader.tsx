@@ -2,8 +2,8 @@ import './CardHeader.scss'
 
 import React from 'react'
 import { type BundledLanguage, bundledLanguagesInfo, type BundledTheme, bundledThemesInfo } from 'shiki'
-import { Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
-import { Button, Link, Select, Tooltip } from 'tdesign-react'
+import { ExtensionIcon, Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
+import { Button, Link, MessagePlugin, Select, Tooltip } from 'tdesign-react'
 
 import { useQueries } from '../hooks/useQueries'
 
@@ -78,6 +78,15 @@ export function CardHeader() {
               }
               queries.set('viewMode', newMode)
             }}
+          />
+        </Tooltip>
+        <Tooltip content='Config extensions'>
+          <Button
+            ghost
+            variant='text'
+            shape='square'
+            icon={<ExtensionIcon />}
+            onClick={() => MessagePlugin.warning('Not implemented yet')}
           />
         </Tooltip>
         <Link
