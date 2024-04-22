@@ -136,8 +136,8 @@ importers:
         specifier: ^5.2.8
         version: 5.2.8(@types/node@20.11.30)(sass@1.72.0)
       vite-plugin-glob-accept:
-        specifier: ^0.0.9
-        version: 0.0.9(@types/node@20.11.30)(sass@1.72.0)
+        specifier: ^0.0.10
+        version: 0.0.10(@types/node@20.11.30)(sass@1.72.0)
       vite-plugin-replacer:
         specifier: ^1.0.0
         version: 1.0.0(@types/node@20.11.30)(sass@1.72.0)
@@ -6315,8 +6315,8 @@ packages:
       - terser
     dev: true
 
-  /vite-plugin-glob-accept@0.0.9(@types/node@20.11.30)(sass@1.72.0):
-    resolution: {integrity: sha512-QGmWnFSUvrIO7OHWYM90wS8ByHmYv5DJb/w06Gxek+Jkzrn/fAN/KXEzLUstJemyPCFrb5ZfrmWGw+fvZCOvtQ==}
+  /vite-plugin-glob-accept@0.0.10(@types/node@20.11.30)(sass@1.72.0):
+    resolution: {integrity: sha512-9Jp7QnuWMDQ8CRxBeHab3Rpibq80bqABfeNtTDzxY+DETgRXIeFL2coz6OZ+gvCCSnmSTqO+ZQrAgkVcq69FHw==}
     dependencies:
       acorn: 8.11.3
       acorn-walk: 8.3.2
