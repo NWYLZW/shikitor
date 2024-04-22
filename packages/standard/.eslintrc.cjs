@@ -34,8 +34,6 @@ module.exports = {
       plugins: ['react', '@typescript-eslint'],
       files: ['*.ts', '*.tsx'],
       rules: {
-        'indent': 'off',
-        '@typescript-eslint/indent': ['error', 2],
         '@typescript-eslint/consistent-type-imports': [
           'error',
           { prefer: 'type-imports', disallowTypeAnnotations: false }
