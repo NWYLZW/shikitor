@@ -1,7 +1,11 @@
 {
   "private": true,
   "name": "standard",
+  "bin": {
+    "dprint": "./node_modules/.bin/dprint"
+  },
   "dependencies": {
+    "dprint": "^0.45.1",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "eslint": "^8.52.0",

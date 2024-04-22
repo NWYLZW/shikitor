@@ -11,6 +11,7 @@
     "jiek": "0.2.10",
     "typescript": "^5.4.3",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.4.0"
+    "vitest": "^1.4.0",
+    "standard": "workspace:*"
   }
 }

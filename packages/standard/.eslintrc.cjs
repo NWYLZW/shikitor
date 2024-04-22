@@ -64,7 +64,7 @@ module.exports = {
               }
             ]
           }
-        ],
+        ]
         // end
       }
     },
@@ -72,7 +72,7 @@ module.exports = {
       plugins: ['@typescript-eslint'],
       files: ['*.spec.ts'],
       rules: {
-        '@typescript-eslint/no-restricted-imports': 'off',
+        '@typescript-eslint/no-restricted-imports': 'off'
       }
     },
     ...Object.entries(pkgSpecialRules).map(([pkg, rules]) => ({
@@ -108,31 +108,15 @@ module.exports = {
         'vars': 'all',
         'varsIgnorePattern': '^_',
         'args': 'after-used',
-        'argsIgnorePattern': '^_',
-      },
+        'argsIgnorePattern': '^_'
+      }
     ],
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
-    'semi': ['error', 'never'],
-    'quotes': [2, 'single'],
     'camelcase': 'error',
     'keyword-spacing': ['error', { before: true, after: true }],
     'space-before-blocks': ['error', 'always'],
-    'comma-dangle': ['error', 'never'],
-    'comma-spacing': ['error', { before: false, after: true }],
-    'no-multi-spaces': ['error', {
-      ignoreEOLComments: true
-    }],
     'block-spacing': 'error',
-    'array-bracket-spacing': ['error', 'never'],
-    'object-curly-spacing': ['error', 'always'],
-    'indent': ['error', 2, {
-      SwitchCase: 1,
-      VariableDeclarator: 'first',
-      // ignore jsx node, template literal expression
-      ignoredNodes: ['JSXElement *', 'TemplateLiteral *']
-    }],
-    'jsx-quotes': ['error', 'prefer-single'],
     'react/prop-types': 'off',
     'react/jsx-indent': ['error', 2],
     'react/jsx-indent-props': ['error', 'first']
