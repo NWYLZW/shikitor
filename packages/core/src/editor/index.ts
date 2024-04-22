@@ -17,19 +17,19 @@ export interface ShikitorExtends {
 
 type ShikitorExtendable = keyof ShikitorExtends
 
-type ShikitorExtend<Keys extends ShikitorExtendable> = Pretty<U2I<
+type ShikitorExtend<Keys extends ShikitorExtendable> = Pretty<U2I<(
   Keys extends infer K extends ShikitorExtendable
     ? ShikitorExtends[K]
     : never
->>
+)>>
 
 interface Depend<
   ThisKeys extends ShikitorExtendable
 > {
-  <Keys extends Exclude<ShikitorExtendable, ThisKeys>>(keys: Keys[], listener: (shikitor:
+  <Keys extends Exclude<ShikitorExtendable, ThisKeys>>(keys: Keys[], listener: (shikitor: (
     & Shikitor<ThisKeys>
     & ShikitorExtend<Keys>
-  ) => void | IDisposable): IDisposable
+  )) => void | IDisposable): IDisposable
 }
 
 export interface ShikitorEventMap extends EventMap {
