@@ -87,7 +87,9 @@ export default function App() {
           style.setProperty('--td-font-gray-1', bg)
           style.setProperty('--fg', fg)
           style.setProperty('--td-bg-color-container', fg)
-          style.setProperty('--td-gray-color-1', `color-mix(in srgb, ${fg}, ${bg} 20%)`)
+          const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
+          style.setProperty('--hover', hoverColor)
+          style.setProperty('--td-gray-color-1', hoverColor)
         }}
         onMounted={initPlaygroundShikitor}
       />
