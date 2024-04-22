@@ -52,7 +52,7 @@
       }
     }
     &:hover, &.t-input--focused {
-      background-color: transparent;
+      background-color: transparent !important;
       opacity: .6;
       outline: none;
     }
