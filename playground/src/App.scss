@@ -24,40 +24,6 @@
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
     border: none;
   }
-  .header {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    padding: 8px 20px;
-    border-bottom: var(--border-size) transparent;
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: calc(100% + var(--border-size) * 2);
-      height: var(--border-size);
-      background-color: var(--fg, white);
-      opacity: 0.2;
-    }
-    > .right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      filter: invert(.5);
-    }
-    a {
-      display: flex;
-      color: var(--fg, white);
-      text-decoration: none;
-      opacity: .8;
-      transition: .2s;
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
   .shikitor {
     flex-grow: 1;
     height: 0;
@@ -65,25 +31,6 @@
     &-input, &-output {
       padding-top: 10px;
       height: calc(100% - 10px);
-    }
-  }
-}
-.card > .header > .left {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  > .t-select__wrap { width: 180px; }
-  .t-input {
-    background-color: transparent;
-    transition: .2s;
-    .t-input__inner {
-      color: var(--fg, white);
-    }
-    &:hover, &.t-input--focused {
-      background-color: var(--td-bg-color-container-hover);
-      opacity: .6;
-      outline: none;
     }
   }
 }
