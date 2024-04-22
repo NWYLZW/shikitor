@@ -82,8 +82,12 @@ export default function App() {
         }), [theme, language])}
         plugins={plugins}
         onColorChange={({ bg, fg }) => {
-          document.documentElement.style.setProperty('--bg', bg)
-          document.documentElement.style.setProperty('--fg', fg)
+          const style = document.documentElement.style
+          style.setProperty('--bg', bg)
+          style.setProperty('--td-font-gray-1', bg)
+          style.setProperty('--fg', fg)
+          style.setProperty('--td-bg-color-container', fg)
+          style.setProperty('--td-gray-color-1', `color-mix(in srgb, ${fg}, ${bg} 20%)`)
         }}
         onMounted={initPlaygroundShikitor}
       />
