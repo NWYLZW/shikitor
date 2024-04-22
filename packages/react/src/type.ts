@@ -1,8 +1,9 @@
 import type { Shikitor, ShikitorOptions } from '@shikitor/core'
 
 export interface EditorProps {
-  options?: ShikitorOptions
-  defaultOptions?: ShikitorOptions
+  options?: Omit<ShikitorOptions, 'plugins'>
+  defaultOptions?: Omit<ShikitorOptions, 'plugins'>
+  plugins?: ShikitorOptions['plugins']
   value?: string
   defaultValue?: string
   onChange?(value: string): void
