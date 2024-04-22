@@ -18,7 +18,8 @@ function getId(path: string) {
   return path
     .replace(/^\.\//, '')
     .replace(/^\.\.\/\.\.\/\.\.\/packages\/core\/src\/plugins\//, '')
-    .replace(/(.jsx?|.tsx?)$/, '')
+    .replace(/^\/@fs\/.*?\/plugins\//, '')
+    .replace(/(\/index)?(.jsx?|.tsx?)$/, '')
 }
 export const bundledPluginsInfo = Object
   .entries(bundledPluginModules)
