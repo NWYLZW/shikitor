@@ -55,10 +55,12 @@ async function initPlaygroundShikitor(shikitor: Shikitor) {
 const { code: hashCode } = analyzeHash()
 export default function App() {
   const [code, setCode] = useState(hashCode ?? DEFAULT_CODE)
-  const { value: {
-    theme = 'github-dark',
-    language = 'typescript'
-  } } = useQueries<{
+  const {
+    value: {
+      theme = 'github-dark',
+      language = 'typescript'
+    }
+  } = useQueries<{
     theme: BundledTheme
     language: BundledLanguage
   }>()
@@ -66,23 +68,25 @@ export default function App() {
   const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
   usePlugins(shikitorRef)
-  return <div className='card'>
-    <CardHeader />
-    <MemoEditor
-      ref={shikitorRef}
-      create={shikitorCreate}
-      value={code}
-      onChange={setCode}
-      options={useMemo(() => ({
-        theme,
-        language
-      }), [theme, language])}
-      plugins={plugins}
-      onColorChange={({ bg, fg }) => {
-        document.documentElement.style.setProperty('--bg', bg)
-        document.documentElement.style.setProperty('--fg', fg)
-      }}
-      onMounted={initPlaygroundShikitor}
-    />
-  </div>
+  return (
+    <div className='card'>
+      <CardHeader />
+      <MemoEditor
+        ref={shikitorRef}
+        create={shikitorCreate}
+        value={code}
+        onChange={setCode}
+        options={useMemo(() => ({
+          theme,
+          language
+        }), [theme, language])}
+        plugins={plugins}
+        onColorChange={({ bg, fg }) => {
+          document.documentElement.style.setProperty('--bg', bg)
+          document.documentElement.style.setProperty('--fg', fg)
+        }}
+        onMounted={initPlaygroundShikitor}
+      />
+    </div>
+  )
 }
