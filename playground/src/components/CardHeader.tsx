@@ -1,6 +1,6 @@
 import './CardHeader.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { type BundledLanguage, bundledLanguagesInfo, type BundledTheme, bundledThemesInfo } from 'shiki'
 import { ExtensionIcon, Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
 import { Button, Link, MessagePlugin, Select, Tooltip } from 'tdesign-react'
@@ -18,6 +18,18 @@ export function CardHeader() {
     language = 'typescript',
     viewMode = 'normal'
   } = queries.value ?? {}
+  useEffect(() => {
+    document.body.classList.toggle('fullview', viewMode !== 'normal')
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    }
+    if (viewMode === 'fullscreen') {
+      document.documentElement.requestFullscreen()
+    }
+    return () => {
+      if (document.fullscreenElement) document.exitFullscreen()
+    }
+  }, [viewMode])
   return (
     <div className='card-header'>
       <div className='left'>
@@ -61,23 +73,17 @@ export function CardHeader() {
               fullview: <Fullscreen1Icon />,
               fullscreen: <FullscreenExit1Icon />
             }[viewMode]}
-            onClick={() => {
-              const newMode = viewMode === 'normal'
-                ? 'fullview'
-                : (
-                  viewMode === 'fullview'
-                    ? 'fullscreen'
-                    : 'normal'
-                )
-              document.body.classList.toggle('fullview', newMode !== 'normal')
-              if (document.fullscreenElement) {
-                document.exitFullscreen()
-              }
-              if (newMode === 'fullscreen') {
-                document.documentElement.requestFullscreen()
-              }
-              queries.set('viewMode', newMode)
-            }}
+            onClick={() =>
+              queries.set(
+                'viewMode',
+                viewMode === 'normal'
+                  ? 'fullview'
+                  : (
+                    viewMode === 'fullview'
+                      ? 'fullscreen'
+                      : 'normal'
+                  )
+              )}
           />
         </Tooltip>
         <Tooltip content='Config extensions'>
