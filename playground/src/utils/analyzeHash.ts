@@ -33,29 +33,3 @@ export function analyzeHash() {
   }
   return { code, type, content }
 }
-
-// // @ts-ignore
-// const bundledPluginModules: Record<string, () => Promise<{
-//   default: ShikitorPlugin | (() => ShikitorPlugin)
-// }>> = import.meta.glob(['../../packages/core/src/plugins/*.ts', '../../packages/core/src/plugins/*/index.ts'])
-// export const bundledPluginsInfo = Object
-//   .entries(bundledPluginModules)
-//   .map(([path, lazyModule]) => {
-//     const name = path.match(/\/plugins\/(.+?)(\/index)?\.ts$/)?.[1]
-//     return { id: name, name, lazyModule }
-//   })
-// const DEFAULT_INSTALLED_PLUGINS: (
-//   () => Promise<ShikitorPlugin>
-// )[] = bundledPluginsInfo
-//   .filter(({ id }) => id && [
-//     'bracket-matcher',
-//     'code-styler',
-//     'provide-completions',
-//     'expression-quick-completions'
-//   ].includes(id))
-//   .map(({ lazyModule }) => () => lazyModule().then(({ default: plugin }) => {
-//     if (typeof plugin === 'function') {
-//       return plugin()
-//     }
-//     return plugin
-//   }))

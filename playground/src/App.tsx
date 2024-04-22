@@ -2,19 +2,20 @@ import './App.scss'
 import 'tdesign-react/es/style/index.css'
 
 import type { Shikitor } from '@shikitor/core'
-import bracketMatcher from '@shikitor/core/plugins/bracket-matcher'
-import codeStyler from '@shikitor/core/plugins/code-styler'
 import { WithoutCoreEditor } from '@shikitor/react/WithoutCoreEditor'
-import React, { memo, useMemo, useState } from 'react'
+import React, { memo, useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import { CardHeader } from './components/CardHeader'
+import { usePlugins } from './hooks/usePlugins'
 import { useQueries } from './hooks/useQueries'
 import { useShikitorCreate } from './hooks/useShikitorCreate'
-import saver from './plugins/saver'
+import { bundledPluginsInfo } from './plugins'
 import { analyzeHash, DEFAULT_CODE } from './utils/analyzeHash'
 import type { GistFile } from './utils/gist'
 import { getGist } from './utils/gist'
+
+const plugins = bundledPluginsInfo.map(({ module: { default: d } }) => d)
 
 const MemoEditor = memo(WithoutCoreEditor)
 
@@ -62,17 +63,20 @@ export default function App() {
     language: BundledLanguage
   }>()
 
+  const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
+  usePlugins(shikitorRef)
   return <div className='card'>
     <CardHeader />
     <MemoEditor
+      ref={shikitorRef}
       create={shikitorCreate}
       value={code}
       onChange={setCode}
       options={useMemo(() => ({
         theme,
         language,
-        plugins: [saver, bracketMatcher, codeStyler]
+        plugins
       }), [theme, language])}
       onColorChange={({ bg, fg }) => {
         document.documentElement.style.setProperty('--bg', bg)
