@@ -3,12 +3,14 @@ import { useContext } from 'react'
 import React from 'react'
 import { createContext, useCallback, useRef, useState } from 'react'
 
-const QueriesContext = createContext<{
-  searchRef: MutableRefObject<URLSearchParams>
-  value: Record<string, string>
-  set: (key: string, value: string) => void
-  del: (key: string) => void
-} | null>(null)
+const QueriesContext = createContext<
+  {
+    searchRef: MutableRefObject<URLSearchParams>
+    value: Record<string, string>
+    set: (key: string, value: string) => void
+    del: (key: string) => void
+  } | null
+>(null)
 
 export function QueriesProvider({ children }: { children: React.ReactNode }) {
   const searchRef = useRef(new URLSearchParams(location.search))
@@ -33,14 +35,17 @@ export function QueriesProvider({ children }: { children: React.ReactNode }) {
       return rest
     })
   }, [])
-  return <QueriesContext.Provider value={{ searchRef, value, set, del }}>
-    {children}
-  </QueriesContext.Provider>
+  return (
+    <QueriesContext.Provider value={{ searchRef, value, set, del }}>
+      {children}
+    </QueriesContext.Provider>
+  )
 }
 
-export const useQueries = <T extends Record<string, string>>() => useContext(QueriesContext) as {
-  searchRef: MutableRefObject<URLSearchParams>
-  value: T
-  set: (key: keyof T, value: string) => void
-  del: (key: keyof T) => void
-}
+export const useQueries = <T extends Record<string, string>>() =>
+  useContext(QueriesContext) as {
+    searchRef: MutableRefObject<URLSearchParams>
+    value: T
+    set: (key: keyof T, value: string) => void
+    del: (key: keyof T) => void
+  }
