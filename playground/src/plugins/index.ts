@@ -1,5 +1,3 @@
-import 'vite-plugin-glob-accept/client'
-
 import type { ShikitorPlugin } from '@shikitor/core'
 import type { ModuleNamespace } from 'vite/types/hot.d.ts'
 
