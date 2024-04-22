@@ -11,7 +11,7 @@ export function CardHeader() {
   const queries = useQueries<{
     theme: BundledTheme
     language: BundledLanguage
-    viewMode: 'normal' | 'fullscreen-page' | 'fullscreen-screen'
+    viewMode: 'normal' | 'fullview' | 'fullscreen'
   }>()
   const {
     theme = 'github-dark',
@@ -51,20 +51,26 @@ export function CardHeader() {
           shape='square'
           icon={{
             normal: <Fullscreen1Icon />,
-            'fullscreen-page': <Fullscreen1Icon />,
-            'fullscreen-screen': <FullscreenExit1Icon />
+            'fullview': <Fullscreen1Icon />,
+            'fullscreen': <FullscreenExit1Icon />
           }[viewMode]}
-          onClick={() =>
-            queries.set(
-              'viewMode',
-              viewMode === 'normal'
-                ? 'fullscreen-page'
-                : (
-                  viewMode === 'fullscreen-page'
-                    ? 'fullscreen-screen'
-                    : 'normal'
-                )
-            )}
+          onClick={() => {
+            const newMode = viewMode === 'normal'
+              ? 'fullview'
+              : (
+                viewMode === 'fullview'
+                  ? 'fullscreen'
+                  : 'normal'
+              )
+            document.body.classList.toggle('fullview', newMode !== 'normal')
+            if (document.fullscreenElement) {
+              document.exitFullscreen()
+            }
+            if (newMode === 'fullscreen') {
+              document.documentElement.requestFullscreen()
+            }
+            queries.set('viewMode', newMode)
+          }}
         />
         <Link
           hover='color'

@@ -15,15 +15,6 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   transition: .1s;
-  &.fullscreen {
-    width: 100vw;
-    height: 100vh;
-    left: 0;
-    top: 0;
-    border-radius: 0;
-    box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
-    border: none;
-  }
   .shikitor {
     flex-grow: 1;
     height: 0;
@@ -33,4 +24,13 @@
       height: calc(100% - 10px);
     }
   }
+}
+body.fullview #app > .card {
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  border-radius: 0;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  border: none;
 }
