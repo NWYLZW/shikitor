@@ -89,6 +89,6 @@ export const WithoutCoreEditor = forwardRef<
       abortController.abort()
       shikitorRef.current?.[Symbol.dispose]()
     }
-  }, [create, mount, optionsRef])
+  }, [create, mount, optionsRef, valueRef])
   return <div ref={eleRef} />
 })
