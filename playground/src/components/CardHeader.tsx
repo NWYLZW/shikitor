@@ -3,7 +3,7 @@ import './CardHeader.scss'
 import React from 'react'
 import { type BundledLanguage, bundledLanguagesInfo, type BundledTheme, bundledThemesInfo } from 'shiki'
 import { Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
-import { Button, Link, Select } from 'tdesign-react'
+import { Button, Link, Select, Tooltip } from 'tdesign-react'
 
 import { useQueries } from '../hooks/useQueries'
 
@@ -45,33 +45,41 @@ export function CardHeader() {
         />
       </div>
       <div className='right'>
-        <Button
-          ghost
-          variant='text'
-          shape='square'
-          icon={{
-            normal: <Fullscreen1Icon />,
-            'fullview': <Fullscreen1Icon />,
-            'fullscreen': <FullscreenExit1Icon />
+        <Tooltip
+          content={{
+            normal: 'Switch to full view',
+            fullview: 'Switch to fullscreen',
+            fullscreen: 'Exit fullscreen'
           }[viewMode]}
-          onClick={() => {
-            const newMode = viewMode === 'normal'
-              ? 'fullview'
-              : (
-                viewMode === 'fullview'
-                  ? 'fullscreen'
-                  : 'normal'
-              )
-            document.body.classList.toggle('fullview', newMode !== 'normal')
-            if (document.fullscreenElement) {
-              document.exitFullscreen()
-            }
-            if (newMode === 'fullscreen') {
-              document.documentElement.requestFullscreen()
-            }
-            queries.set('viewMode', newMode)
-          }}
-        />
+        >
+          <Button
+            ghost
+            variant='text'
+            shape='square'
+            icon={{
+              normal: <Fullscreen1Icon />,
+              fullview: <Fullscreen1Icon />,
+              fullscreen: <FullscreenExit1Icon />
+            }[viewMode]}
+            onClick={() => {
+              const newMode = viewMode === 'normal'
+                ? 'fullview'
+                : (
+                  viewMode === 'fullview'
+                    ? 'fullscreen'
+                    : 'normal'
+                )
+              document.body.classList.toggle('fullview', newMode !== 'normal')
+              if (document.fullscreenElement) {
+                document.exitFullscreen()
+              }
+              if (newMode === 'fullscreen') {
+                document.documentElement.requestFullscreen()
+              }
+              queries.set('viewMode', newMode)
+            }}
+          />
+        </Tooltip>
         <Link
           hover='color'
           href='https://github.com/nwylzw/shikitor'

@@ -85,8 +85,10 @@ export default function App() {
           const style = document.documentElement.style
           style.setProperty('--bg', bg)
           style.setProperty('--td-font-gray-1', bg)
+          style.setProperty('--td-text-color-anti', bg)
           style.setProperty('--fg', fg)
           style.setProperty('--td-bg-color-container', fg)
+          style.setProperty('--td-gray-color-13', fg)
           const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
           style.setProperty('--hover', hoverColor)
           style.setProperty('--td-gray-color-1', hoverColor)
