@@ -59,9 +59,11 @@ export function CardHeader() {
               'viewMode',
               viewMode === 'normal'
                 ? 'fullscreen-page'
-                : viewMode === 'fullscreen-page'
-                ? 'fullscreen-screen'
-                : 'normal'
+                : (
+                  viewMode === 'fullscreen-page'
+                    ? 'fullscreen-screen'
+                    : 'normal'
+                )
             )}
         />
         <Link
