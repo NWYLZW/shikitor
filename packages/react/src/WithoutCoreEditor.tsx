@@ -10,7 +10,8 @@ export interface WithoutCoreEditorProps extends EditorProps {
 }
 
 export const WithoutCoreEditor = forwardRef<
-  EditorRef, WithoutCoreEditorProps
+  EditorRef,
+  WithoutCoreEditorProps
 >(function WithoutCoreEditor(props, ref) {
   const {
     value,
@@ -50,7 +51,7 @@ export const WithoutCoreEditor = forwardRef<
     const shikitor = shikitorRef.current
     if (!shikitor) return
 
-    shikitor.updateOptions(old => ({ ...old, opts }))
+    shikitor.updateOptions(old => ({ ...old, ...opts }))
   })
 
   useEffect(() => {
@@ -78,8 +79,9 @@ export const WithoutCoreEditor = forwardRef<
       ...optionsRef.current,
       plugins
     }
-    if (valueRef.current)
+    if (valueRef.current) {
       overrideOpts.value = valueRef.current
+    }
     create?.(ele, overrideOpts, { abort: abortSignal })
       .then(mount)
       .catch(e => {
