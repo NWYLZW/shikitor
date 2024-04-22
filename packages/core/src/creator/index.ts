@@ -117,6 +117,7 @@ export async function create(
       throw new Error('Aborted')
     }
   }
+  await new Promise(resolve => setTimeout(resolve, 0))
   checkAborted()
 
   const [input, output] = initDom(target)
