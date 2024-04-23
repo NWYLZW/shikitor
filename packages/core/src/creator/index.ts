@@ -37,8 +37,11 @@ function initDom(target: HTMLElement) {
 
   output.classList.add('shikitor-output')
   input.addEventListener('scroll', () => {
-    output.scrollTop = input.scrollTop
-    output.scrollLeft = input.scrollLeft
+    setTimeout(() => {
+      // wait the output renders, whether not wait it, the scrollTop can't be set
+      output.scrollTop = input.scrollTop
+      output.scrollLeft = input.scrollLeft
+    }, 10)
   })
   input.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !isMultipleKey(e)) {
