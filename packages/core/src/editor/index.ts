@@ -59,6 +59,12 @@ export interface ShikitorOptions extends ShikitorEvents {
   cursor?: ResolvedPosition
   language?: BundledLanguage
   lineNumbers?: 'on' | 'off'
+  autoSize?: boolean | {
+    /**
+     * @default 5
+     */
+    maxRows: number
+  }
   readOnly?: boolean
   theme?: BundledTheme
   decorations?: DecorationItem[]
