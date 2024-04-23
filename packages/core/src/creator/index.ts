@@ -173,14 +173,6 @@ export async function create(
     }
   })
   scopeWatch(get => {
-    const { enabled, minRows } = get(autoSizeRef)
-    if (!enabled || !minRows) return
-    const style = getComputedStyle(target)
-    const lineHeight = parseFloat(style.lineHeight)
-    const topAndBottom = getEleTopAndBottom(target)
-    target.style.height = target.style.minHeight = `${lineHeight * minRows + topAndBottom}px`
-  })
-  scopeWatch(get => {
     // noinspection BadExpressionStatementJS
     get(valueRef).current
     const { enabled, minRows, maxRows } = get(autoSizeRef)
