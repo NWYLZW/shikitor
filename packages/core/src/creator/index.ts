@@ -67,15 +67,6 @@ function initDom(target: HTMLElement) {
   return [input, output] as const
 }
 
-function getEleTopAndBottom(ele: HTMLElement) {
-  const style = getComputedStyle(ele)
-  const paddingTop = parseFloat(style.paddingTop)
-  const paddingBottom = parseFloat(style.paddingBottom)
-  const borderTop = parseFloat(style.borderTopWidth)
-  const borderBottom = parseFloat(style.borderBottomWidth)
-  return paddingTop + paddingBottom + borderTop + borderBottom
-}
-
 export interface CreateOptions {
   abort?: AbortSignal
 }
