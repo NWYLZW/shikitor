@@ -3,7 +3,7 @@ import './index.scss'
 import type { Shikitor } from '@shikitor/core'
 import provideCompletions from '@shikitor/core/plugins/provide-completions'
 import { WithoutCoreEditor } from '@shikitor/react'
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import { useQueries } from '#hooks/useQueries.tsx'
@@ -20,6 +20,7 @@ export default function Messenger() {
     theme: BundledTheme
     language: BundledLanguage
   }>()
+  const [text, setText] = useState('')
 
   const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
@@ -34,6 +35,8 @@ export default function Messenger() {
         <WithoutCoreEditor
           ref={shikitorRef}
           create={shikitorCreate}
+          value={text}
+          onChange={setText}
           options={useMemo(() => ({
             theme,
             language: 'markdown',
