@@ -33,6 +33,7 @@ export default function MessageSender() {
             theme,
             language: 'markdown',
             lineNumbers: 'off',
+            placeholder: 'Message here...',
             autoSize: { maxRows: 10 }
           }), [theme])}
           onColorChange={({ bg, fg }) => {
