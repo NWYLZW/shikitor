@@ -17,19 +17,24 @@ export interface ShikitorExtends {
 
 type ShikitorExtendable = keyof ShikitorExtends
 
-type ShikitorExtend<Keys extends ShikitorExtendable> = Pretty<U2I<(
+// @dprint-ignore
+type ShikitorExtend<Keys extends ShikitorExtendable> = Pretty<U2I<
   Keys extends infer K extends ShikitorExtendable
     ? ShikitorExtends[K]
     : never
-)>>
+>>
 
 interface Depend<
   ThisKeys extends ShikitorExtendable
 > {
-  <Keys extends Exclude<ShikitorExtendable, ThisKeys>>(keys: Keys[], listener: (shikitor: (
-    & Shikitor<ThisKeys>
-    & ShikitorExtend<Keys>
-  )) => void | IDisposable): IDisposable
+  <Keys extends Exclude<ShikitorExtendable, ThisKeys>>(
+    keys: Keys[],
+    listener: (
+      shikitor:
+        & Shikitor<ThisKeys>
+        & ShikitorExtend<Keys>
+    ) => void | IDisposable
+  ): IDisposable
 }
 
 export interface ShikitorEventMap extends EventMap {
@@ -75,7 +80,7 @@ interface InternalShikitor {
   /**
    * @internal
    */
-  _getCursorAbsolutePosition: (cursor: ResolvedCursor) => { x: number, y: number }
+  _getCursorAbsolutePosition: (cursor: ResolvedCursor) => { x: number; y: number }
   /**
    * @internal
    */
@@ -87,9 +92,11 @@ export interface Shikitor<
 > extends InternalShikitor, ShikitorRegister, Disposable {
   value: string
   language?: BundledLanguage
-  options: RecursiveReadonly<Omit<ShikitorOptions, 'plugins'>> & RecursiveReadonly<{
-    plugins: ShikitorPlugin[]
-  }>
+  options:
+    & RecursiveReadonly<Omit<ShikitorOptions, 'plugins'>>
+    & RecursiveReadonly<{
+      plugins: ShikitorPlugin[]
+    }>
   optionsRef: RefObject<ShikitorOptions>
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
