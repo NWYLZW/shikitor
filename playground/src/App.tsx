@@ -1,14 +1,19 @@
 import './App.scss'
 
-import React, { memo, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import CodeEditor from './examples/CodeEditor'
+import CodeEditorPreview from './examples/CodeEditor/Preview'
+import MarkdownEditor from './examples/MarkdownEditor'
+import MarkdownEditorPreview from './examples/MarkdownEditor/Preview'
+import MessageSender from './examples/MessageSender'
+import MessageSenderPreview from './examples/MessageSender/Preview'
 import { useQueries } from './hooks/useQueries'
 
 const examples = [
-  ['Code Editor', memo(CodeEditor), memo(CodeEditor.ExamplePreview)],
-  ['Markdown Editor', memo(CodeEditor), memo(CodeEditor.ExamplePreview)],
-  ['Message Sender', memo(CodeEditor), memo(CodeEditor.ExamplePreview)]
+  ['Code Editor', CodeEditor, CodeEditorPreview],
+  ['Markdown Editor', MarkdownEditor, MarkdownEditorPreview],
+  ['Message Sender', MessageSender, MessageSenderPreview]
 ] as const
 
 export default function App() {
