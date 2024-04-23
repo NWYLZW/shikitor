@@ -1,0 +1,36 @@
+.code-editor {
+  --border-size: 1px;
+
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 60vw;
+  height: 80vh;
+  left: calc(20vw - var(--border-size) * 2);
+  top: calc(10vh - var(--border-size) * 2);
+
+  background-color: var(--bg, black);
+  border-radius: 4px;
+  border: var(--border-size) solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: .1s;
+  .shikitor {
+    flex-grow: 1;
+    height: 0;
+    padding: 10px 0;
+    &-input, &-output {
+      padding-top: 10px;
+      height: calc(100% - 10px);
+    }
+  }
+}
+body.fullview #app > .code-editor {
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  border-radius: 0;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  border: none;
+}

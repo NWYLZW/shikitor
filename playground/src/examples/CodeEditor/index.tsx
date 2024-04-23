@@ -1,3 +1,5 @@
+import './index.scss'
+
 import type { Shikitor } from '@shikitor/core'
 import { WithoutCoreEditor } from '@shikitor/react'
 import React, { memo, useMemo, useRef, useState } from 'react'
@@ -67,7 +69,7 @@ export default function CodeEditor() {
   const shikitorCreate = useShikitorCreate()
   usePlugins(shikitorRef)
   return (
-    <div className='card'>
+    <div className='code-editor'>
       <CardHeader />
       <MemoEditor
         ref={shikitorRef}
