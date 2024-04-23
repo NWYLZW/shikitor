@@ -184,9 +184,9 @@ export async function create(
     const value = get(valueRef).current
     if (text) {
       if (value.length === 0) {
-        placeholder.innerHTML = text
+        placeholder.innerText = text
       } else {
-        placeholder.innerHTML = ''
+        placeholder.innerText = ''
       }
     }
   })
