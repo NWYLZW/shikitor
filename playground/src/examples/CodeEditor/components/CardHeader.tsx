@@ -5,7 +5,7 @@ import { type BundledLanguage, bundledLanguagesInfo, type BundledTheme, bundledT
 import { ExtensionIcon, Fullscreen1Icon, FullscreenExit1Icon } from 'tdesign-icons-react'
 import { Button, Link, MessagePlugin, Select, Tooltip } from 'tdesign-react'
 
-import { useQueries } from '../hooks/useQueries'
+import { useQueries } from '../../../hooks/useQueries'
 
 export function CardHeader() {
   const queries = useQueries<{

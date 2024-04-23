@@ -51,14 +51,21 @@ body.fullview #app > .card {
     padding: 10px;
     width: calc(100% - 20px);
     cursor: pointer;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid color-mix(in srgb, var(--bg), var(--fg) 50%);
     border-radius: 4px;
+    background-color: var(--fg);
     transition: .3s;
     h4 {
       user-select: none;
       color: var(--bg);
       margin: 0 0 5px;
       font-weight: normal;
+    }
+    &:not(.active):hover {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    }
+    &.active {
+      cursor: default;
     }
     &:hover, &.active {
       right: 30px;
@@ -111,7 +118,7 @@ body.fullview #app > .card {
       align-items: center;
       height: 12px;
       &.highlight {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: color-mix(in srgb, var(--bg), var(--fg) 50%);
       }
     }
     .code-block {
