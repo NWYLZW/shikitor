@@ -47,6 +47,7 @@ export default function MessageSender() {
             style.setProperty('--hover', hoverColor)
             style.setProperty('--td-gray-color-1', hoverColor)
           }}
+          onMounted={shikitor => shikitor.focus()}
         />
       </div>
     </div>
