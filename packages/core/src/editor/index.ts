@@ -64,6 +64,11 @@ export interface ShikitorOptions extends ShikitorEvents {
   cursor?: ResolvedPosition
   language?: BundledLanguage
   lineNumbers?: 'on' | 'off'
+  /**
+   * @default false
+   *
+   * automatically adjust the height of the textarea
+   */
   autoSize?: boolean | {
     /**
      * @default 1
