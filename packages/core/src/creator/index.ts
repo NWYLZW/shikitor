@@ -395,7 +395,6 @@ export async function create(
       plugins?.splice(index, 1)
     },
     [Symbol.dispose]() {
-      offDocumentSelectionChange()
       target.innerHTML = ''
       dispose()
     },
@@ -593,7 +592,7 @@ export async function create(
     })
   }, 50))
 
-  const offDocumentSelectionChange = listen(document, 'selectionchange', () => {
+  disposes.push(listen(document, 'selectionchange', () => {
     if (document.getSelection()?.focusNode === target) {
       const { resolvePosition } = shikitor.rawTextHelper
       const [start, end] = [input.selectionStart, input.selectionEnd]
@@ -607,7 +606,7 @@ export async function create(
       prevSelection = selection
       return
     }
-  })
+  }))
   input.addEventListener('keydown', e => callAllShikitorPlugins('onKeydown', e as _KeyboardEvent))
   input.addEventListener('keyup', e => callAllShikitorPlugins('onKeyup', e as _KeyboardEvent))
   input.addEventListener('keypress', e => callAllShikitorPlugins('onKeypress', e as _KeyboardEvent))
