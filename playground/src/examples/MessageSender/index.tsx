@@ -25,7 +25,9 @@ export default function MessageSender() {
       <div className='messages'>
       </div>
       <div className='message-sender'>
-        <div className='avatar' />
+        <div className='avatar'>
+          <img src='favicon.svg' width={24} height={24} />
+        </div>
         <WithoutCoreEditor
           ref={shikitorRef}
           create={shikitorCreate}

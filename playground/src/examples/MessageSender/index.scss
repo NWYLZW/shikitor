@@ -5,11 +5,15 @@
   width: 100%;
   overflow: hidden;
   .avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     min-width: 32px;
     min-height: 32px;
     border-radius: 50%;
-    background-color: #e2cd83;
+    background-color: white;
     border: 2px solid color-mix(in srgb, var(--bg), var(--fg) 50%);
+    overflow: hidden;
   }
 }
 .messages {
