@@ -178,7 +178,6 @@ export async function create(
     const style = getComputedStyle(target)
     const lineHeight = parseFloat(style.lineHeight)
     const topAndBottom = getEleTopAndBottom(target)
-    console.log('lineHeight', lineHeight, 'topAndBottom', topAndBottom)
     target.style.height = target.style.minHeight = `${lineHeight * minRows + topAndBottom}px`
   })
   scopeWatch(get => {
