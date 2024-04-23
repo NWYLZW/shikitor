@@ -1,6 +1,7 @@
 import './index.scss'
 
 import type { Shikitor } from '@shikitor/core'
+import provideCompletions from '@shikitor/core/plugins/provide-completions'
 import { WithoutCoreEditor } from '@shikitor/react'
 import React, { useMemo, useRef } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
@@ -8,7 +9,7 @@ import type { BundledLanguage, BundledTheme } from 'shiki'
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
 
-export default function MessageSender() {
+export default function Messenger() {
   const {
     value: {
       theme = 'github-dark'
@@ -38,6 +39,7 @@ export default function MessageSender() {
             placeholder: 'Message here...',
             autoSize: { maxRows: 10 }
           }), [theme])}
+          plugins={[provideCompletions]}
           onColorChange={({ bg, fg }) => {
             const style = document.documentElement.style
             style.setProperty('--bg', bg)
