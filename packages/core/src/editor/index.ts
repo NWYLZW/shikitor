@@ -66,9 +66,13 @@ export interface ShikitorOptions extends ShikitorEvents {
   lineNumbers?: 'on' | 'off'
   autoSize?: boolean | {
     /**
+     * @default 1
+     */
+    minRows?: number
+    /**
      * @default 5
      */
-    maxRows: number
+    maxRows?: number
   }
   readOnly?: boolean
   theme?: BundledTheme

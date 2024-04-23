@@ -12,6 +12,7 @@ import type { PickByValue } from '../types'
 import { callUpdateDispatcher, diffArray, isMultipleKey, isWhatBrowser, listen, throttle } from '../utils' with {
   'unbundled-reexport': 'on'
 }
+import { calcTextareaHeight } from '../utils/calcTextareaHeight'
 import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { scoped } from '../utils/valtio/scoped'
 import { cursorControlled } from './controlled/cursorControlled'
@@ -64,6 +65,15 @@ function initDom(target: HTMLElement) {
 
   target.append(output, input)
   return [input, output] as const
+}
+
+function getEleTopAndBottom(ele: HTMLElement) {
+  const style = getComputedStyle(ele)
+  const paddingTop = parseFloat(style.paddingTop)
+  const paddingBottom = parseFloat(style.paddingBottom)
+  const borderTop = parseFloat(style.borderTopWidth)
+  const borderBottom = parseFloat(style.borderBottomWidth)
+  return paddingTop + paddingBottom + borderTop + borderBottom
 }
 
 export interface CreateOptions {
@@ -145,6 +155,42 @@ export async function create(
     }
   )
   disposes.push(disposeCursorControlled)
+
+  const autoSizeRef = derive({
+    minRows: get => {
+      const inputAutoSize = get(optionsRef).current.autoSize
+      if (!inputAutoSize) return
+      return inputAutoSize === true ? 1 : Math.max(1, inputAutoSize.minRows ?? 1)
+    },
+    maxRows: get => {
+      const inputAutoSize = get(optionsRef).current.autoSize
+      if (!inputAutoSize) return
+      return inputAutoSize === true ? 5 : Math.max(1, inputAutoSize.maxRows ?? 5)
+    },
+    enabled: get => {
+      const inputAutoSize = get(optionsRef).current.autoSize
+      return inputAutoSize !== false
+    }
+  })
+  scopeWatch(get => {
+    const { enabled, minRows } = get(autoSizeRef)
+    if (!enabled || !minRows) return
+    const style = getComputedStyle(target)
+    const lineHeight = parseFloat(style.lineHeight)
+    const topAndBottom = getEleTopAndBottom(target)
+    console.log('lineHeight', lineHeight, 'topAndBottom', topAndBottom)
+    target.style.height = target.style.minHeight = `${lineHeight * minRows + topAndBottom}px`
+  })
+  scopeWatch(get => {
+    // noinspection BadExpressionStatementJS
+    get(valueRef).current
+    const { enabled, minRows, maxRows } = get(autoSizeRef)
+    if (!enabled || !minRows || !maxRows) return
+
+    const { height, minHeight } = calcTextareaHeight(input, minRows, maxRows)
+    height && (target.style.height = height)
+    minHeight && (target.style.minHeight = minHeight)
+  })
 
   let prevSelection: ResolvedSelection | undefined
 

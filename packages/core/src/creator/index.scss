@@ -1,6 +1,9 @@
 .shikitor {
   --gutter-width: 3em;
+  --line-height: 22px;
   position: relative;
+  line-height: var(--line-height);
+  transition: .1s;
 
   &-bg-lighting {
     position: relative;
@@ -23,7 +26,6 @@
   &-input, &-output {
     position: absolute;
     width: 100%;
-    height: 100%;
     inset: 0;
     margin: 0;
     padding: 0;
@@ -48,19 +50,21 @@
     outline: none;
     overflow: auto;
     white-space: pre;
+    line-height: var(--line-height);
   }
   &-output {
+    height: 100%;
     overflow: hidden;
     > pre {
       margin: 0;
     }
     &-lines {
       display: block;
+      line-height: var(--line-height);
     }
     &-line {
       position: relative;
       min-width: calc(100% - var(--gutter-width));
-      height: auto;
       &::after {
         position: absolute;
         content: attr(data-line);
