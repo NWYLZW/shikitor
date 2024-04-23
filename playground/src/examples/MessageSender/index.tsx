@@ -52,6 +52,9 @@ export default function MessageSender() {
           }}
           onMounted={shikitor => shikitor.focus()}
         />
+        <div className='send-tooltip'>
+          <kbd>⌘ enter</kbd>
+        </div>
       </div>
     </div>
   )

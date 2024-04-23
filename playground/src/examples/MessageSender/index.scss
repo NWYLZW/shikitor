@@ -23,6 +23,7 @@
   padding: 0 20px;
 }
 .message-sender {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -30,6 +31,18 @@
   margin: 10px 50px;
   background-color: var(--bg);
   border-radius: 5px;
+  .send-tooltip {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    padding: 2px;
+    color: color-mix(in srgb, var(--fg), var(--bg) 50%);
+    font-size: 12px;
+    background-color: color-mix(in srgb, var(--bg), var(--fg) 10%);
+    border-radius: 2px;
+    box-shadow: 2px 2px color-mix(in srgb, var(--fg), var(--bg) 50%);
+    opacity: .5;
+  }
   .shikitor {
     width: 100%;
   }
