@@ -32,7 +32,8 @@ export default function MessageSender() {
           options={useMemo(() => ({
             theme,
             language: 'markdown',
-            lineNumbers: 'off'
+            lineNumbers: 'off',
+            autoSize: { maxRows: 10 }
           }), [theme])}
           onColorChange={({ bg, fg }) => {
             const style = document.documentElement.style
