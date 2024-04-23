@@ -1,4 +1,10 @@
 import type { Shikitor, ShikitorOptions } from '@shikitor/core'
+import type React from 'react'
+
+export interface StyledProps {
+  className?: string
+  style?: React.CSSProperties
+}
 
 export interface EditorProps {
   options?: Omit<ShikitorOptions, 'plugins'>

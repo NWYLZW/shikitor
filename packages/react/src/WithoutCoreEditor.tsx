@@ -3,9 +3,9 @@ import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
 
 import { useDefault } from './hooks/useDefault'
 import { useEvent } from './hooks/useEvent'
-import type { EditorProps, EditorRef } from './type'
+import type { EditorProps, EditorRef, StyledProps } from './type'
 
-export interface WithoutCoreEditorProps extends EditorProps {
+export interface WithoutCoreEditorProps extends EditorProps, StyledProps {
   create?: typeof create
 }
 
@@ -22,7 +22,9 @@ export const WithoutCoreEditor = forwardRef<
     plugins,
     create,
     onMounted,
-    onColorChange
+    onColorChange,
+    style,
+    className
   } = props
   const emitChange = useEvent(onChange)
   const shikitorRef = useRef<Shikitor | null>(null)
@@ -93,5 +95,11 @@ export const WithoutCoreEditor = forwardRef<
       shikitorRef.current?.[Symbol.dispose]()
     }
   }, [create, mount, optionsRef, plugins, valueRef])
-  return <div ref={eleRef} />
+  return (
+    <div
+      ref={eleRef}
+      style={style}
+      className={className}
+    />
+  )
 })
