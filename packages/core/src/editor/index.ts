@@ -64,6 +64,7 @@ export interface ShikitorOptions extends ShikitorEvents {
   cursor?: ResolvedPosition
   language?: BundledLanguage
   lineNumbers?: 'on' | 'off'
+  placeholder?: string
   /**
    * @default false
    *

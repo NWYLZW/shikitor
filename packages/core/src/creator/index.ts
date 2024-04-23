@@ -27,6 +27,7 @@ function initDom(target: HTMLElement) {
 
   const input = document.createElement('textarea')
   const output = document.createElement('div')
+  const placeholder = document.createElement('div')
 
   input.classList.add('shikitor-input')
   input.setAttribute('autocapitalize', 'off')
@@ -63,8 +64,9 @@ function initDom(target: HTMLElement) {
     }
   })
 
-  target.append(output, input)
-  return [input, output] as const
+  placeholder.classList.add('shikitor-placeholder')
+  target.append(output, placeholder, input)
+  return [input, output, placeholder] as const
 }
 
 export interface CreateOptions {
@@ -109,7 +111,7 @@ export async function create(
   await new Promise(resolve => setTimeout(resolve, 0))
   checkAborted()
 
-  const [input, output] = initDom(target)
+  const [input, output, placeholder] = initDom(target)
 
   const optionsRef = proxy({
     current: {
@@ -172,6 +174,21 @@ export async function create(
     const { height, minHeight } = calcTextareaHeight(input, minRows, maxRows)
     height && (target.style.height = height)
     minHeight && (target.style.minHeight = minHeight)
+  })
+
+  const placeholderRef = derive({
+    current: get => get(optionsRef).current.placeholder
+  })
+  scopeWatch(get => {
+    const text = get(placeholderRef).current
+    const value = get(valueRef).current
+    if (text) {
+      if (value.length === 0) {
+        placeholder.innerHTML = text
+      } else {
+        placeholder.innerHTML = ''
+      }
+    }
   })
 
   let prevSelection: ResolvedSelection | undefined

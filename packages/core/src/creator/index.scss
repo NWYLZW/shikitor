@@ -88,4 +88,9 @@
       }
     }
   }
+  &-placeholder {
+    position: absolute;
+    top: 0;
+    color: color-mix(in srgb, var(--fg), var(--bg) 50%)
+  }
 }
