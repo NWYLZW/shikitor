@@ -29,4 +29,7 @@
   .shikitor {
     width: 100%;
   }
+  .shikitor-output-line-highlighted::before {
+    content: unset;
+  }
 }
