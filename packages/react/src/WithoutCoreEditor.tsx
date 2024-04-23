@@ -9,6 +9,18 @@ export interface WithoutCoreEditorProps extends EditorProps, StyledProps {
   create?: typeof create
 }
 
+// TODO abstract to @shikitor/utils
+export function throttle<T extends (...args: any[]) => void>(fn: T, delay: number) {
+  let last = 0
+  return (...args: any[]) => {
+    const now = Date.now()
+    if (now - last >= delay) {
+      fn(...args)
+      last = now
+    }
+  }
+}
+
 export const WithoutCoreEditor = forwardRef<
   EditorRef,
   WithoutCoreEditorProps
@@ -60,16 +72,18 @@ export const WithoutCoreEditor = forwardRef<
     if (!eleRef.current) return
     const ele = eleRef.current
 
+    const throttleChange = throttle(onColorChange ?? (() => void 0), 20)
     const observer = new MutationObserver(mutationsList => {
       for (const mutation of mutationsList) {
         if (mutation.attributeName === 'style') {
           const bg = getComputedStyle(ele).backgroundColor
           const fg = getComputedStyle(ele).color
-          onColorChange?.({ bg, fg })
+          throttleChange({ bg, fg })
         }
       }
     })
     observer.observe(ele, { attributes: true, attributeFilter: ['style'] })
+    return () => observer.disconnect()
   }, [onColorChange])
   useEffect(() => {
     if (!eleRef.current) return
