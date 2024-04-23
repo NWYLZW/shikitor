@@ -10,14 +10,11 @@ export interface WithoutCoreEditorProps extends EditorProps, StyledProps {
 }
 
 // TODO abstract to @shikitor/utils
-export function throttle<T extends (...args: any[]) => void>(fn: T, delay: number) {
-  let last = 0
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+  let timer: number
   return (...args: any[]) => {
-    const now = Date.now()
-    if (now - last >= delay) {
-      fn(...args)
-      last = now
-    }
+    clearTimeout(timer)
+    timer = window.setTimeout(() => fn(...args), delay)
   }
 }
 
@@ -72,12 +69,13 @@ export const WithoutCoreEditor = forwardRef<
     if (!eleRef.current) return
     const ele = eleRef.current
 
-    const throttleChange = throttle(onColorChange ?? (() => void 0), 20)
+    const throttleChange = debounce(onColorChange ?? (() => void 0), 20)
     const observer = new MutationObserver(mutationsList => {
       for (const mutation of mutationsList) {
+        const target = mutation.target as HTMLElement
         if (mutation.attributeName === 'style') {
-          const bg = getComputedStyle(ele).backgroundColor
-          const fg = getComputedStyle(ele).color
+          const bg = target.style.backgroundColor
+          const fg = target.style.color
           throttleChange({ bg, fg })
         }
       }
