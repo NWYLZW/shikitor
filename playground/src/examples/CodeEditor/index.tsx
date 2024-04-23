@@ -2,7 +2,7 @@ import './index.scss'
 
 import type { Shikitor } from '@shikitor/core'
 import { WithoutCoreEditor } from '@shikitor/react'
-import React, { memo, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
 import { usePlugins } from '#hooks/usePlugins.ts'
@@ -16,8 +16,6 @@ import { getGist } from '#utils/gist.ts'
 import { CardHeader } from './components/CardHeader'
 
 const plugins = bundledPluginsInfo.map(({ module: { default: d } }) => d)
-
-const MemoEditor = memo(WithoutCoreEditor)
 
 async function initPlaygroundShikitor(shikitor: Shikitor) {
   const { type, content } = analyzeHash()
@@ -71,7 +69,7 @@ export default function CodeEditor() {
   return (
     <div className='code-editor'>
       <CardHeader />
-      <MemoEditor
+      <WithoutCoreEditor
         ref={shikitorRef}
         create={shikitorCreate}
         value={code}
