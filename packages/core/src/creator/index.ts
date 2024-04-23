@@ -4,24 +4,12 @@ import { getHighlighter } from 'shiki'
 import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
 
-import type {
-  IDisposable,
-  ResolvedSelection,
-  Shikitor,
-  ShikitorOptions
-} from '../editor'
+import type { IDisposable, ResolvedSelection, Shikitor, ShikitorOptions } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
 import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
-import {
-  callUpdateDispatcher,
-  diffArray,
-  isMultipleKey,
-  isWhatBrowser,
-  listen,
-  throttle
-  } from '../utils' with {
+import { callUpdateDispatcher, diffArray, isMultipleKey, isWhatBrowser, listen, throttle } from '../utils' with {
   'unbundled-reexport': 'on'
 }
 import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
@@ -328,7 +316,8 @@ export async function create(
       const { resolvePosition } = this.rawTextHelper
       const resolvedStartPos = resolvePosition(cursor ?? 0)
       input.setSelectionRange(
-        resolvedStartPos.offset, resolvedStartPos.offset
+        resolvedStartPos.offset,
+        resolvedStartPos.offset
       )
       input.focus()
     },
@@ -358,10 +347,12 @@ export async function create(
         start: resolvePosition(selectionT1.start),
         end: resolvePosition(selectionT1.end)
       }
-      if ([
-        prevResolvedPrevSelection.start.offset !== resolvedSelection.start.offset,
-        prevResolvedPrevSelection.end.offset !== resolvedSelection.end.offset
-      ].some(Boolean)) {
+      if (
+        [
+          prevResolvedPrevSelection.start.offset !== resolvedSelection.start.offset,
+          prevResolvedPrevSelection.end.offset !== resolvedSelection.end.offset
+        ].some(Boolean)
+      ) {
         // TODO
         // options.onSelectionChange?.(selection)
         // callAllShikitorPlugins('onSelectionChange', selection)
@@ -421,19 +412,21 @@ export async function create(
 
         popups.splice(firstIndex, pushedPopupsLength)
       }
-      const disposePositionRerender = meta.position === 'relative' ? scopeWatch(async get => {
-        const cursor = get(cursorRef).current
-        if (pushedFirstPopupRef === undefined) return
+      const disposePositionRerender = meta.position === 'relative'
+        ? scopeWatch(async get => {
+          const cursor = get(cursorRef).current
+          if (pushedFirstPopupRef === undefined) return
 
-        const firstIndex = popups.indexOf(pushedFirstPopupRef)
-        for (let i = firstIndex; i < firstIndex + pushedPopupsLength; i++) {
-          const popup = popups[i]
-          if (popup.position === 'relative') {
-            popup.cursors = [cursor]
-            popup.selections = [prevSelection!]
+          const firstIndex = popups.indexOf(pushedFirstPopupRef)
+          for (let i = firstIndex; i < firstIndex + pushedPopupsLength; i++) {
+            const popup = popups[i]
+            if (popup.position === 'relative') {
+              popup.cursors = [cursor]
+              popup.selections = [prevSelection!]
+            }
           }
-        }
-      }) : undefined
+        })
+        : undefined
       return {
         dispose() {
           if (popupsProvideDispose) {
@@ -496,7 +489,7 @@ export async function create(
         }
       }
     },
-    _getCursorAbsolutePosition(cursor): { x: number, y: number } {
+    _getCursorAbsolutePosition(cursor): { x: number; y: number } {
       const { rawTextHelper: { line } } = this
       const span = document.createElement('span')
       span.style.cssText = `
@@ -507,11 +500,13 @@ export async function create(
         word-wrap: break-word;
         overflow-wrap: break-word;
       `
-      const style = getComputedStyle(input);
-      ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'textTransform', 'letterSpacing'].forEach(prop => {
-        // @ts-ignore
-        span.style[prop] = style[prop]
-      })
+      const style = getComputedStyle(input)
+      ;['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'textTransform', 'letterSpacing'].forEach(
+        prop => {
+          // @ts-ignore
+          span.style[prop] = style[prop]
+        }
+      )
       const text = '\n'.repeat(cursor.line - 1) + line(cursor).substring(0, cursor.character)
       const inTheLineStart = cursor.character === 0
       span.textContent = inTheLineStart ? text + ' ' : text
@@ -539,58 +534,61 @@ export async function create(
   }
 
   let prevOutputHoverElement: Element | null = null
-  input.addEventListener('mousemove', throttle(e => {
-    input.style.pointerEvents = 'none'
-    output.style.pointerEvents = 'auto'
-    const outputHoverElement = document.elementFromPoint(e.clientX, e.clientY)
-    input.style.pointerEvents = ''
-    output.style.pointerEvents = ''
-    if (outputHoverElement === prevOutputHoverElement) {
-      return
-    }
-    prevOutputHoverElement = outputHoverElement
-    if (outputHoverElement === null) {
-      return
-    }
-    if (
-      outputHoverElement.className.includes('shikitor')
-      && outputHoverElement.className.includes('output')
-    ) {
-      return
-    }
+  input.addEventListener(
+    'mousemove',
+    throttle(e => {
+      input.style.pointerEvents = 'none'
+      output.style.pointerEvents = 'auto'
+      const outputHoverElement = document.elementFromPoint(e.clientX, e.clientY)
+      input.style.pointerEvents = ''
+      output.style.pointerEvents = ''
+      if (outputHoverElement === prevOutputHoverElement) {
+        return
+      }
+      prevOutputHoverElement = outputHoverElement
+      if (outputHoverElement === null) {
+        return
+      }
+      if (
+        outputHoverElement.className.includes('shikitor')
+        && outputHoverElement.className.includes('output')
+      ) {
+        return
+      }
 
-    if (!outputHoverElement?.className.includes('position')) {
-      return
-    }
+      if (!outputHoverElement?.className.includes('position')) {
+        return
+      }
 
-    const offsetStr = /offset:(\d+)/
-      .exec(outputHoverElement.className)
-      ?.[1]
-    if (!offsetStr) {
-      return
-    }
-    const offset = Number(offsetStr)
-    if (isNaN(offset)) {
-      return
-    }
-    const [line, start, end] = /position:(\d+):(\d+),(\d+)/
-      .exec(outputHoverElement.className)
-      ?.slice(1)
-      ?.map(Number)
-    ?? []
-    if (!line || !start || !end || [line, start, end].some(isNaN)) {
-      return
-    }
+      const offsetStr = /offset:(\d+)/
+        .exec(outputHoverElement.className)
+        ?.[1]
+      if (!offsetStr) {
+        return
+      }
+      const offset = Number(offsetStr)
+      if (isNaN(offset)) {
+        return
+      }
+      const [line, start, end] = /position:(\d+):(\d+),(\d+)/
+        .exec(outputHoverElement.className)
+        ?.slice(1)
+        ?.map(Number)
+        ?? []
+      if (!line || !start || !end || [line, start, end].some(isNaN)) {
+        return
+      }
 
-    callAllShikitorPlugins('onHoverElement', {
-      start: { offset, line, character: start },
-      end: { offset, line, character: end }
-    }, {
-      content: input.value.slice(start - 1, end - 1),
-      element: outputHoverElement,
-      raw: input.value
-    })
-  }, 50))
+      callAllShikitorPlugins('onHoverElement', {
+        start: { offset, line, character: start },
+        end: { offset, line, character: end }
+      }, {
+        content: input.value.slice(start - 1, end - 1),
+        element: outputHoverElement,
+        raw: input.value
+      })
+    }, 50)
+  )
 
   disposes.push(listen(document, 'selectionchange', () => {
     if (document.getSelection()?.focusNode === target) {
