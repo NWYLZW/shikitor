@@ -9,6 +9,8 @@ import type { BundledLanguage, BundledTheme } from 'shiki'
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
 
+import atUser from './plugins/at-user'
+
 export default function Messenger() {
   const {
     value: {
@@ -39,7 +41,12 @@ export default function Messenger() {
             placeholder: 'Message here...',
             autoSize: { maxRows: 10 }
           }), [theme])}
-          plugins={[provideCompletions]}
+          plugins={[
+            provideCompletions,
+            atUser({
+              targets: ['Shikitor', 'YiJie', 'ShikitorBot']
+            })
+          ]}
           onColorChange={({ bg, fg }) => {
             const style = document.documentElement.style
             style.setProperty('--bg', bg)
