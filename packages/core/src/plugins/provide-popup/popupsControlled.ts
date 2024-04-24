@@ -3,9 +3,9 @@ import './popupsControlled.scss'
 import { proxy } from 'valtio/vanilla'
 
 import type { Shikitor } from '../../editor'
-import type { ResolvedPopup } from '../../editor/register'
 import { classnames } from '../../utils/classnames'
 import { debounceSubscribe } from '../../utils/valtio/debounceSubscribe'
+import type { ResolvedPopup } from './index'
 
 const prefix = `${'shikitor'}-popup`
 
@@ -27,6 +27,7 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     if (!popup.cursors) return ele
 
     const [cursor] = popup.cursors
+    if (!cursor) return ele
     const { x, y } = shikitor._getCursorAbsolutePosition(cursor)
     if (popup.placement === 'bottom') {
       ele.style.top = `${y}px`

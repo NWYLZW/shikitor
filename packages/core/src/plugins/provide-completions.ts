@@ -282,108 +282,111 @@ export default (options: ProvideCompletionsOptions = {}) => {
       disposeScoped()
     },
     install() {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const shikitor = this
-      const { optionsRef } = shikitor
-      const cursorRef = derive({
-        current: get => get(optionsRef).current.cursor
-      })
-      const languageRef = derive({
-        current: get => get(optionsRef).current.language
-      })
-      const { disposeScoped, scopeWatch } = scoped()
-      const disposeExtend = this.extend(name, {
-        registerCompletionItemProvider(selector, provider) {
-          let providerDispose: (() => void) | undefined
-          const { triggerCharacters, provideCompletionItems } = provider
+      const installedDefer = Promise.withResolvers<IDisposable>()
+      const dependDispose = this.depend(['provide-popup'], shikitor => {
+        const { optionsRef } = shikitor
+        const cursorRef = derive({
+          current: get => get(optionsRef).current.cursor
+        })
+        const languageRef = derive({
+          current: get => get(optionsRef).current.language
+        })
+        const { disposeScoped, scopeWatch } = scoped()
+        const disposeExtend = this.extend(name, {
+          registerCompletionItemProvider(selector, provider) {
+            let providerDispose: (() => void) | undefined
+            const { triggerCharacters, provideCompletionItems } = provider
 
-          const completionSymbol = Symbol('completion')
-          const start = allTriggerCharacters.length
-          const end = allTriggerCharacters.push(...triggerCharacters ?? [])
-          scopeWatch(async get => {
-            const char = get(triggerCharacter).current
-            const language = get(languageRef).current
-            if (selector !== '*' && selector !== language) return
+            const completionSymbol = Symbol('completion')
+            const start = allTriggerCharacters.length
+            const end = allTriggerCharacters.push(...triggerCharacters ?? [])
+            scopeWatch(async get => {
+              const char = get(triggerCharacter).current
+              const language = get(languageRef).current
+              if (selector !== '*' && selector !== language) return
 
-            const cursor = cursorRef.current
-            if (cursor === undefined) return
-            let suggestions: CompletionItem[] = []
-            if (char && triggerCharacters?.includes(char)) {
-              const { rawTextHelper } = shikitor
-              providerDispose?.()
-              const { suggestions: newSugs = [], dispose } = await Promise.resolve(
-                provideCompletionItems(rawTextHelper, cursor)
-              ) ?? {}
-              suggestions = newSugs
-              providerDispose = dispose
+              const cursor = cursorRef.current
+              if (cursor === undefined) return
+              let suggestions: CompletionItem[] = []
+              if (char && triggerCharacters?.includes(char)) {
+                const { rawTextHelper } = shikitor
+                providerDispose?.()
+                const { suggestions: newSugs = [], dispose } = await Promise.resolve(
+                  provideCompletionItems(rawTextHelper, cursor)
+                ) ?? {}
+                suggestions = newSugs
+                providerDispose = dispose
+              }
+
+              const oldCompletionsIndexes = completions
+                .reduce((indexes, completion, index) => {
+                  // @ts-expect-error
+                  return completion[completionSymbol]
+                    ? [...indexes, index]
+                    : indexes
+                }, [] as number[])
+              const removedCompletions = completions
+                .filter((_, index) => !oldCompletionsIndexes.includes(index))
+              completions.length = 0
+              completions.push(
+                ...removedCompletions,
+                ...suggestions.map(suggestion => ({
+                  ...suggestion,
+                  [completionSymbol]: true
+                }))
+              )
+            })
+            return {
+              dispose() {
+                providerDispose?.()
+                allTriggerCharacters.splice(start, end - start)
+              }
             }
+          }
+        })
+        const popupProviderDisposable = shikitor.registerPopupProvider({
+          position: 'relative',
+          placement: 'bottom',
+          target: 'cursor',
+          providePopups() {
+            return {
+              dispose() {
+                if (triggerCharacter.current === undefined) {
+                  completions.length = 0
+                }
+              },
+              popups: [{
+                id: 'completions-board',
+                render: ele => {
+                  elementRef.current = ref(ele)
+                  ele.addEventListener('click', e => {
+                    if (!(e.target instanceof HTMLElement)) return
+                    const item = e.target.closest(`.${completionItemTemplate.prefix}`) as HTMLDivElement
+                    if (!item) return
 
-            const oldCompletionsIndexes = completions
-              .reduce((indexes, completion, index) => {
-                // @ts-expect-error
-                return completion[completionSymbol]
-                  ? [...indexes, index]
-                  : indexes
-              }, [] as number[])
-            const removedCompletions = completions
-              .filter((_, index) => !oldCompletionsIndexes.includes(index))
-            completions.length = 0
-            completions.push(
-              ...removedCompletions,
-              ...suggestions.map(suggestion => ({
-                ...suggestion,
-                [completionSymbol]: true
-              }))
-            )
-          })
-          return {
-            dispose() {
-              providerDispose?.()
-              allTriggerCharacters.splice(start, end - start)
+                    const index = parseInt(item.dataset.index ?? '')
+                    if (Number.isInteger(index)) {
+                      selectIndexRef.current = index
+                    }
+                    let accept = selectMode === 'once'
+                    accept ||= selectMode === 'need-confirm' && item.classList.contains('selected')
+                    if (accept) acceptCompletion(shikitor)
+                  })
+                }
+              }]
             }
+          }
+        })
+        installedDefer.resolve(dependDispose)
+        return {
+          dispose() {
+            disposeExtend()
+            popupProviderDisposable.dispose?.()
+            disposeScoped()
           }
         }
       })
-      const popupProviderDisposable = this.registerPopupProvider({
-        position: 'relative',
-        placement: 'bottom',
-        target: 'cursor',
-        providePopups() {
-          return {
-            dispose() {
-              if (triggerCharacter.current === undefined) {
-                completions.length = 0
-              }
-            },
-            popups: [{
-              id: 'completions-board',
-              render: ele => {
-                elementRef.current = ref(ele)
-                ele.addEventListener('click', e => {
-                  if (!(e.target instanceof HTMLElement)) return
-                  const item = e.target.closest(`.${completionItemTemplate.prefix}`) as HTMLDivElement
-                  if (!item) return
-
-                  const index = parseInt(item.dataset.index ?? '')
-                  if (Number.isInteger(index)) {
-                    selectIndexRef.current = index
-                  }
-                  let accept = selectMode === 'once'
-                  accept ||= selectMode === 'need-confirm' && item.classList.contains('selected')
-                  if (accept) acceptCompletion(shikitor)
-                })
-              }
-            }]
-          }
-        }
-      })
-      return {
-        dispose() {
-          disposeExtend()
-          popupProviderDisposable.dispose?.()
-          disposeScoped()
-        }
-      }
+      return installedDefer.promise
     },
     onKeydown(e) {
       if (!isMultipleKey(e) && e.key === 'Escape') {

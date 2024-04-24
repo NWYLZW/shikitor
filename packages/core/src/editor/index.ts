@@ -8,7 +8,6 @@ import type { UpdateDispatcher } from '../utils/callUpdateDispatcher'
 import type { RawTextHelper } from '../utils/getRawTextHelper'
 import type { Cursor, IDisposable, ResolvedCursor, ResolvedSelection, Selection } from './base'
 import type { EventEmitter, EventMap } from './base.eventEmitter'
-import type { ShikitorRegister } from './register'
 
 export * from './base'
 
@@ -99,7 +98,7 @@ interface InternalShikitor {
 
 export interface Shikitor<
   Keys extends ShikitorExtendable = never
-> extends InternalShikitor, ShikitorRegister, Disposable {
+> extends InternalShikitor, Disposable {
   readonly element: HTMLElement
   value: string
   language?: BundledLanguage

@@ -8,8 +8,8 @@ import { proxy, snapshot } from 'valtio/vanilla'
 import type { RefObject } from '../base'
 import type { IDisposable, ResolvedCursor, ResolvedSelection, Shikitor, ShikitorOptions } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
-import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
+import { popupsControlled } from '../plugins/provide-popup/popupsControlled'
 import type { PickByValue } from '../types'
 import { callUpdateDispatcher, diffArray, isMultipleKey, isWhatBrowser, listen, throttle } from '../utils' with {
   'unbundled-reexport': 'on'
@@ -19,7 +19,6 @@ import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { scoped } from '../utils/valtio/scoped'
 import { HIGHLIGHTED } from './classes'
 import { cursorControlled } from './controlled/cursorControlled'
-import { popupsControlled } from './controlled/popupsControlled'
 import { valueControlled } from './controlled/valueControlled'
 import { resolveInputPlugins } from './resolveInputPlugins'
 import { shikitorStructureTransformer } from './structureTransfomer'
@@ -350,6 +349,11 @@ export async function create(
     { valueRef, cursorRef, optionsRef }
   ))
 
+  const installedKeys: string[] = []
+  ee.on('install', key => {
+    if (!key) return
+    installedKeys.push(key)
+  })
   const shikitor: Shikitor = {
     ee,
     get element() {
@@ -477,56 +481,6 @@ export async function create(
       target.innerHTML = ''
       dispose()
     },
-    registerPopupProvider(provider) {
-      const { providePopups, ...meta } = provider
-      const popupsPromise = Promise.resolve(providePopups())
-
-      let pushedFirstPopupRef: ResolvedPopup | undefined
-      let pushedPopupsLength = 0
-      let popupsProvideDispose: (() => void) | undefined
-      popupsPromise.then(({ dispose, popups: newPopups }) => {
-        popupsProvideDispose = dispose
-        const resolvedPopups = newPopups.map(popup => ({
-          ...meta,
-          ...popup
-        })) as ResolvedPopup[]
-        popups.splice(0, popups.length, ...resolvedPopups)
-        pushedPopupsLength = resolvedPopups.length
-        pushedFirstPopupRef = popups[popups.length - pushedPopupsLength]
-      })
-      const removeNewPopups = () => {
-        if (pushedFirstPopupRef === undefined) return
-        const firstIndex = popups.indexOf(pushedFirstPopupRef)
-
-        popups.splice(firstIndex, pushedPopupsLength)
-      }
-      const disposePositionRerender = meta.position === 'relative'
-        ? scopeWatch(async get => {
-          const cursor = get(cursorRef).current
-          if (pushedFirstPopupRef === undefined) return
-
-          const firstIndex = popups.indexOf(pushedFirstPopupRef)
-          for (let i = firstIndex; i < firstIndex + pushedPopupsLength; i++) {
-            const popup = popups[i]
-            if (popup.position === 'relative') {
-              popup.cursors = [cursor]
-              popup.selections = [prevSelection!]
-            }
-          }
-        })
-        : undefined
-      return {
-        dispose() {
-          if (popupsProvideDispose) {
-            popupsProvideDispose()
-          } else {
-            popupsPromise.then(({ dispose }) => dispose?.())
-          }
-          disposePositionRerender?.()
-          removeNewPopups?.()
-        }
-      }
-    },
     extend(key, obj) {
       const properties = Object.getOwnPropertyDescriptors(obj)
       const newPropDescs: [string, PropertyDescriptor][] = []
@@ -546,15 +500,19 @@ export async function create(
     },
     depend(keys, listener) {
       let installed = false
-      let installedPlugins = new Set<string>()
+      let dependInstalledKeys = new Set<string>(installedKeys)
       function allKeysInstalled() {
-        return keys.every(key => installedPlugins.has(key))
+        return keys.every(key => dependInstalledKeys.has(key))
+      }
+      if (allKeysInstalled()) {
+        listener(this as any)
+        installed = true
       }
       const listenPluginsInstalled = () => {
-        installedPlugins = new Set<string>()
+        dependInstalledKeys = new Set<string>(installedKeys)
         const offInstallListener = this.ee.on('install', key => {
           if (!key) return
-          installedPlugins.add(key)
+          dependInstalledKeys.add(key)
           if (allKeysInstalled()) {
             listener(this as any)
             offInstallListener?.()
