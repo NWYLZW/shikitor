@@ -375,7 +375,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
       return {
         dispose() {
           disposeExtend()
-          popupProviderDisposable.dispose()
+          popupProviderDisposable.dispose?.()
           disposeScoped()
         }
       }
