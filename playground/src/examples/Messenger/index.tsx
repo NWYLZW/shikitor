@@ -11,6 +11,13 @@ import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
 
 import atUser from './plugins/at-user'
 
+const bundledPlugins = [
+  provideCompletions,
+  atUser({
+    targets: ['Shikitor', 'YiJie', 'ShikitorBot']
+  })
+]
+
 export default function Messenger() {
   const {
     value: {
@@ -44,12 +51,7 @@ export default function Messenger() {
             placeholder: 'Message here...',
             autoSize: { maxRows: 10 }
           }), [theme])}
-          plugins={[
-            provideCompletions,
-            atUser({
-              targets: ['Shikitor', 'YiJie', 'ShikitorBot']
-            })
-          ]}
+          plugins={bundledPlugins}
           onColorChange={({ bg, fg }) => {
             const style = document.documentElement.style
             style.setProperty('--bg', bg)
