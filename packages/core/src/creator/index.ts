@@ -171,7 +171,9 @@ export async function create(
   const dispose = () => {
     disposeScoped()
     disposes.forEach(dispose => dispose())
-    disposeAllPlugins()
+    pluginsDisposes
+      .filter(<T>(x: T | void): x is T => x !== undefined)
+      .forEach(({ dispose }) => dispose?.())
     onDispose?.()
     try {
       // plugins may not installed
@@ -306,7 +308,7 @@ export async function create(
     for (const plugin of removed) {
       const index = prevPluginSnapshots.indexOf(plugin)
       if (index === -1) return
-      pluginsDisposes[index]?.dispose()
+      pluginsDisposes[index]?.dispose?.()
       plugin.onDispose?.call(shikitor)
       shikitor.ee.emit('dispose', plugin.name)
     }
@@ -604,10 +606,6 @@ export async function create(
     callAllShikitorPlugins('install', shikitor)
   )
   checkAborted()
-  function disposeAllPlugins() {
-    pluginsDisposes.forEach(({ dispose } = { dispose: () => void 0 }) => dispose())
-    pluginsDisposes = []
-  }
 
   let prevOutputHoverElement: Element | null = null
   input.addEventListener(

@@ -12,7 +12,7 @@ export interface ResolvedSelection extends ResolvedTextRange {}
 export type LanguageSelector = '*' | BundledLanguage | readonly BundledLanguage[]
 
 export interface IDisposable {
-  dispose(): void
+  dispose?: () => void
 }
 
 export type ProviderResult<T> = Awaitable<Nullable<T>>
