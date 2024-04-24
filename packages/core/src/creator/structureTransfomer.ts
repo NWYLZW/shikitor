@@ -39,7 +39,7 @@ export function shikitorStructureTransformer(
         isCursor && 'shikitor-output-line-highlighted'
       )
       props['data-line'] = String(line)
-      if (isCursor && ele.children.length === 0) {
+      if (ele.children.length === 0) {
         ele.children.push({ type: 'text', value: ' ' })
       }
     },
