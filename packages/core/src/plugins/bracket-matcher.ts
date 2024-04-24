@@ -1,3 +1,5 @@
+import type { DecorationItem } from '@shikijs/core'
+
 import type { Shikitor } from '../editor'
 import type { ResolvedCursor } from '../editor/base'
 import { definePlugin } from '../plugin'
@@ -21,7 +23,7 @@ export default () => {
   function insertBracketHighlighting(this: Shikitor) {
     const cursor = shikitorCursor
     const { decorations = [] } = this.options
-    let newDecorations = [
+    const filteredDecorations = [
       ...decorations.filter(d => {
         const { class: className } = d.properties ?? {}
         if (typeof className === 'string' || Array.isArray(className)) {
@@ -31,7 +33,7 @@ export default () => {
       })
     ]
     if (!cursor) {
-      this.updateOptions(old => ({ ...old, decorations: newDecorations }))
+      this.updateOptions(old => ({ ...old, decorations: filteredDecorations }))
       return
     }
     const value = this.value
@@ -41,6 +43,7 @@ export default () => {
     const prevBracket = bracketMap[prev]
     const nextBracket = bracketMap[next]
     const relativeBracket = prevBracket || nextBracket
+    let newDecorations: DecorationItem[] = []
     if (relativeBracket) {
       const bracket = prevBracket ? prev : next
 
@@ -57,7 +60,7 @@ export default () => {
       const increase = lBrackets.includes(relativeBracket) ? -1 : 1
       const stack = []
       // TODO `console.log(")")`
-      for (let i = bracketOffset + increase; ; i += increase) {
+      for (let i = bracketOffset + increase;; i += increase) {
         if (i < 0 || i >= value.length) {
           break
         }
@@ -67,7 +70,7 @@ export default () => {
         }
         if (char === relativeBracket) {
           if (stack.length === 0) {
-            newDecorations.push({
+            filteredDecorations.push({
               start: i,
               end: i + 1,
               properties: {
@@ -82,7 +85,8 @@ export default () => {
     } else {
       newDecorations = []
     }
-    this.updateOptions(old => ({ ...old, decorations: newDecorations }))
+    if (newDecorations.length === 0 && filteredDecorations.length === decorations.length) return
+    this.updateOptions(old => ({ ...old, decorations: filteredDecorations.concat(newDecorations) }))
   }
   let isPressedDelete = false
   return definePlugin({

@@ -293,7 +293,6 @@ export async function create(
   })
   scopeWatch(async get => {
     const value = get(valueRef).current
-    const cursor = get(cursorRef).current
     const {
       theme = 'github-light',
       language = 'javascript',
@@ -301,7 +300,7 @@ export async function create(
     } = get(outputRenderDeps)
     if (!highlighter || value === undefined) return
 
-    const cursorLine = cursor?.line
+    const cursorLine = cursorRef.current.line
     const { codeToHtml } = await highlighter
     output.innerHTML = codeToHtml(value, {
       lang: language,
