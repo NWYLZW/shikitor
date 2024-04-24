@@ -101,7 +101,9 @@ function highlightingKeyword(text: string, keywordParts: string[]) {
   return keywordParts.reduce((prev, keyword) => {
     const index = prev.toLowerCase().indexOf(keyword)
     if (index === -1) return prev
-    return prev.slice(0, index) + `<span class="${prefix}__keyword">${keyword}</span>` + prev.slice(index + keyword.length)
+    return prev.slice(0, index)
+      + `<span class="${prefix}__keyword">${keyword}</span>`
+      + prev.slice(index + keyword.length)
   }, text)
 }
 
@@ -166,7 +168,8 @@ export default (options: ProvideCompletionsOptions = {}) => {
   scopeSubscribe(completionsDeps, () => {
     const {
       keyword,
-      element, completions
+      element,
+      completions
     } = completionsDeps
     if (isUnset(element)) return
     const completionsSnapshot = snapshot(completions)
@@ -218,7 +221,8 @@ export default (options: ProvideCompletionsOptions = {}) => {
   })
   scopeSubscribe(selectIndexDeps, () => {
     const {
-      element, selectIndex
+      element,
+      selectIndex
     } = selectIndexDeps
     if (isUnset(element)) return
 
@@ -236,8 +240,9 @@ export default (options: ProvideCompletionsOptions = {}) => {
     length: get => get(resolvedCompletions).current.length
   })
   scopeSubscribe(resetSelectIndexWhenResolvedCompletionsChangeDeps, () => {
-    if (selectIndexRef.current >= resolvedCompletions.current.length)
+    if (selectIndexRef.current >= resolvedCompletions.current.length) {
       selectIndexRef.current = 0
+    }
   })
 
   function resetTriggerCharacter() {
@@ -257,10 +262,10 @@ export default (options: ProvideCompletionsOptions = {}) => {
       const prefix = value.slice(0, resolvedRange.start.offset)
       const suffix = value.slice(
         resolvedRange.end.offset
-        // remove trigger character
-        + 1
-        // remove keyword
-        + keyword.length
+          // remove trigger character
+          + 1
+          // remove keyword
+          + keyword.length
       )
       shikitor.value = prefix + insertText + suffix
       resetTriggerCharacter()
@@ -351,11 +356,11 @@ export default (options: ProvideCompletionsOptions = {}) => {
               }
             },
             popups: [{
-              id: 'completions-board', render: ele => {
+              id: 'completions-board',
+              render: ele => {
                 elementRef.current = ref(ele)
                 ele.addEventListener('click', e => {
-                  if (!(e.target instanceof HTMLElement))
-                    return
+                  if (!(e.target instanceof HTMLElement)) return
                   const item = e.target.closest(`.${completionItemTemplate.prefix}`) as HTMLDivElement
                   if (!item) return
 
@@ -425,8 +430,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
               return
             }
           } catch (e) {
-            if (e !== CalcExitError)
-              throw e
+            if (e !== CalcExitError) throw e
           }
           resetTriggerCharacter()
         }
@@ -442,8 +446,7 @@ function calcNewKeyword(keyword: string, key: string, nextChar = '') {
       return keyword + nextChar
     case 'ArrowLeft':
     case 'Backspace':
-      if (keyword.length - 1 < 0)
-        throw CalcExitError
+      if (keyword.length - 1 < 0) throw CalcExitError
       return keyword.slice(0, keyword.length - 1)
   }
   if (key.length === 1) {
