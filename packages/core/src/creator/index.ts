@@ -4,7 +4,8 @@ import { getHighlighter } from 'shiki'
 import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
 
-import type { IDisposable, ResolvedSelection, Shikitor, ShikitorOptions } from '../editor'
+import type { RefObject } from '../base'
+import type { IDisposable, ResolvedCursor, ResolvedSelection, Shikitor, ShikitorOptions } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
 import type { ResolvedPopup } from '../editor/register'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
@@ -71,6 +72,77 @@ function initDom(target: HTMLElement) {
   placeholder.classList.add('shikitor-placeholder')
   target.append(output, placeholder, input)
   return [input, output, placeholder] as const
+}
+
+function outputRenderControlled(
+  { target, output }: {
+    target: HTMLElement
+    output: HTMLElement
+  },
+  { valueRef, cursorRef, optionsRef }: {
+    valueRef: RefObject<string>
+    cursorRef: RefObject<ResolvedCursor>
+    optionsRef: RefObject<ShikitorOptions>
+  }
+) {
+  const { scopeWatch, scopeSubscribe, disposeScoped } = scoped()
+  scopeWatch(get => {
+    const {
+      readOnly,
+      lineNumbers = 'on'
+    } = get(derive({
+      readOnly: get => get(optionsRef).current.readOnly,
+      lineNumbers: get => get(optionsRef).current.lineNumbers
+    }))
+    target.classList.toggle('line-numbers', lineNumbers === 'on')
+    target.classList.toggle('read-only', readOnly === true)
+  })
+  let highlighter: ReturnType<typeof getHighlighter> | undefined
+  const highlighterDeps = derive({
+    theme: get => get(optionsRef).current.theme,
+    language: get => get(optionsRef).current.language
+  })
+  scopeWatch(async get => {
+    const {
+      theme = 'github-light',
+      language = 'javascript'
+    } = get(highlighterDeps)
+    highlighter = getHighlighter({ themes: [theme], langs: [language] })
+  })
+  const outputRenderDeps = derive({
+    theme: get => get(optionsRef).current.theme,
+    language: get => get(optionsRef).current.language,
+    // TODO remove decorations
+    decorations: get => get(optionsRef).current.decorations
+  })
+  scopeWatch(async get => {
+    const value = get(valueRef).current
+    const {
+      theme = 'github-light',
+      language = 'javascript',
+      decorations
+    } = get(outputRenderDeps)
+    if (!highlighter || value === undefined) return
+
+    const { codeToHtml } = await highlighter
+    output.innerHTML = codeToHtml(value, {
+      lang: language,
+      theme: theme,
+      decorations,
+      transformers: [
+        shikitorStructureTransformer(target)
+      ]
+    })
+  })
+  scopeSubscribe(cursorRef, () => {
+    const cursor = snapshot(cursorRef).current
+    output.querySelector(`.${HIGHLIGHTED}`)?.classList.remove(HIGHLIGHTED)
+    if (cursor.line === undefined) return
+    const line = output.querySelector(`[data-line="${cursor.line}"]`)
+    if (!line) return
+    line.classList.add(HIGHLIGHTED)
+  })
+  return disposeScoped
 }
 
 export interface CreateOptions {
@@ -264,62 +336,10 @@ export async function create(
     prevPluginSnapshots = pluginSnapshots
   })
 
-  scopeWatch(get => {
-    const {
-      readOnly,
-      lineNumbers = 'on'
-    } = get(derive({
-      readOnly: get => get(optionsRef).current.readOnly,
-      lineNumbers: get => get(optionsRef).current.lineNumbers
-    }))
-    target.classList.toggle('line-numbers', lineNumbers === 'on')
-    target.classList.toggle('read-only', readOnly === true)
-  })
-  let highlighter: ReturnType<typeof getHighlighter> | undefined
-  const highlighterDeps = derive({
-    theme: get => get(optionsRef).current.theme,
-    language: get => get(optionsRef).current.language
-  })
-  scopeWatch(async get => {
-    const {
-      theme = 'github-light',
-      language = 'javascript'
-    } = get(highlighterDeps)
-    highlighter = getHighlighter({ themes: [theme], langs: [language] })
-  })
-  const outputRenderDeps = derive({
-    theme: get => get(optionsRef).current.theme,
-    language: get => get(optionsRef).current.language,
-    // TODO remove decorations
-    decorations: get => get(optionsRef).current.decorations
-  })
-  scopeWatch(async get => {
-    const value = get(valueRef).current
-    const {
-      theme = 'github-light',
-      language = 'javascript',
-      decorations
-    } = get(outputRenderDeps)
-    if (!highlighter || value === undefined) return
-
-    const { codeToHtml } = await highlighter
-    output.innerHTML = codeToHtml(value, {
-      lang: language,
-      theme: theme,
-      decorations,
-      transformers: [
-        shikitorStructureTransformer(target)
-      ]
-    })
-  })
-  scopeSubscribe(cursorRef, () => {
-    const cursor = snapshot(cursorRef).current
-    output.querySelector(`.${HIGHLIGHTED}`)?.classList.remove(HIGHLIGHTED)
-    if (cursor.line === undefined) return
-    const line = output.querySelector(`[data-line="${cursor.line}"]`)
-    if (!line) return
-    line.classList.add(HIGHLIGHTED)
-  })
+  disposes.push(outputRenderControlled(
+    { target, output },
+    { valueRef, cursorRef, optionsRef }
+  ))
 
   const shikitor: Shikitor = {
     ee,
