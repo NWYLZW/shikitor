@@ -100,6 +100,7 @@ interface InternalShikitor {
 export interface Shikitor<
   Keys extends ShikitorExtendable = never
 > extends InternalShikitor, ShikitorRegister, Disposable {
+  readonly element: HTMLElement
   value: string
   language?: BundledLanguage
   options:

@@ -42,11 +42,12 @@ function mountPopup(shikitor: Shikitor, container: HTMLElement, popup: ResolvedP
   return ele
 }
 
-export function popupsControlled(getShikitor: () => Shikitor, container: HTMLElement) {
+export function popupsControlled(getShikitor: () => Shikitor) {
   const popups = proxy<ResolvedPopup[]>([])
   const prevPopupElements = new Map<ResolvedPopup, HTMLDivElement>()
   const dispose = debounceSubscribe(popups, () => {
     const shikitor = getShikitor()
+    const container = shikitor.element
     const newPopupElements = new Map<ResolvedPopup, HTMLDivElement>()
     for (const popup of popups) {
       let ele = prevPopupElements.get(popup)
@@ -68,6 +69,7 @@ export function popupsControlled(getShikitor: () => Shikitor, container: HTMLEle
     }
   })
   return {
-    popups, dispose
+    popups,
+    dispose
   }
 }

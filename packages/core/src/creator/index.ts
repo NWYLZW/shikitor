@@ -209,7 +209,7 @@ export async function create(
   const {
     dispose: disposePopupsControlled,
     popups
-  } = popupsControlled(() => shikitor, target)
+  } = popupsControlled(() => shikitor)
   disposes.push(disposePopupsControlled)
   const {
     dispose: disposeValueControlled,
@@ -352,6 +352,9 @@ export async function create(
 
   const shikitor: Shikitor = {
     ee,
+    get element() {
+      return target
+    },
     get value() {
       return valueRef.current
     },
