@@ -136,10 +136,15 @@ function outputRenderControlled(
   })
   scopeSubscribe(cursorRef, () => {
     const cursor = snapshot(cursorRef).current
-    output.querySelector(`.${HIGHLIGHTED}`)?.classList.remove(HIGHLIGHTED)
     if (cursor.line === undefined) return
     const line = output.querySelector(`[data-line="${cursor.line}"]`)
     if (!line) return
+
+    const oldLine = output.querySelector(`.${HIGHLIGHTED}`)
+    if (oldLine === line) return
+    if (oldLine) {
+      oldLine.classList.remove(HIGHLIGHTED)
+    }
     line.classList.add(HIGHLIGHTED)
   })
   return disposeScoped
