@@ -290,6 +290,7 @@ export async function create(
   const outputRenderDeps = derive({
     theme: get => get(optionsRef).current.theme,
     language: get => get(optionsRef).current.language,
+    // TODO remove decorations
     decorations: get => get(optionsRef).current.decorations
   })
   scopeWatch(async get => {
