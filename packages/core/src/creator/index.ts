@@ -15,6 +15,7 @@ import { callUpdateDispatcher, diffArray, isMultipleKey, isWhatBrowser, listen, 
 import { calcTextareaHeight } from '../utils/calcTextareaHeight'
 import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { scoped } from '../utils/valtio/scoped'
+import { HIGHLIGHTED } from './classes'
 import { cursorControlled } from './controlled/cursorControlled'
 import { popupsControlled } from './controlled/popupsControlled'
 import { valueControlled } from './controlled/valueControlled'
@@ -300,16 +301,23 @@ export async function create(
     } = get(outputRenderDeps)
     if (!highlighter || value === undefined) return
 
-    const cursorLine = cursorRef.current.line
     const { codeToHtml } = await highlighter
     output.innerHTML = codeToHtml(value, {
       lang: language,
       theme: theme,
       decorations,
       transformers: [
-        shikitorStructureTransformer(target, cursorLine)
+        shikitorStructureTransformer(target)
       ]
     })
+  })
+  scopeSubscribe(cursorRef, () => {
+    const cursor = snapshot(cursorRef).current
+    output.querySelector(`.${HIGHLIGHTED}`)?.classList.remove(HIGHLIGHTED)
+    if (cursor.line === undefined) return
+    const line = output.querySelector(`[data-line="${cursor.line}"]`)
+    if (!line) return
+    line.classList.add(HIGHLIGHTED)
   })
 
   const shikitor: Shikitor = {
