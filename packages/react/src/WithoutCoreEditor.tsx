@@ -36,6 +36,7 @@ export const WithoutCoreEditor = forwardRef<
     className
   } = props
   const emitChange = useEvent(onChange)
+  const emitMounted = useEvent(onMounted)
   const shikitorRef = useRef<Shikitor | null>(null)
   const eleRef = useRef<HTMLDivElement>(null)
 
@@ -49,8 +50,8 @@ export const WithoutCoreEditor = forwardRef<
       }
     }
     shikitor.ee.on('change', emitChange)
-    onMounted?.(shikitor)
-  }, [emitChange, onMounted, ref])
+    emitMounted(shikitor)
+  }, [emitChange, emitMounted, ref])
 
   const { vRef: valueRef } = useDefault(value, defaultValue, v => {
     const shikitor = shikitorRef.current
