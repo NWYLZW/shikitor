@@ -87,6 +87,19 @@
         opacity: .1;
       }
     }
+    .tab, .space {
+      position: relative;
+    }
+    .tab::before {
+      content: '⇥';
+      position: absolute;
+      opacity: 0.3;
+    }
+    .space::before {
+      content: '·';
+      position: absolute;
+      opacity: 0.3;
+    }
   }
   &-placeholder {
     position: absolute;

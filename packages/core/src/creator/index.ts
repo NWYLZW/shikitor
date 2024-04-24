@@ -1,5 +1,6 @@
 import './index.scss'
 
+import { transformerRenderWhitespace } from '@shikijs/transformers'
 import { getHighlighter } from 'shiki'
 import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
@@ -130,7 +131,8 @@ function outputRenderControlled(
       theme: theme,
       decorations,
       transformers: [
-        shikitorStructureTransformer(target, cursorRef.current.line)
+        shikitorStructureTransformer(target, cursorRef.current.line),
+        transformerRenderWhitespace()
       ]
     })
   })
