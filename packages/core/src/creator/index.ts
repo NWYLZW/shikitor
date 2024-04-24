@@ -130,7 +130,7 @@ function outputRenderControlled(
       theme: theme,
       decorations,
       transformers: [
-        shikitorStructureTransformer(target)
+        shikitorStructureTransformer(target, cursorRef.current.line)
       ]
     })
   })

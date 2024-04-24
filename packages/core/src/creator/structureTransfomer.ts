@@ -3,7 +3,10 @@ import type { ShikiTransformer } from '@shikijs/core'
 import { cssvar } from '../base'
 import { classnames } from '../utils/classnames'
 
-export function shikitorStructureTransformer(target: HTMLElement): ShikiTransformer {
+export function shikitorStructureTransformer(
+  target: HTMLElement,
+  cursorLine: number
+): ShikiTransformer {
   return {
     name: 'shikitor',
     pre(ele) {
@@ -29,12 +32,14 @@ export function shikitorStructureTransformer(target: HTMLElement): ShikiTransfor
         'data-line'?: string
         class?: string
       }
+      const isCursor = !!cursorLine && cursorLine === line
       props.class = classnames(
         props.class,
-        'shikitor-output-line'
+        'shikitor-output-line',
+        isCursor && 'shikitor-output-line-highlighted'
       )
       props['data-line'] = String(line)
-      if (ele.children.length === 0) {
+      if (isCursor && ele.children.length === 0) {
         ele.children.push({ type: 'text', value: ' ' })
       }
     },
