@@ -14,7 +14,10 @@ import atUser from './plugins/at-user'
 
 const bundledPlugins = [
   providePopup,
-  provideCompletions({ popupPlacement: 'top' }),
+  provideCompletions({
+    popupPlacement: 'top',
+    footer: false
+  }),
   atUser({
     targets: ['Shikitor', 'YiJie', 'ShikitorBot']
   })
