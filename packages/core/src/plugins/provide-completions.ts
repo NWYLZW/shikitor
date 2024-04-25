@@ -139,6 +139,14 @@ export interface ProvideCompletionsOptions {
    * @default 'bottom'
    */
   popupPlacement?: 'top' | 'bottom'
+  /**
+   * @default true
+   */
+  tooltip?: string | boolean
+  /**
+   * @default true
+   */
+  footer?: boolean
 }
 export default (options: ProvideCompletionsOptions = {}) => {
   const {
@@ -185,17 +193,25 @@ export default (options: ProvideCompletionsOptions = {}) => {
     const completionsContent = completionsSnapshot.length === 0
       ? 'No completions available'
       : completionsSnapshot.map(innerCompletionItemTemplate).join('')
+    const {
+      footer = true,
+      tooltip = true
+    } = options
+    const tooltipStr = tooltip === true
+      ? 'Press <kbd>↑</kbd> <kbd>↓</kbd> to navigate, <kbd>↵</kbd> to select'
+      : (tooltip || '')
     element.innerHTML = `
       ${completionsContent}
-      <div class="${'shikitor'}-completions__footer">
-        <div class="${'shikitor'}-completions__tooltip">
-          Press <kbd>↑</kbd> <kbd>↓</kbd> to navigate, <kbd>↵</kbd> to select
-        </div>
-        <div class="${'shikitor'}-completions__setting">
-          <button>⚙️</button>
-        </div>
-      </div>
-    `
+      ${
+      footer
+        ? `<div class="${'shikitor'}-completions__footer">
+            <div class="${'shikitor'}-completions__tooltip">${tooltipStr}</div>
+            <div class="${'shikitor'}-completions__setting">
+              <button>⚙️</button>
+            </div>
+          </div>`
+        : ''
+    }`
   })
 
   const displayRef = derive({
