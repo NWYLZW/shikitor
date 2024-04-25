@@ -23,8 +23,9 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     popup.offset.bottom && (ele.style.bottom = `${popup.offset.bottom}px`)
     popup.offset.right && (ele.style.right = `${popup.offset.right}px`)
   }
-  if (popup.position === 'relative' && popup.target === 'cursor') {
+  if (popup.position === 'relative') {
     if (!popup.cursors) return
+    if (!popup.selections) return
 
     const [cursor] = popup.cursors
     if (!cursor) {
@@ -34,6 +35,15 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
       return
     } else {
       ele.style.display = ''
+    }
+    const [selection] = popup.selections
+    if (popup.target === 'selection') {
+      if (!selection || selection.start.offset === selection.end.offset) {
+        ele.style.display = 'none'
+        return
+      } else {
+        ele.style.display = ''
+      }
     }
     const { x, y } = shikitor._getCursorAbsolutePosition(
       cursor,
