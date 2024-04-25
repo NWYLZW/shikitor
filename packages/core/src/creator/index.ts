@@ -9,9 +9,8 @@ import type { RefObject } from '../base'
 import type { IDisposable, ResolvedCursor, ResolvedSelection, Shikitor, ShikitorOptions } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
-import { popupsControlled } from '../plugins/provide-popup/popupsControlled'
 import type { PickByValue } from '../types'
-import { callUpdateDispatcher, diffArray, isMultipleKey, isWhatBrowser, listen, throttle } from '../utils' with {
+import { callUpdateDispatcher, diffArray, isMultipleKey, isWhatBrowser, listen } from '../utils' with {
   'unbundled-reexport': 'on'
 }
 import { calcTextareaHeight } from '../utils/calcTextareaHeight'
