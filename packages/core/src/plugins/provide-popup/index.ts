@@ -58,7 +58,6 @@ export type BasePopup = {
 
 type RelativeCursorPopup = {
   target: 'cursor'
-  hiddenOnNoCursor?: boolean
   offset?: 'line-start'
 }
 
@@ -71,6 +70,7 @@ export type RelativePopup =
   & {
     position: 'relative'
     placement: RelativePopupPlacement
+    hiddenOnNoCursor?: boolean
   }
   & (
     | RelativeCursorPopup
