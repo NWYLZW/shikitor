@@ -206,11 +206,6 @@ export async function create(
   checkAborted()
 
   const {
-    dispose: disposePopupsControlled,
-    popups
-  } = popupsControlled(() => shikitor)
-  disposes.push(disposePopupsControlled)
-  const {
     dispose: disposeValueControlled,
     valueRef,
     rawTextHelperRef
