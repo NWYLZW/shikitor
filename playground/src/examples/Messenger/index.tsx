@@ -2,6 +2,7 @@ import './index.scss'
 
 import type { Shikitor } from '@shikitor/core'
 import provideCompletions from '@shikitor/core/plugins/provide-completions'
+import providePopup from '@shikitor/core/plugins/provide-popup'
 import { WithoutCoreEditor } from '@shikitor/react'
 import React, { useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
@@ -12,6 +13,7 @@ import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
 import atUser from './plugins/at-user'
 
 const bundledPlugins = [
+  providePopup,
   provideCompletions,
   atUser({
     targets: ['Shikitor', 'YiJie', 'ShikitorBot']
