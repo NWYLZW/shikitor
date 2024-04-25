@@ -529,7 +529,7 @@ export async function create(
         }
       }
     },
-    _getCursorAbsolutePosition(cursor): { x: number; y: number } {
+    _getCursorAbsolutePosition(cursor, lineOffset = 0): { x: number; y: number } {
       const { rawTextHelper: { line } } = this
       const span = document.createElement('span')
       span.style.cssText = `
@@ -547,7 +547,9 @@ export async function create(
           span.style[prop] = style[prop]
         }
       )
-      const text = '\n'.repeat(cursor.line - 1) + line(cursor).substring(0, cursor.character)
+      const reallyLine = cursor.line + lineOffset - 1
+      const computedLine = Math.max(reallyLine, 0)
+      const text = '\n'.repeat(computedLine) + line(cursor).substring(0, cursor.character)
       const inTheLineStart = cursor.character === 0
       span.textContent = inTheLineStart ? text + ' ' : text
       document.body.appendChild(span)
@@ -560,7 +562,9 @@ export async function create(
         x: (
           inTheLineStart ? 0 : rect.right
         ) + left,
-        y: rect.bottom + top
+        y: (
+          reallyLine === -1 ? 0 : rect.bottom
+        ) + top
       }
     }
   }

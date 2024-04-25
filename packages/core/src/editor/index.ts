@@ -89,7 +89,7 @@ interface InternalShikitor {
   /**
    * @internal
    */
-  _getCursorAbsolutePosition: (cursor: ResolvedCursor) => { x: number; y: number }
+  _getCursorAbsolutePosition: (cursor: ResolvedCursor, lineOffset?: number) => { x: number; y: number }
   /**
    * @internal
    */
