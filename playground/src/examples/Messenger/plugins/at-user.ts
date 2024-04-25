@@ -13,7 +13,6 @@ export default function atUser(options: AtUserOptions) {
         shikitor.registerCompletionItemProvider('markdown', {
           triggerCharacters: ['@'],
           provideCompletionItems(rawTextHelper, position) {
-            console.log(position)
             return {
               suggestions: options.targets.map(target => ({
                 label: target,
