@@ -1,14 +1,7 @@
 import type { ResolvedPosition } from '@shikijs/core'
 
-import type { ResolvedTextRange } from './base'
 import type { IDisposable, Shikitor } from './editor'
 import type { Awaitable } from './types'
-
-export interface OnHoverElementContext {
-  content: string
-  element: Element
-  raw: string
-}
 
 export type _KeyboardEvent = KeyboardEvent & {
   target: HTMLTextAreaElement
@@ -25,7 +18,6 @@ export interface ShikitorPlugin extends Keyboards {
   onChange?: (this: Shikitor, value: string) => void
   onDispose?: (this: Shikitor) => void
   onCursorChange?: (this: Shikitor, cursor?: ResolvedPosition) => void
-  onHoverElement?: (this: Shikitor, range: ResolvedTextRange, context: OnHoverElementContext) => void
 }
 
 export function definePlugin(plugin: ShikitorPlugin) {
