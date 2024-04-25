@@ -28,11 +28,15 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
 
     const [cursor] = popup.cursors
     if (!cursor) return ele
-    const { x, y } = shikitor._getCursorAbsolutePosition(cursor)
-    if (popup.placement === 'bottom') {
-      ele.style.top = `${y}px`
-      ele.style.left = `${x}px`
+    const { x, y } = shikitor._getCursorAbsolutePosition(
+      cursor,
+      popup.placement === 'top' ? -1 : 0
+    )
+    ele.style.top = `${y}px`
+    if (popup.placement === 'top') {
+      ele.style.transform = 'translateY(-100%)'
     }
+    ele.style.left = `${x}px`
   }
 }
 function mountPopup(shikitor: Shikitor, container: HTMLElement, popup: ResolvedPopup) {
