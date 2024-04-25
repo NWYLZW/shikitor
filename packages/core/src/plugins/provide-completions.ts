@@ -135,10 +135,15 @@ export interface ProvideCompletionsOptions {
    * @default 'need-confirm'
    */
   selectMode?: 'once' | 'need-confirm'
+  /**
+   * @default 'bottom'
+   */
+  popupPlacement?: 'top' | 'bottom'
 }
 export default (options: ProvideCompletionsOptions = {}) => {
   const {
-    selectMode = 'once'
+    selectMode = 'once',
+    popupPlacement = 'bottom'
   } = options
   const { disposeScoped, scopeSubscribe } = scoped()
   const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
@@ -346,7 +351,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
         })
         const popupProviderDisposable = shikitor.registerPopupProvider({
           position: 'relative',
-          placement: 'bottom',
+          placement: popupPlacement,
           target: 'cursor',
           providePopups() {
             return {
