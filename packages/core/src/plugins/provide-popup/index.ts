@@ -58,11 +58,16 @@ export type BasePopup = {
 
 type RelativeCursorPopup = {
   target: 'cursor'
+  // TODO
   offset?: 'line-start'
 }
 
 type RelativeSelectionPopup = {
   target: 'selection'
+  // TODO
+  offset?:
+    | 'selection-start'
+    | 'selection-end'
 }
 
 export type RelativePopup =
