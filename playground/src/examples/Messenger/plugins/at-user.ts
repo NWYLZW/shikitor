@@ -7,11 +7,13 @@ export interface AtUserOptions {
 export default function atUser(options: AtUserOptions) {
   return definePlugin({
     name: 'at-user',
-    install() {
-      return this.depend(['provide-completions'], shikitor => {
+    async install() {
+      const installedDefer = Promise.withResolvers<void>()
+      const disposeDepend = this.depend(['provide-completions'], shikitor => {
         shikitor.registerCompletionItemProvider('markdown', {
           triggerCharacters: ['@'],
           provideCompletionItems(rawTextHelper, position) {
+            console.log(position)
             return {
               suggestions: options.targets.map(target => ({
                 label: target,
@@ -21,7 +23,14 @@ export default function atUser(options: AtUserOptions) {
             }
           }
         })
-      })
+        installedDefer.resolve()
+      }).dispose
+      await installedDefer.promise
+      return {
+        dispose() {
+          disposeDepend?.()
+        }
+      }
     }
   })
 }
