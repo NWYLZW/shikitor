@@ -152,6 +152,7 @@ export default () => {
               if (pushedFirstPopupRef === undefined) return
 
               const firstIndex = popups.indexOf(pushedFirstPopupRef)
+              if (firstIndex === -1) return
               for (let i = firstIndex; i < firstIndex + pushedPopupsLength; i++) {
                 const popup = popups[i]
                 if (popup.position === 'relative') {
