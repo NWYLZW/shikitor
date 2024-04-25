@@ -122,7 +122,7 @@ export default () => {
       const cursorRef = derive({
         current: get => get(this.optionsRef).current.cursor
       })
-      const disposeExtend = this.extend('provide-popup', {
+      const extendDisposable = shikitor.extend('provide-popup', {
         registerPopupProvider(provider) {
           const { providePopups, ...meta } = provider
           const popupsPromise = Promise.resolve(providePopups())
@@ -178,7 +178,7 @@ export default () => {
         dispose() {
           disposeScoped()
           disposePopupsControlled()
-          disposeExtend()
+          extendDisposable.dispose?.()
         }
       }
     }

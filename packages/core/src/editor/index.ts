@@ -122,5 +122,5 @@ export interface Shikitor<
   extend: <K extends ShikitorExtendable>(
     key: K,
     obj: ShikitorExtend<K>
-  ) => () => void
+  ) => IDisposable
 }

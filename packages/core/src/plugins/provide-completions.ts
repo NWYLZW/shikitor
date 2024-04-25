@@ -292,7 +292,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
           current: get => get(optionsRef).current.language
         })
         const { disposeScoped, scopeWatch } = scoped()
-        const disposeExtend = this.extend(name, {
+        const extendDisposable = this.extend(name, {
           registerCompletionItemProvider(selector, provider) {
             let providerDispose: (() => void) | undefined
             const { triggerCharacters, provideCompletionItems } = provider
@@ -380,7 +380,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
         installedDefer.resolve(dependDispose)
         return {
           dispose() {
-            disposeExtend()
+            extendDisposable.dispose?.()
             popupProviderDisposable.dispose?.()
             disposeScoped()
           }

@@ -486,10 +486,10 @@ export async function create(
         newPropDescs.push([prop, descriptor])
         Object.defineProperty(this, prop, descriptor)
       }
-      return () => {
-        for (const [prop] of newPropDescs) {
+      return {
+        dispose: () => {
           // @ts-ignore
-          delete this[prop]
+          for (const [prop] of newPropDescs) delete this[prop]
         }
       }
     },
