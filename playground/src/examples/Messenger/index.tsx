@@ -3,6 +3,7 @@ import './index.scss'
 import type { Shikitor } from '@shikitor/core'
 import provideCompletions from '@shikitor/core/plugins/provide-completions'
 import providePopup from '@shikitor/core/plugins/provide-popup'
+import provideSelectionToolbox from '@shikitor/core/plugins/provide-selection-toolbox'
 import { WithoutCoreEditor } from '@shikitor/react'
 import React, { useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
@@ -20,7 +21,8 @@ const bundledPlugins = [
   }),
   atUser({
     targets: ['Shikitor', 'YiJie', 'ShikitorBot']
-  })
+  }),
+  provideSelectionToolbox
 ]
 
 export default function Messenger() {
