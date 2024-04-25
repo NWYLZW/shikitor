@@ -136,7 +136,7 @@ export default () => {
               ...meta,
               ...popup
             })) as ResolvedPopup[]
-            popups.splice(0, popups.length, ...resolvedPopups)
+            popups.push(...resolvedPopups)
             pushedPopupsLength = resolvedPopups.length
             pushedFirstPopupRef = popups[popups.length - pushedPopupsLength]
           })
