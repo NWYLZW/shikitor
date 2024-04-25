@@ -27,7 +27,14 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     if (!popup.cursors) return
 
     const [cursor] = popup.cursors
-    if (!cursor) return
+    if (!cursor) {
+      if (popup.hiddenOnNoCursor) {
+        ele.style.display = 'none'
+      }
+      return
+    } else {
+      ele.style.display = ''
+    }
     const { x, y } = shikitor._getCursorAbsolutePosition(
       cursor,
       popup.placement === 'top' ? -1 : 0
