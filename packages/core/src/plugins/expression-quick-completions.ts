@@ -50,7 +50,7 @@ export default definePlugin({
     )
     return {
       dispose() {
-        dependDisposable.dispose()
+        dependDisposable.dispose?.()
       }
     }
   }
