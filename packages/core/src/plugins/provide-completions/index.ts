@@ -13,6 +13,7 @@ import { classnames, isMultipleKey } from '../../utils' with { 'unbundled-reexpo
 import type { RawTextHelper } from '../../utils/getRawTextHelper'
 import { refProxy } from '../../utils/valtio/refProxy'
 import { scoped } from '../../utils/valtio/scoped'
+import type {} from '../provide-popup'
 
 const name = 'provide-completions'
 
