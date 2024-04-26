@@ -8,7 +8,7 @@ export default () =>
     name,
     async install() {
       const extendDefer = Promise.withResolvers<void>()
-      const dependDisposable = this.depend(['provide-popup'], shikitor => {
+      const dependDispose = this.depend(['provide-popup'], shikitor => {
         const disposePopupProvider = shikitor.registerPopupProvider({
           position: 'relative',
           placement: 'top',
@@ -42,7 +42,7 @@ export default () =>
       await extendDefer.promise
       return {
         dispose() {
-          dependDisposable.dispose?.()
+          dependDispose.dispose?.()
         }
       }
     }
