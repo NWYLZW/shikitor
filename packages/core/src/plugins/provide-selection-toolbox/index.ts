@@ -1,14 +1,35 @@
 import './index.scss'
 
+import type { IDisposable, LanguageSelector } from '@shikitor/core'
+import { derive } from 'valtio/utils'
+
 import { definePlugin } from '../../plugin'
+import { scoped } from '../../utils/valtio/scoped'
 
 const name = 'provide-selection-toolbox'
+
+declare module '@shikitor/core' {
+  export interface SelectionToolboxProvider {
+  }
+  export interface ShikitorProvideSelectionToolbox {
+    registerSelectionToolboxProvider: (selector: LanguageSelector, provider: SelectionToolboxProvider) => IDisposable
+  }
+  export interface ShikitorExtends {
+    'provide-selection-toolbox': ShikitorProvideSelectionToolbox
+  }
+}
+
 export default () =>
   definePlugin({
     name,
     async install() {
       const extendDefer = Promise.withResolvers<void>()
       const dependDispose = this.depend(['provide-popup'], shikitor => {
+        const { optionsRef } = shikitor
+        const languageRef = derive({
+          current: get => get(optionsRef).current.language
+        })
+        const { disposeScoped, scopeWatch } = scoped()
         const disposeSelectionToolboxProvider = shikitor.registerPopupProvider({
           position: 'relative',
           placement: 'top',
@@ -36,6 +57,7 @@ export default () =>
         return {
           dispose() {
             disposeSelectionToolboxProvider?.()
+            disposeScoped()
           }
         }
       })
