@@ -9,7 +9,7 @@ export default () =>
     async install() {
       const extendDefer = Promise.withResolvers<void>()
       const dependDispose = this.depend(['provide-popup'], shikitor => {
-        const disposePopupProvider = shikitor.registerPopupProvider({
+        const disposeSelectionToolboxProvider = shikitor.registerPopupProvider({
           position: 'relative',
           placement: 'top',
           target: 'selection',
@@ -35,7 +35,7 @@ export default () =>
         extendDefer.resolve()
         return {
           dispose() {
-            disposePopupProvider?.()
+            disposeSelectionToolboxProvider?.()
           }
         }
       })
