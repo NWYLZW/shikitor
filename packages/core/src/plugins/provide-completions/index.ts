@@ -1,12 +1,11 @@
 import './index.scss'
 
 import type { ResolvedPosition } from '@shikijs/core'
+import type { IDisposable, LanguageSelector, ProviderResult, Shikitor } from '@shikitor/core'
 import { derive } from 'valtio/utils'
 import { proxy, ref, snapshot } from 'valtio/vanilla'
 
 import type { TextRange } from '../../base'
-import type { IDisposable, ProviderResult } from '../../editor'
-import type { LanguageSelector, Shikitor } from '../../index'
 import { definePlugin } from '../../plugin'
 import type { RecursiveReadonly } from '../../types'
 import { classnames, isMultipleKey } from '../../utils' with { 'unbundled-reexport': 'on' }
@@ -16,28 +15,6 @@ import { scoped } from '../../utils/valtio/scoped'
 import type {} from '../provide-popup'
 
 const name = 'provide-completions'
-
-declare module '@shikitor/core' {
-  export interface CompletionList extends Partial<IDisposable> {
-    suggestions: CompletionItem[]
-  }
-  export interface CompletionItemProvider {
-    triggerCharacters?: string[]
-    /**
-     * Provide completion items for the given position and document.
-     */
-    provideCompletionItems(
-      rawTextHelper: RawTextHelper,
-      position: ResolvedPosition
-    ): ProviderResult<CompletionList>
-  }
-  export interface ShikitorProvideCompletions {
-    registerCompletionItemProvider: (selector: LanguageSelector, provider: CompletionItemProvider) => IDisposable
-  }
-  interface ShikitorExtends {
-    'provide-completions': ShikitorProvideCompletions
-  }
-}
 
 export enum CompletionItemKind {
   Method = 0,
@@ -69,7 +46,8 @@ export enum CompletionItemKind {
   Issue = 26,
   Snippet = 27
 }
-export interface CompletionItem {
+
+export interface CompletionItemInner {
   label: string
   kind?: CompletionItemKind
   detail?: string
@@ -80,6 +58,29 @@ export interface CompletionItem {
    * @internal
    */
   additionalTextEdits?: unknown[]
+}
+
+declare module '@shikitor/core' {
+  export type CompletionItem = CompletionItemInner
+  export interface CompletionList extends Partial<IDisposable> {
+    suggestions: CompletionItemInner[]
+  }
+  export interface CompletionItemProvider {
+    triggerCharacters?: string[]
+    /**
+     * Provide completion items for the given position and document.
+     */
+    provideCompletionItems(
+      rawTextHelper: RawTextHelper,
+      position: ResolvedPosition
+    ): ProviderResult<CompletionList>
+  }
+  export interface ShikitorProvideCompletions {
+    registerCompletionItemProvider: (selector: LanguageSelector, provider: CompletionItemProvider) => IDisposable
+  }
+  interface ShikitorExtends {
+    'provide-completions': ShikitorProvideCompletions
+  }
 }
 
 /**
@@ -111,7 +112,7 @@ function highlightingKeyword(text: string, keywordParts: string[]) {
 function completionItemTemplate(
   keywordParts: string[],
   selectedIndex: number,
-  item: RecursiveReadonly<CompletionItem>,
+  item: RecursiveReadonly<CompletionItemInner>,
   index: number
 ) {
   const { prefix } = completionItemTemplate
@@ -164,7 +165,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
   })
   const allTriggerCharacters = proxy<string[]>([])
 
-  const completions = proxy<CompletionItem[]>([])
+  const completions = proxy<CompletionItemInner[]>([])
   const resolvedCompletions = derive({
     current: get => {
       const keyword = get(keywordRef).current
@@ -329,7 +330,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
 
               const cursor = cursorRef.current
               if (cursor === undefined) return
-              let suggestions: CompletionItem[] = []
+              let suggestions: CompletionItemInner[] = []
               if (char && triggerCharacters?.includes(char)) {
                 const { rawTextHelper } = shikitor
                 providerDispose?.()
@@ -479,7 +480,7 @@ function calcNewKeyword(keyword: string, key: string, nextChar = '') {
   }
   return keyword
 }
-function filterCompletions(completions: readonly RecursiveReadonly<CompletionItem>[], keyword?: string) {
+function filterCompletions(completions: readonly RecursiveReadonly<CompletionItemInner>[], keyword?: string) {
   if (!keyword || keyword === '') return completions
 
   return completions.filter(({ label }) => label.startsWith(keyword))
