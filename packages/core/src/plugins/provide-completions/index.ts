@@ -62,7 +62,7 @@ export interface CompletionItemInner {
 
 declare module '@shikitor/core' {
   export type CompletionItem = CompletionItemInner
-  export interface CompletionList extends Partial<IDisposable> {
+  export interface CompletionList extends IDisposable {
     suggestions: CompletionItemInner[]
   }
   export interface CompletionItemProvider {
