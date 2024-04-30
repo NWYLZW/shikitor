@@ -9,13 +9,13 @@ import { scoped } from '../../utils/valtio/scoped'
 const name = 'provide-selection-toolbox'
 
 declare module '@shikitor/core' {
-  export interface SelectionToolboxProvider {
+  export interface SelectionToolsProvider {
   }
-  export interface ShikitorProvideSelectionToolbox {
-    registerSelectionToolboxProvider: (selector: LanguageSelector, provider: SelectionToolboxProvider) => IDisposable
+  export interface ShikitorProvideSelectionTools {
+    registerSelectionToolsProvider: (selector: LanguageSelector, provider: SelectionToolsProvider) => IDisposable
   }
   export interface ShikitorExtends {
-    'provide-selection-toolbox': ShikitorProvideSelectionToolbox
+    'provide-selection-toolbox': ShikitorProvideSelectionTools
   }
 }
 
@@ -30,6 +30,17 @@ export default () =>
           current: get => get(optionsRef).current.language
         })
         const { disposeScoped, scopeWatch } = scoped()
+        const disposeSelectionToolsExtend = shikitor.extend('provide-selection-toolbox', {
+          registerSelectionToolsProvider(selector, provider) {
+            const disposeWatcher = scopeWatch(get => {
+              const language = get(languageRef).current
+              if (selector !== '*' && selector !== language) return
+            })
+            return {
+              dispose: () => disposeWatcher()
+            }
+          }
+        }).dispose
         const disposeSelectionToolboxProvider = shikitor.registerPopupProvider({
           position: 'relative',
           placement: 'top',
@@ -56,6 +67,7 @@ export default () =>
         extendDefer.resolve()
         return {
           dispose() {
+            disposeSelectionToolsExtend?.()
             disposeSelectionToolboxProvider?.()
             disposeScoped()
           }
