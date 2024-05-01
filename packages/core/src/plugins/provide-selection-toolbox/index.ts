@@ -1,6 +1,6 @@
 import './index.scss'
 
-import type { IDisposable, LanguageSelector } from '@shikitor/core'
+import type { IDisposable, LanguageSelector, ProviderResult } from '@shikitor/core'
 import { derive } from 'valtio/utils'
 
 import { definePlugin } from '../../plugin'
@@ -8,8 +8,18 @@ import { scoped } from '../../utils/valtio/scoped'
 
 const name = 'provide-selection-toolbox'
 
+export interface ToolInner {
+  label?: string
+  title?: string
+}
+
 declare module '@shikitor/core' {
+  export type Tool = ToolInner
+  export interface ToolList extends IDisposable {
+    tools: ToolInner[]
+  }
   export interface SelectionToolsProvider {
+    provideSelectionTools: (selection: string) => ProviderResult<ToolList>
   }
   export interface ShikitorProvideSelectionTools {
     registerSelectionToolsProvider: (selector: LanguageSelector, provider: SelectionToolsProvider) => IDisposable
@@ -30,6 +40,7 @@ export default () =>
           current: get => get(optionsRef).current.language
         })
         const { disposeScoped, scopeWatch } = scoped()
+        const tools = []
         const disposeSelectionToolsExtend = shikitor.extend('provide-selection-toolbox', {
           registerSelectionToolsProvider(selector, provider) {
             const disposeWatcher = scopeWatch(get => {
