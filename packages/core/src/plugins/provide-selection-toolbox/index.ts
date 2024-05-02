@@ -11,6 +11,7 @@ const name = 'provide-selection-toolbox'
 export interface ToolInner {
   label?: string
   title?: string
+  type?: 'button' | 'toggle' | 'select'
 }
 
 declare module '@shikitor/core' {
