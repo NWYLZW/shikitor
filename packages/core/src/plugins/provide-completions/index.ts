@@ -8,7 +8,7 @@ import { proxy, ref, snapshot } from 'valtio/vanilla'
 import type { TextRange } from '../../base'
 import { definePlugin } from '../../plugin'
 import type { RecursiveReadonly } from '../../types'
-import { classnames, isMultipleKey } from '../../utils' with { 'unbundled-reexport': 'on' }
+import { classnames, isMultipleKey, isUnset, UNSET } from '../../utils' with { 'unbundled-reexport': 'on' }
 import type { RawTextHelper } from '../../utils/getRawTextHelper'
 import { refProxy } from '../../utils/valtio/refProxy'
 import { scoped } from '../../utils/valtio/scoped'
@@ -126,11 +126,6 @@ function completionItemTemplate(
   `
 }
 completionItemTemplate.prefix = `${'shikitor'}-completion-item` as const
-
-const UNSET = { __: Symbol('unset') } as const
-function isUnset<T>(value: T | typeof UNSET): value is typeof UNSET {
-  return value === UNSET
-}
 
 export interface ProvideCompletionsOptions {
   /**
