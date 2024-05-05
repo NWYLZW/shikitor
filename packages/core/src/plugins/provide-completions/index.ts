@@ -8,7 +8,7 @@ import { proxy, ref, snapshot } from 'valtio/vanilla'
 import type { TextRange } from '../../base'
 import { definePlugin } from '../../plugin'
 import type { RecursiveReadonly } from '../../types'
-import { classnames, isMultipleKey, isUnset, UNSET } from '../../utils' with { 'unbundled-reexport': 'on' }
+import { classnames, icon, isMultipleKey, isUnset, UNSET } from '../../utils' with { 'unbundled-reexport': 'on' }
 import type { RawTextHelper } from '../../utils/getRawTextHelper'
 import { refProxy } from '../../utils/valtio/refProxy'
 import { scoped } from '../../utils/valtio/scoped'
@@ -204,7 +204,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
         ? `<div class="${'shikitor'}-completions__footer">
             <div class="${'shikitor'}-completions__tooltip">${tooltipStr}</div>
             <div class="${'shikitor'}-completions__setting">
-              <button>⚙️</button>
+              <button>${icon('settings')}</button>
             </div>
           </div>`
         : ''
