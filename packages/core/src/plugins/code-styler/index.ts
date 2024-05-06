@@ -74,35 +74,38 @@ export default ({
     if (inputTabSize < 1) return
     const tabSize = ~~inputTabSize
     const textarea = e.target
-    if (isPrevBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
-      const { value, selections: [prevSelection] } = this
-      const cursor = prevSelection.end.offset
-      const char = e.key
-      const bracket = prevBracketMapping[char]
-      const nextChar = value[cursor]
-      if (nextChar !== bracket) {
-        e.preventDefault()
-        textarea.setRangeText(char + bracket, cursor, cursor)
-        textarea.dispatchEvent(new Event('input'))
-        this.updateSelection(0, { start: cursor + 1, end: cursor + 1 })
-        return
+    const [selection] = this.selections
+    if (selection.start.offset === selection.end.offset) {
+      if (isPrevBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
+        const { value, selections: [prevSelection] } = this
+        const cursor = prevSelection.end.offset
+        const char = e.key
+        const bracket = prevBracketMapping[char]
+        const nextChar = value[cursor]
+        if (nextChar !== bracket) {
+          e.preventDefault()
+          textarea.setRangeText(char + bracket, cursor, cursor)
+          textarea.dispatchEvent(new Event('input'))
+          this.updateSelection(0, { start: cursor + 1, end: cursor + 1 })
+          return
+        }
       }
-    }
-    if (isNextBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
-      const { value, selections: [selection] } = this
-      const nextCharIndex = selection.end.offset
-      if (nextCharIndex > value.length) return
+      if (isNextBracketKey(e.key) && !(e.metaKey || e.ctrlKey)) {
+        const { value, selections: [selection] } = this
+        const nextCharIndex = selection.end.offset
+        if (nextCharIndex > value.length) return
 
-      const nextChar = value[nextCharIndex]
-      if (nextChar === e.key) {
-        e.preventDefault()
-        // TODO ```
-        //      >
-        //      | // cursor
-        //      ```
-        //      insert `>` at the cursor
-        //      use stack
-        this.updateSelection(0, { start: nextCharIndex + 1, end: nextCharIndex + 1 })
+        const nextChar = value[nextCharIndex]
+        if (nextChar === e.key) {
+          e.preventDefault()
+          // TODO ```
+          //      >
+          //      | // cursor
+          //      ```
+          //      insert `>` at the cursor
+          //      use stack
+          this.updateSelection(0, { start: nextCharIndex + 1, end: nextCharIndex + 1 })
+        }
       }
     }
     if (['Tab', 'Enter'].includes(e.key) && !isMultipleKey(e)) {
