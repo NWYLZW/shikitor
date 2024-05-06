@@ -495,11 +495,13 @@ export async function create(
     depend(keys, listener) {
       let installed = false
       let dependInstalledKeys = new Set<string>(installedKeys)
+      let disposeListenerCaller: (() => void) | undefined
       function allKeysInstalled() {
         return keys.every(key => dependInstalledKeys.has(key))
       }
       if (allKeysInstalled()) {
-        listener(this as any)
+        disposeListenerCaller?.()
+        disposeListenerCaller = (listener(this as any) ?? {}).dispose
         installed = true
       }
       const listenPluginsInstalled = () => {
@@ -508,7 +510,8 @@ export async function create(
           if (!key) return
           dependInstalledKeys.add(key)
           if (allKeysInstalled()) {
-            listener(this as any)
+            disposeListenerCaller?.()
+            disposeListenerCaller = (listener(this as any) ?? {}).dispose
             offInstallListener?.()
             installed = true
           }
