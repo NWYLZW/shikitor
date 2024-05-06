@@ -300,8 +300,8 @@ export default (options: ProvideCompletionsOptions = {}) => {
     onDispose() {
       disposeScoped()
     },
-    install() {
-      const installedDefer = Promise.withResolvers<IDisposable>()
+    async install() {
+      const installedDefer = Promise.withResolvers<void>()
       const dependDispose = this.depend(['provide-popup'], shikitor => {
         const { optionsRef } = shikitor
         const cursorRef = derive({
@@ -396,7 +396,7 @@ export default (options: ProvideCompletionsOptions = {}) => {
             }
           }
         })
-        installedDefer.resolve(dependDispose)
+        installedDefer.resolve()
         return {
           dispose() {
             extendDisposable.dispose?.()
@@ -405,7 +405,12 @@ export default (options: ProvideCompletionsOptions = {}) => {
           }
         }
       })
-      return installedDefer.promise
+      await installedDefer.promise
+      return {
+        dispose() {
+          dependDispose.dispose?.()
+        }
+      }
     },
     onKeydown(e) {
       if (!isMultipleKey(e) && e.key === 'Escape') {
