@@ -529,6 +529,7 @@ export async function create(
       return {
         dispose() {
           offDisposeListener?.()
+          disposeListenerCaller?.()
         }
       }
     },
