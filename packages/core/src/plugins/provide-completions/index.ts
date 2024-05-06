@@ -200,15 +200,16 @@ export default (options: ProvideCompletionsOptions = {}) => {
     element.innerHTML = `
       ${completionsContent}
       ${
-      footer
-        ? `<div class="${'shikitor'}-completions__footer">
-            <div class="${'shikitor'}-completions__tooltip">${tooltipStr}</div>
-            <div class="${'shikitor'}-completions__setting">
-              <button>${icon('settings')}</button>
-            </div>
-          </div>`
-        : ''
-    }`
+        footer
+          ? `<div class="${'shikitor'}-completions__footer">
+                <div class="${'shikitor'}-completions__tooltip">${tooltipStr}</div>
+                <div class="${'shikitor'}-completions__setting">
+                  <button>${icon('settings')}</button>
+                </div>
+              </div>`
+          : ''
+      }
+    `
   })
 
   const displayRef = derive({

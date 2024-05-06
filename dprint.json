@@ -1,5 +1,6 @@
 {
   "typescript": {
+    "width": 200,
     "quoteStyle": "preferSingle",
     "semiColons": "asi",
     "trailingCommas": "never",
