@@ -118,7 +118,6 @@ export default () =>
         return {
           dispose() {
             disposeSelectionToolsExtend?.()
-            console.log(disposeSelectionToolboxProvider)
             disposeSelectionToolboxProvider?.()
             disposeScoped()
           }
