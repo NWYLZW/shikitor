@@ -330,8 +330,8 @@ export default (options: ProvideCompletionsOptions = {}) => {
               if (char && triggerCharacters?.includes(char)) {
                 const { rawTextHelper } = shikitor
                 providerDispose?.()
-                const { suggestions: newSugs = [], dispose } = await Promise.resolve(
-                  provideCompletionItems(rawTextHelper, cursor)
+                const { suggestions: newSugs = [], dispose } = await provideCompletionItems(
+                  rawTextHelper, cursor
                 ) ?? {}
                 suggestions = newSugs
                 providerDispose = dispose
