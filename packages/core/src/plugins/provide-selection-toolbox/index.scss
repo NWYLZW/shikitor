@@ -7,42 +7,22 @@
   color: var(--bg);
   background-color: var(--fg);
   border-radius: 4px;
-  font-family: var(--font-family, monospace);
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 20px;
-    min-width: 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    user-select: none;
-    transition: .3s;
-    &:hover {
-      background-color: color-mix(in srgb, var(--bg), var(--fg) 90%);
+  font-family: var(--font-family, monospace), serif;
+  &-item {
+    &__btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 20px;
+      min-width: 20px;
+      font-size: 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: .3s;
+      &:hover {
+        background-color: color-mix(in srgb, var(--bg), var(--fg) 90%);
+      }
     }
-  }
-  .blob {
-    font-weight: bold;
-    color: #ed666e;
-  }
-  .italic {
-    font-style: italic;
-    color: #af5fbd;
-  }
-  .underline {
-    text-decoration: underline;
-  }
-  .strikethrough {
-    text-decoration: line-through;
-    color: #79bf7d;
-  }
-  .code {
-    font-family: var(--font-family, monospace);
-    color: #c9973a;
-  }
-  .link {
-    text-decoration: underline;
-    color: #4782b2;
   }
 }

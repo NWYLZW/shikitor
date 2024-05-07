@@ -32,12 +32,12 @@ function toolItemTemplate(tool: ToolInner) {
   if (tool.type === 'button') {
     return `<div class='${prefix}'>
       ${tool.icon ? icon(tool.icon ?? '', `${prefix}__btn`) : ''}
-      <div class='${prefix}__label'>${tool.label}</div>
+      ${tool.label ? `<div class='${prefix}__label'>${tool.label}</div>` : ''}
     </div>`
   }
   return ''
 }
-toolItemTemplate.prefix = `${'shikitor'}-tool-item`
+toolItemTemplate.prefix = `${'shikitor'}-popup-selection-toolbox-item`
 
 declare module '@shikitor/core' {
   export type Tool = ToolInner
@@ -65,6 +65,9 @@ export default () =>
         const languageRef = derive({
           current: get => get(optionsRef).current.language
         })
+        const cursorRef = derive({
+          current: get => get(optionsRef).current.cursor
+        })
         const { disposeScoped, scopeWatch } = scoped()
         const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
         const tools = proxy<ToolInner[]>([])
@@ -84,14 +87,43 @@ export default () =>
           registerSelectionToolsProvider(selector, provider) {
             let providerDispose: Nullable<() => void>
             const { provideSelectionTools } = provider
+            const sym = Symbol('provideSelectionTools')
             const disposeWatcher = scopeWatch(async get => {
               const language = get(languageRef).current
+              get(cursorRef).current
               if (selector !== '*' && selector !== language) return
               providerDispose?.()
-              const [{ start, end }] = shikitor.selections
-              const selection = shikitor.value.slice(start.offset, end.offset)
-              const { tools: newTools, dispose } = await provideSelectionTools(selection) ?? {}
-              providerDispose = dispose
+              const [s0] = shikitor.selections
+              if (s0 === undefined) return
+              const { start, end } = s0
+
+              const ele = elementRef.current
+              if (isUnset(ele)) return
+
+              if (start.offset === end.offset) {
+                ele.style.visibility = 'hidden'
+                ele.innerHTML = ''
+                return
+              } else {
+                const selection = shikitor.value.slice(start.offset, end.offset)
+                const { tools: newTools = [], dispose } = await provideSelectionTools(selection) ?? {}
+                console.log(newTools)
+                providerDispose = dispose
+                const oldToolsIndexes = tools
+                  .reduce((indexes, tool, index) => {
+                    // @ts-expect-error
+                    return tool[sym]
+                      ? [...indexes, index]
+                      : indexes
+                  }, [] as number[])
+                const removedTools = tools
+                  .filter((_, index) => !oldToolsIndexes.includes(index))
+                tools.length = 0
+                tools.push(
+                  ...removedTools,
+                  ...newTools.map(tool => ({ ...tool, [sym]: true }))
+                )
+              }
             })
             return {
               dispose: () => disposeWatcher()
