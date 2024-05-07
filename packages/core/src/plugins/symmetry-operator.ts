@@ -25,8 +25,8 @@ export default () => {
         textarea.setRangeText(e.key, start.offset, start.offset)
         textarea.dispatchEvent(new Event('input'))
         this.updateSelection(0, { start: end.offset + 2, end: end.offset + 2 })
+        e.preventDefault()
       }
-      e.preventDefault()
     }
   })
 }
