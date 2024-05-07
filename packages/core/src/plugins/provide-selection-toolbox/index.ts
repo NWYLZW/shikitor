@@ -59,7 +59,7 @@ export default () =>
   definePlugin({
     name,
     async install() {
-      const extendDefer = Promise.withResolvers<void>()
+      const dependDefer = Promise.withResolvers<void>()
       const dependDispose = this.depend(['provide-popup'], shikitor => {
         const { optionsRef } = shikitor
         const languageRef = derive({
@@ -114,7 +114,7 @@ export default () =>
             }]
           })
         }).dispose
-        extendDefer.resolve()
+        dependDefer.resolve()
         return {
           dispose() {
             disposeSelectionToolsExtend?.()
@@ -123,7 +123,7 @@ export default () =>
           }
         }
       })
-      await extendDefer.promise
+      await dependDefer.promise
       return {
         dispose() {
           dependDispose.dispose?.()
