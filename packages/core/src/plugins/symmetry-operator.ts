@@ -18,7 +18,7 @@ export default () => {
     name,
     onKeydown(e) {
       const textarea = e.target
-      const [{ start, end }] = this.selections
+      const [{ start, end }] = this.selections ?? [{}]
       if (start.offset === end.offset) return
       if (isSymmetryOperatorKey(e.key) && !(e.metaKey || e.ctrlKey)) {
         textarea.setRangeText(symmetryOperatorMapping[e.key], end.offset, end.offset)
