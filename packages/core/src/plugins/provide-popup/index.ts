@@ -114,80 +114,78 @@ declare module '@shikitor/core' {
   }
 }
 
-export default () => {
-  return definePlugin({
-    name,
-    install() {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const shikitor = this
-      const { disposeScoped, scopeWatch } = scoped()
-      const {
-        dispose: disposePopupsControlled,
-        popups
-      } = popupsControlled(() => shikitor)
-      const cursorRef = derive({
-        current: get => get(this.optionsRef).current.cursor
-      })
-      const extendDisposable = shikitor.extend('provide-popup', {
-        registerPopupProvider(provider) {
-          const { providePopups, ...meta } = provider
-          const popupsPromise = Promise.resolve(providePopups())
+export default () => definePlugin({
+  name,
+  install() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const shikitor = this
+    const { disposeScoped, scopeWatch } = scoped()
+    const {
+      dispose: disposePopupsControlled,
+      popups
+    } = popupsControlled(() => shikitor)
+    const cursorRef = derive({
+      current: get => get(this.optionsRef).current.cursor
+    })
+    const extendDisposable = shikitor.extend('provide-popup', {
+      registerPopupProvider(provider) {
+        const { providePopups, ...meta } = provider
+        const popupsPromise = Promise.resolve(providePopups())
 
-          let pushedFirstPopupRef: ResolvedPopup | undefined
-          let pushedPopupsLength = 0
-          let popupsProvideDispose: (() => void) | undefined
-          popupsPromise.then(({ dispose, popups: newPopups }) => {
-            popupsProvideDispose = dispose
-            const resolvedPopups = newPopups.map(popup => ({
-              ...meta,
-              ...popup
-            })) as ResolvedPopup[]
-            popups.push(...resolvedPopups)
-            pushedPopupsLength = resolvedPopups.length
-            pushedFirstPopupRef = popups[popups.length - pushedPopupsLength]
-          })
-          const removeNewPopups = () => {
-            if (pushedFirstPopupRef === undefined) return
-            const firstIndex = popups.indexOf(pushedFirstPopupRef)
+        let pushedFirstPopupRef: ResolvedPopup | undefined
+        let pushedPopupsLength = 0
+        let popupsProvideDispose: (() => void) | undefined
+        popupsPromise.then(({ dispose, popups: newPopups }) => {
+          popupsProvideDispose = dispose
+          const resolvedPopups = newPopups.map(popup => ({
+            ...meta,
+            ...popup
+          })) as ResolvedPopup[]
+          popups.push(...resolvedPopups)
+          pushedPopupsLength = resolvedPopups.length
+          pushedFirstPopupRef = popups[popups.length - pushedPopupsLength]
+        })
+        const removeNewPopups = () => {
+          if (pushedFirstPopupRef === undefined) return
+          const firstIndex = popups.indexOf(pushedFirstPopupRef)
 
-            popups.splice(firstIndex, pushedPopupsLength)
-          }
-          const disposePositionRerender = meta.position === 'relative'
-            ? scopeWatch(async get => {
-              const cursor = get(cursorRef).current
-              if (pushedFirstPopupRef === undefined) return
-
-              const firstIndex = popups.indexOf(pushedFirstPopupRef)
-              if (firstIndex === -1) return
-              for (let i = firstIndex; i < firstIndex + pushedPopupsLength; i++) {
-                const popup = popups[i]
-                if (popup.position === 'relative') {
-                  popup.cursors = [cursor]
-                  popup.selections = shikitor.selections
-                }
-              }
-            })
-            : undefined
-          return {
-            dispose() {
-              if (popupsProvideDispose) {
-                popupsProvideDispose()
-              } else {
-                popupsPromise.then(({ dispose }) => dispose?.())
-              }
-              disposePositionRerender?.()
-              removeNewPopups?.()
-            }
-          }
+          popups.splice(firstIndex, pushedPopupsLength)
         }
-      })
-      return {
-        dispose() {
-          disposeScoped()
-          disposePopupsControlled()
-          extendDisposable.dispose?.()
+        const disposePositionRerender = meta.position === 'relative'
+          ? scopeWatch(async get => {
+            const cursor = get(cursorRef).current
+            if (pushedFirstPopupRef === undefined) return
+
+            const firstIndex = popups.indexOf(pushedFirstPopupRef)
+            if (firstIndex === -1) return
+            for (let i = firstIndex; i < firstIndex + pushedPopupsLength; i++) {
+              const popup = popups[i]
+              if (popup.position === 'relative') {
+                popup.cursors = [cursor]
+                popup.selections = shikitor.selections
+              }
+            }
+          })
+          : undefined
+        return {
+          dispose() {
+            if (popupsProvideDispose) {
+              popupsProvideDispose()
+            } else {
+              popupsPromise.then(({ dispose }) => dispose?.())
+            }
+            disposePositionRerender?.()
+            removeNewPopups?.()
+          }
         }
       }
+    })
+    return {
+      dispose() {
+        disposeScoped()
+        disposePopupsControlled()
+        extendDisposable.dispose?.()
+      }
     }
-  })
-}
+  }
+})
