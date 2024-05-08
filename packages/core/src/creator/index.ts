@@ -6,11 +6,21 @@ import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
 
 import type { RefObject } from '../base'
-import type { IDisposable, ResolvedCursor, ResolvedSelection, Shikitor, ShikitorOptions } from '../editor'
+import type {
+  IDisposable,
+  ResolvedCursor,
+  ResolvedSelection,
+  Shikitor,
+  ShikitorBase,
+  ShikitorInternal,
+  ShikitorOptions,
+  ShikitorSupportExtend,
+  ShikitorSupportPlugin
+} from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
 import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
 import type { PickByValue } from '../types'
-import { callUpdateDispatcher, diffArray, isMultipleKey, isWhatBrowser, listen } from '../utils' with {
+import { callUpdateDispatcher, completeAssign, diffArray, isMultipleKey, isWhatBrowser, listen } from '../utils' with {
   'unbundled-reexport': 'on'
 }
 import { calcTextareaHeight } from '../utils/calcTextareaHeight'
@@ -348,8 +358,141 @@ export async function create(
     if (!key) return
     installedKeys.push(key)
   })
-  const shikitor: Shikitor = {
+  const shikitorSupportExtend: ShikitorSupportExtend = {
+    extend(key, obj) {
+      const properties = Object.getOwnPropertyDescriptors(obj)
+      const newPropDescs: [string, PropertyDescriptor][] = []
+      for (const [prop, descriptor] of Object.entries(properties)) {
+        if (prop in this) {
+          throw new Error(`Property "${prop}" already exists`)
+        }
+        newPropDescs.push([prop, descriptor])
+        Object.defineProperty(this, prop, descriptor)
+      }
+      return {
+        dispose: () => {
+          // @ts-ignore
+          for (const [prop] of newPropDescs) delete this[prop]
+        }
+      }
+    },
+    depend(keys, listener) {
+      let installed = false
+      let dependInstalledKeys = new Set<string>(installedKeys)
+      let disposeListenerCaller: (() => void) | undefined
+      function allKeysInstalled() {
+        return keys.every(key => dependInstalledKeys.has(key))
+      }
+      if (allKeysInstalled()) {
+        disposeListenerCaller?.()
+        disposeListenerCaller = (listener(this as any) ?? {}).dispose
+        installed = true
+      }
+      const listenPluginsInstalled = () => {
+        dependInstalledKeys = new Set<string>(installedKeys)
+        const offInstallListener = ee.on('install', key => {
+          if (!key) return
+          dependInstalledKeys.add(key)
+          if (allKeysInstalled()) {
+            disposeListenerCaller?.()
+            disposeListenerCaller = (listener(this as any) ?? {}).dispose
+            offInstallListener?.()
+            installed = true
+          }
+        })
+      }
+      listenPluginsInstalled()
+      const offDisposeListener = ee.on('dispose', key => {
+        if (!key) return
+        if (!(keys as string[]).includes(key)) return
+        if (!installed) return
+
+        installed = false
+        listenPluginsInstalled()
+      })
+      return {
+        dispose() {
+          offDisposeListener?.()
+          disposeListenerCaller?.()
+        }
+      }
+    }
+  }
+  const shikitorSupportPlugin: ShikitorSupportPlugin = {
+    async upsertPlugin(plugin, index) {
+      const p = await Promise.resolve(typeof plugin === 'function' ? plugin() : plugin)
+      if (p === undefined) {
+        throw new Error('Not provided plugin')
+      }
+      const plugins = pluginsRef.current
+      const realIndex = index ?? plugins.length - 1
+      if (realIndex < 0 || realIndex >= plugins.length) {
+        throw new Error('Invalid index')
+      }
+      if (index === undefined) {
+        plugins?.push(p)
+      } else {
+        plugins?.splice(index, 1, p)
+      }
+      return realIndex
+    },
+    async removePlugin(index) {
+      const plugins = pluginsRef.current
+      const p = plugins[index]
+      if (p === undefined) {
+        throw new Error(`Not found plugin at index ${index}`)
+      }
+      plugins?.splice(index, 1)
+    }
+  }
+  const shikitorInternal: ShikitorInternal = {
     ee,
+    _getCursorAbsolutePosition(cursor, lineOffset = 0): { x: number; y: number } {
+      const { rawTextHelper: { line } } = this
+      const span = document.createElement('span')
+      span.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      `
+      const style = getComputedStyle(input)
+      ;['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'textTransform', 'letterSpacing'].forEach(
+        prop => {
+          // @ts-ignore
+          span.style[prop] = style[prop]
+        }
+      )
+      const reallyLine = cursor.line + lineOffset - 1
+      const computedLine = Math.max(reallyLine, 0)
+      const text = '\n'.repeat(computedLine) + line(cursor).substring(0, cursor.character)
+      const inTheLineStart = cursor.character === 0
+      span.textContent = inTheLineStart ? text + ' ' : text
+      document.body.appendChild(span)
+      const rect = span.getBoundingClientRect()
+      document.body.removeChild(span)
+      const inputStyle = getComputedStyle(input)
+      const left = parseInt(inputStyle.marginLeft) + parseInt(inputStyle.paddingLeft)
+      const top = parseInt(inputStyle.marginTop) + parseInt(inputStyle.paddingTop)
+      return {
+        x: (
+          inTheLineStart ? 0 : rect.right
+        ) + left,
+        y: (
+          reallyLine === -1 ? 0 : rect.bottom
+        ) + top
+      }
+    }
+  }
+  const shikitorDisposable: Disposable = {
+    [Symbol.dispose]() {
+      target.innerHTML = ''
+      dispose()
+    }
+  }
+  const shikitorBase: ShikitorBase = {
     get element() {
       return target
     },
@@ -448,133 +591,20 @@ export async function create(
         prevSelection = resolvedSelection
       }
       input.setSelectionRange(resolvedSelection.start.offset, resolvedSelection.end.offset)
-    },
-    async upsertPlugin(plugin, index) {
-      const p = await Promise.resolve(typeof plugin === 'function' ? plugin() : plugin)
-      if (p === undefined) {
-        throw new Error('Not provided plugin')
-      }
-      const plugins = pluginsRef.current
-      const realIndex = index ?? plugins.length - 1
-      if (realIndex < 0 || realIndex >= plugins.length) {
-        throw new Error('Invalid index')
-      }
-      if (index === undefined) {
-        plugins?.push(p)
-      } else {
-        plugins?.splice(index, 1, p)
-      }
-      return realIndex
-    },
-    async removePlugin(index) {
-      const plugins = pluginsRef.current
-      const p = plugins[index]
-      if (p === undefined) {
-        throw new Error(`Not found plugin at index ${index}`)
-      }
-      plugins?.splice(index, 1)
-    },
-    [Symbol.dispose]() {
-      target.innerHTML = ''
-      dispose()
-    },
-    extend(key, obj) {
-      const properties = Object.getOwnPropertyDescriptors(obj)
-      const newPropDescs: [string, PropertyDescriptor][] = []
-      for (const [prop, descriptor] of Object.entries(properties)) {
-        if (prop in this) {
-          throw new Error(`Property "${prop}" already exists`)
-        }
-        newPropDescs.push([prop, descriptor])
-        Object.defineProperty(this, prop, descriptor)
-      }
-      return {
-        dispose: () => {
-          // @ts-ignore
-          for (const [prop] of newPropDescs) delete this[prop]
-        }
-      }
-    },
-    depend(keys, listener) {
-      let installed = false
-      let dependInstalledKeys = new Set<string>(installedKeys)
-      let disposeListenerCaller: (() => void) | undefined
-      function allKeysInstalled() {
-        return keys.every(key => dependInstalledKeys.has(key))
-      }
-      if (allKeysInstalled()) {
-        disposeListenerCaller?.()
-        disposeListenerCaller = (listener(this as any) ?? {}).dispose
-        installed = true
-      }
-      const listenPluginsInstalled = () => {
-        dependInstalledKeys = new Set<string>(installedKeys)
-        const offInstallListener = this.ee.on('install', key => {
-          if (!key) return
-          dependInstalledKeys.add(key)
-          if (allKeysInstalled()) {
-            disposeListenerCaller?.()
-            disposeListenerCaller = (listener(this as any) ?? {}).dispose
-            offInstallListener?.()
-            installed = true
-          }
-        })
-      }
-      listenPluginsInstalled()
-      const offDisposeListener = this.ee.on('dispose', key => {
-        if (!key) return
-        if (!(keys as string[]).includes(key)) return
-        if (!installed) return
-
-        installed = false
-        listenPluginsInstalled()
-      })
-      return {
-        dispose() {
-          offDisposeListener?.()
-          disposeListenerCaller?.()
-        }
-      }
-    },
-    _getCursorAbsolutePosition(cursor, lineOffset = 0): { x: number; y: number } {
-      const { rawTextHelper: { line } } = this
-      const span = document.createElement('span')
-      span.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-      `
-      const style = getComputedStyle(input)
-      ;['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'textTransform', 'letterSpacing'].forEach(
-        prop => {
-          // @ts-ignore
-          span.style[prop] = style[prop]
-        }
-      )
-      const reallyLine = cursor.line + lineOffset - 1
-      const computedLine = Math.max(reallyLine, 0)
-      const text = '\n'.repeat(computedLine) + line(cursor).substring(0, cursor.character)
-      const inTheLineStart = cursor.character === 0
-      span.textContent = inTheLineStart ? text + ' ' : text
-      document.body.appendChild(span)
-      const rect = span.getBoundingClientRect()
-      document.body.removeChild(span)
-      const inputStyle = getComputedStyle(input)
-      const left = parseInt(inputStyle.marginLeft) + parseInt(inputStyle.paddingLeft)
-      const top = parseInt(inputStyle.marginTop) + parseInt(inputStyle.paddingTop)
-      return {
-        x: (
-          inTheLineStart ? 0 : rect.right
-        ) + left,
-        y: (
-          reallyLine === -1 ? 0 : rect.bottom
-        ) + top
-      }
     }
   }
+  const base = completeAssign(
+    shikitorBase,
+    shikitorDisposable
+  )
+  const baseWithInternal = completeAssign(
+    base,
+    shikitorInternal
+  )
+  const shikitor: Shikitor = completeAssign(
+    baseWithInternal,
+    completeAssign(shikitorSupportExtend, shikitorSupportPlugin)
+  )
   pluginsDisposes = await Promise.all(
     callAllShikitorPlugins('install', shikitor)
   )

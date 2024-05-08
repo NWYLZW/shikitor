@@ -27,6 +27,7 @@ interface Depend<
   ThisKeys extends ShikitorExtendable
 > {
   <Keys extends Exclude<ShikitorExtendable, ThisKeys>>(
+    this: Shikitor<ThisKeys>,
     keys: Keys[],
     listener: (
       shikitor:
@@ -85,43 +86,63 @@ export interface ShikitorOptions extends ShikitorEvents {
   plugins?: InputShikitorPlugin[]
 }
 
-interface InternalShikitor {
+export interface ShikitorInternal {
   /**
    * @internal
    */
-  _getCursorAbsolutePosition: (cursor: ResolvedCursor, lineOffset?: number) => { x: number; y: number }
+  _getCursorAbsolutePosition: (
+    this: Shikitor,
+    cursor: ResolvedCursor,
+    lineOffset?: number
+  ) => { x: number; y: number }
   /**
    * @internal
    */
   ee: EventEmitter<ShikitorEventMap>
 }
 
-export interface Shikitor<
+export interface ShikitorSupportExtend<
   Keys extends ShikitorExtendable = never
-> extends InternalShikitor, Disposable {
+> {
+  depend: Depend<Keys>
+  extend: <K extends ShikitorExtendable>(
+    this: Shikitor<Keys>,
+    key: K,
+    obj: ShikitorExtend<K>
+  ) => IDisposable
+}
+
+export interface ShikitorSupportPlugin {
+  upsertPlugin: (this: Shikitor, plugin: InputShikitorPlugin, index?: number) => Promise<number>
+  removePlugin: (this: Shikitor, index: number) => void
+}
+
+export interface ShikitorBase {
   readonly element: HTMLElement
   value: string
+
   language?: BundledLanguage
+  updateLanguage: UpdateDispatcher<Shikitor['language']>
+
   options:
     & RecursiveReadonly<Omit<ShikitorOptions, 'plugins'>>
     & RecursiveReadonly<{
       plugins: ShikitorPlugin[]
     }>
   optionsRef: RefObject<ShikitorOptions>
+  updateOptions: UpdateDispatcher<RecursiveReadonly<ShikitorOptions>, [], Promise<void>, Shikitor['options']>
+
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
   blur: () => void
-  readonly selections: readonly ResolvedSelection[]
-  readonly rawTextHelper: RawTextHelper
-  updateOptions: UpdateDispatcher<RecursiveReadonly<ShikitorOptions>, [], Promise<void>, Shikitor['options']>
-  updateLanguage: UpdateDispatcher<Shikitor['language']>
-  updateSelection: UpdateDispatcher<Selection, [index: number]>
-  upsertPlugin: (plugin: InputShikitorPlugin, index?: number) => Promise<number>
-  removePlugin: (index: number) => void
 
-  depend: Depend<Keys>
-  extend: <K extends ShikitorExtendable>(
-    key: K,
-    obj: ShikitorExtend<K>
-  ) => IDisposable
+  readonly selections: readonly ResolvedSelection[]
+  updateSelection: UpdateDispatcher<Selection, [index: number]>
+
+  readonly rawTextHelper: RawTextHelper
+}
+
+export interface Shikitor<
+  Keys extends ShikitorExtendable = never
+> extends ShikitorBase, ShikitorSupportExtend<Keys>, ShikitorSupportPlugin, ShikitorInternal, Disposable {
 }
