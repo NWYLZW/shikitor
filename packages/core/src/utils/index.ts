@@ -1,5 +1,6 @@
 export { callUpdateDispatcher } from './callUpdateDispatcher'
 export { classnames } from './classnames'
+export { completeAssign } from './completeAssign'
 export { debounce } from './debounce'
 export { diffArray } from './diffArray'
 export { getRawTextHelper } from './getRawTextHelper'
