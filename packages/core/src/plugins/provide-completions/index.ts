@@ -197,18 +197,17 @@ export default (options: ProvideCompletionsOptions = {}) => {
     const tooltipStr = tooltip === true
       ? 'Press <kbd>↑</kbd> <kbd>↓</kbd> to navigate, <kbd>↵</kbd> to select'
       : (tooltip || '')
+    const footerStr = footer
+      ? `<div class="${'shikitor'}-completions__footer">
+            <div class="${'shikitor'}-completions__tooltip">${tooltipStr}</div>
+            <div class="${'shikitor'}-completions__setting">
+              <button>${icon('settings')}</button>
+            </div>
+          </div>`
+      : ''
     element.innerHTML = `
       ${completionsContent}
-      ${
-        footer
-          ? `<div class="${'shikitor'}-completions__footer">
-                <div class="${'shikitor'}-completions__tooltip">${tooltipStr}</div>
-                <div class="${'shikitor'}-completions__setting">
-                  <button>${icon('settings')}</button>
-                </div>
-              </div>`
-          : ''
-      }
+      ${footerStr}
     `
   })
 
@@ -331,7 +330,8 @@ export default (options: ProvideCompletionsOptions = {}) => {
                 const { rawTextHelper } = shikitor
                 providerDispose?.()
                 const { suggestions: newSugs = [], dispose } = await provideCompletionItems(
-                  rawTextHelper, cursor
+                  rawTextHelper,
+                  cursor
                 ) ?? {}
                 suggestions = newSugs
                 providerDispose = dispose
