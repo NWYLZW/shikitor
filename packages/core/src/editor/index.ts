@@ -110,6 +110,7 @@ export interface Shikitor<
   optionsRef: RefObject<ShikitorOptions>
   readonly cursor: ResolvedCursor
   focus: (cursor?: Cursor) => void
+  blur: () => void
   readonly selections: readonly ResolvedSelection[]
   readonly rawTextHelper: RawTextHelper
   updateOptions: UpdateDispatcher<RecursiveReadonly<ShikitorOptions>, [], Promise<void>, Shikitor['options']>

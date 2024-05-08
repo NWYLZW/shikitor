@@ -407,6 +407,9 @@ export async function create(
       )
       input.focus()
     },
+    blur() {
+      input.blur()
+    },
     get selections() {
       return [prevSelection!]
     },
