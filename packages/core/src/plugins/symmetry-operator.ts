@@ -24,7 +24,7 @@ export default () => {
         textarea.setRangeText(symmetryOperatorMapping[e.key], end.offset, end.offset)
         textarea.setRangeText(e.key, start.offset, start.offset)
         textarea.dispatchEvent(new Event('input'))
-        this.updateSelection(0, { start: end.offset + 2, end: end.offset + 2 })
+        this.focus(end.offset + 2)
         e.preventDefault()
       }
     }
