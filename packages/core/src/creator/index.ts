@@ -201,16 +201,22 @@ export async function create(
     if (document.getSelection()?.focusNode !== target) return
 
     const { resolvePosition } = shikitor.rawTextHelper
+    const selections = selectionsRef.current
     const [start, end] = [input.selectionStart, input.selectionEnd]
     const selection = { start: resolvePosition(start), end: resolvePosition(end) }
-    const prevSelection = selectionsRef.current[0]
+    const [prevSelection] = selections
     const pos = selection.start.offset !== prevSelection?.start.offset
       ? selection.start
       : selection.end
     if (optionsRef.current.cursor?.offset !== pos.offset) {
       optionsRef.current.cursor = resolvePosition(pos)
     }
-    selectionsRef.current[0] = selection
+    if (
+      selection.start.offset !== prevSelection?.start.offset
+      || selection.end.offset !== prevSelection?.end.offset
+    ) {
+      selectionsRef.current[0] = selection
+    }
   }))
 
   disposes.push(outputRenderControlled(
