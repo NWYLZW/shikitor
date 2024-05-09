@@ -61,12 +61,12 @@ export default () =>
     async install() {
       const dependDefer = Promise.withResolvers<void>()
       const dependDispose = this.depend(['provide-popup'], shikitor => {
-        const { optionsRef } = shikitor
+        const { optionsRef, selectionsRef } = shikitor
         const languageRef = derive({
           current: get => get(optionsRef).current.language
         })
-        const cursorRef = derive({
-          current: get => get(optionsRef).current.cursor
+        const firstSelectionRef = derive({
+          current: get => get(selectionsRef).current[0]
         })
         const { disposeScoped, scopeWatch } = scoped()
         const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
@@ -90,11 +90,10 @@ export default () =>
             const sym = Symbol('provideSelectionTools')
             const disposeWatcher = scopeWatch(async get => {
               const language = get(languageRef).current
-              get(cursorRef).current
+              const s0 = get(firstSelectionRef).current
+              if (s0 === undefined) return
               if (selector !== '*' && selector !== language) return
               providerDispose?.()
-              const [s0] = shikitor.selections
-              if (s0 === undefined) return
               const { start, end } = s0
 
               const ele = elementRef.current
