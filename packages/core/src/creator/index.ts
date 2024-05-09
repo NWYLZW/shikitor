@@ -7,27 +7,24 @@ import { proxy, snapshot } from 'valtio/vanilla'
 
 import type { RefObject } from '../base'
 import type {
-  IDisposable,
   ResolvedCursor,
   ResolvedSelection,
   Shikitor,
   ShikitorBase,
   ShikitorInternal,
   ShikitorOptions,
-  ShikitorSupportExtend,
-  ShikitorSupportPlugin
+  ShikitorSupportExtend
 } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
-import type { _KeyboardEvent, ShikitorPlugin } from '../plugin'
-import type { PickByValue } from '../types'
-import { callUpdateDispatcher, completeAssign, diffArray, isMultipleKey, isWhatBrowser, listen } from '../utils' with {
+import type { _KeyboardEvent } from '../plugin'
+import { callUpdateDispatcher, completeAssign, isMultipleKey, isWhatBrowser, listen } from '../utils' with {
   'unbundled-reexport': 'on'
 }
 import { calcTextareaHeight } from '../utils/calcTextareaHeight'
-import { isSameSnapshot } from '../utils/valtio/isSameSnapshot'
 import { scoped } from '../utils/valtio/scoped'
 import { HIGHLIGHTED } from './classes'
 import { cursorControlled } from './controlled/cursorControlled'
+import { pluginsControlled } from './controlled/pluginsControlled'
 import { valueControlled } from './controlled/valueControlled'
 import { resolveInputPlugins } from './resolveInputPlugins'
 import { shikitorStructureTransformer } from './structureTransfomer'
@@ -179,16 +176,12 @@ export async function create(
     abort
   } = options
 
-  let pluginsDisposes: (void | IDisposable)[] = []
   const disposes: (() => void)[] = []
-  const { disposeScoped, scopeWatch, scopeSubscribe } = scoped()
+  const { disposeScoped, scopeWatch } = scoped()
 
   const dispose = () => {
     disposeScoped()
     disposes.forEach(dispose => dispose())
-    pluginsDisposes
-      .filter(<T>(x: T | void): x is T => x !== undefined)
-      .forEach(({ dispose }) => dispose?.())
     onDispose?.()
     try {
       // plugins may not installed
@@ -236,6 +229,13 @@ export async function create(
     }
   )
   disposes.push(disposeCursorControlled)
+  const {
+    dispose: disposePluginsControlled,
+    install: installAllPlugins,
+    shikitorSupportPlugin,
+    callAllShikitorPlugins
+  } = pluginsControlled(optionsRef, ee)
+  disposes.push(disposePluginsControlled)
 
   const autoSizeRef = derive({
     minRows: get => {
@@ -280,73 +280,6 @@ export async function create(
   })
 
   let prevSelection: ResolvedSelection | undefined
-
-  const pluginsRef = derive({
-    current: get => get(optionsRef).current.plugins
-  })
-  function callAllShikitorPlugins<
-    K extends Exclude<keyof PickByValue<ShikitorPlugin, (...args: any[]) => any>, undefined>
-  >(method: K, ...args: Parameters<Exclude<ShikitorPlugin[K], undefined>>) {
-    const plugins = pluginsRef.current
-    return plugins.map(plugin => {
-      let funcRT = plugin[method]?.call(
-        shikitor,
-        // @ts-ignore
-        ...args
-      )
-      if (['install', 'onDispose'].includes(method)) {
-        funcRT = Promise.resolve(funcRT)
-          .then(rt => {
-            const eventName = {
-              install: 'install',
-              onDispose: 'dispose'
-            }[method as 'install' | 'onDispose']
-            shikitor.ee.emit(eventName, plugin.name, shikitor)
-            return rt
-          })
-      }
-      return funcRT
-    })
-  }
-  let prevPluginSnapshots = snapshot(pluginsRef).current
-  scopeSubscribe(pluginsRef, async () => {
-    const pluginSnapshots = snapshot(pluginsRef).current
-    if (prevPluginSnapshots === pluginSnapshots) {
-      return
-    }
-    const { added, reordered, removed } = diffArray(prevPluginSnapshots, pluginSnapshots, isSameSnapshot)
-    for (const plugin of removed) {
-      const index = prevPluginSnapshots.indexOf(plugin)
-      if (index === -1) return
-      pluginsDisposes[index]?.dispose?.()
-      plugin.onDispose?.call(shikitor)
-      shikitor.ee.emit('dispose', plugin.name)
-    }
-    for (const plugin of removed) {
-      const index = prevPluginSnapshots.indexOf(plugin)
-      if (index === -1) return
-      pluginsDisposes.splice(index, 1)
-    }
-    for (const [oldI, newI] of reordered) {
-      const temp = pluginsDisposes[oldI]
-      pluginsDisposes[oldI] = pluginsDisposes[newI]
-      pluginsDisposes[newI] = temp
-    }
-    await Promise.all(
-      added.map(async ([plugin, index]) => {
-        const dispose = await plugin.install?.call(shikitor, shikitor)
-        shikitor.ee.emit('install', plugin.name, shikitor)
-        if (index < pluginsDisposes.length) {
-          pluginsDisposes.splice(index, 0, dispose)
-        } else if (index === pluginsDisposes.length) {
-          pluginsDisposes.push(dispose)
-        } else {
-          pluginsDisposes[index] = dispose
-        }
-      })
-    )
-    prevPluginSnapshots = pluginSnapshots
-  })
 
   disposes.push(outputRenderControlled(
     { target, output },
@@ -416,33 +349,6 @@ export async function create(
           disposeListenerCaller?.()
         }
       }
-    }
-  }
-  const shikitorSupportPlugin: ShikitorSupportPlugin = {
-    async upsertPlugin(plugin, index) {
-      const p = await Promise.resolve(typeof plugin === 'function' ? plugin() : plugin)
-      if (p === undefined) {
-        throw new Error('Not provided plugin')
-      }
-      const plugins = pluginsRef.current
-      const realIndex = index ?? plugins.length - 1
-      if (realIndex < 0 || realIndex >= plugins.length) {
-        throw new Error('Invalid index')
-      }
-      if (index === undefined) {
-        plugins?.push(p)
-      } else {
-        plugins?.splice(index, 1, p)
-      }
-      return realIndex
-    },
-    async removePlugin(index) {
-      const plugins = pluginsRef.current
-      const p = plugins[index]
-      if (p === undefined) {
-        throw new Error(`Not found plugin at index ${index}`)
-      }
-      plugins?.splice(index, 1)
     }
   }
   const shikitorInternal: ShikitorInternal = {
@@ -605,9 +511,7 @@ export async function create(
     baseWithInternal,
     completeAssign(shikitorSupportExtend, shikitorSupportPlugin)
   )
-  pluginsDisposes = await Promise.all(
-    callAllShikitorPlugins('install', shikitor)
-  )
+  await installAllPlugins(shikitor)
   checkAborted()
 
   disposes.push(listen(document, 'selectionchange', () => {
