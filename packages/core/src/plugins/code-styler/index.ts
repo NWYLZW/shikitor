@@ -110,7 +110,7 @@ export default ({
           }
         }
       }
-      if (['Tab', 'Enter'].includes(e.key) && !isMultipleKey(e)) {
+      if (['Tab', 'Enter'].includes(e.key) && !isMultipleKey(e, false)) {
         const { selections: [selection] } = this
         if (e.key === 'Enter') {
           // TODO make timeout configurable for this plugin?
