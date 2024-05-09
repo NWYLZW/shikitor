@@ -1,6 +1,6 @@
 import './index.scss'
 
-import type { IDisposable, LanguageSelector, ProviderResult } from '@shikitor/core'
+import type { IDisposable, LanguageSelector, ProviderResult, ResolvedTextRange } from '@shikitor/core'
 import { derive } from 'valtio/utils'
 import { proxy, ref, snapshot } from 'valtio/vanilla'
 
@@ -45,7 +45,7 @@ declare module '@shikitor/core' {
     tools: ToolInner[]
   }
   export interface SelectionToolsProvider {
-    provideSelectionTools: (selection: string) => ProviderResult<ToolList>
+    provideSelectionTools: (selectionText: string, selection: ResolvedTextRange) => ProviderResult<ToolList>
   }
   export interface ShikitorProvideSelectionTools {
     registerSelectionToolsProvider: (selector: LanguageSelector, provider: SelectionToolsProvider) => IDisposable
@@ -90,11 +90,11 @@ export default () =>
             const sym = Symbol('provideSelectionTools')
             const disposeWatcher = scopeWatch(async get => {
               const language = get(languageRef).current
-              const s0 = get(firstSelectionRef).current
-              if (s0 === undefined) return
+              const selection = get(firstSelectionRef).current
+              if (selection === undefined) return
               if (selector !== '*' && selector !== language) return
               providerDispose?.()
-              const { start, end } = s0
+              const { start, end } = selection
 
               const ele = elementRef.current
               if (isUnset(ele)) return
@@ -104,8 +104,8 @@ export default () =>
                 ele.innerHTML = ''
                 return
               } else {
-                const selection = shikitor.value.slice(start.offset, end.offset)
-                const { tools: newTools = [], dispose } = await provideSelectionTools(selection) ?? {}
+                const selectionText = shikitor.value.slice(start.offset, end.offset)
+                const { tools: newTools = [], dispose } = await provideSelectionTools(selectionText, selection) ?? {}
                 providerDispose = dispose
                 const oldToolsIndexes = tools
                   .reduce((indexes, tool, index) => {
