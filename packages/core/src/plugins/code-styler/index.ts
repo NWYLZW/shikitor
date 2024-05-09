@@ -88,7 +88,7 @@ export default ({
             e.preventDefault()
             textarea.setRangeText(char + bracket, cursor, cursor)
             textarea.dispatchEvent(new Event('input'))
-            this.updateSelection(0, { start: cursor + 1, end: cursor + 1 })
+            this.focus(cursor + 1)
             return
           }
         }
@@ -106,7 +106,7 @@ export default ({
             //      ```
             //      insert `>` at the cursor
             //      use stack
-            this.updateSelection(0, { start: nextCharIndex + 1, end: nextCharIndex + 1 })
+            this.focus(nextCharIndex + 1)
           }
         }
       }
