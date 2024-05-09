@@ -194,21 +194,23 @@ export async function create(
     }
   })
 
-  let prevSelection: ResolvedSelection | undefined
+  const selectionsRef = proxy({
+    current: [] as ResolvedSelection[]
+  })
   disposes.push(listen(document, 'selectionchange', () => {
-    if (document.getSelection()?.focusNode === target) {
-      const { resolvePosition } = shikitor.rawTextHelper
-      const [start, end] = [input.selectionStart, input.selectionEnd]
-      const selection = { start: resolvePosition(start), end: resolvePosition(end) }
-      const pos = selection.start.offset !== prevSelection?.start.offset
-        ? selection.start
-        : selection.end
-      if (optionsRef.current.cursor?.offset !== pos.offset) {
-        optionsRef.current.cursor = resolvePosition(pos)
-      }
-      prevSelection = selection
-      return
+    if (document.getSelection()?.focusNode !== target) return
+
+    const { resolvePosition } = shikitor.rawTextHelper
+    const [start, end] = [input.selectionStart, input.selectionEnd]
+    const selection = { start: resolvePosition(start), end: resolvePosition(end) }
+    const prevSelection = selectionsRef.current[0]
+    const pos = selection.start.offset !== prevSelection?.start.offset
+      ? selection.start
+      : selection.end
+    if (optionsRef.current.cursor?.offset !== pos.offset) {
+      optionsRef.current.cursor = resolvePosition(pos)
     }
+    selectionsRef.current[0] = selection
   }))
 
   disposes.push(outputRenderControlled(
@@ -330,10 +332,10 @@ export async function create(
       return snapshot(rawTextHelperRef).current
     },
     get selections() {
-      return [prevSelection!]
+      return snapshot(selectionsRef).current
     },
     updateSelection(index, selectionOrGetSelection) {
-      const { selections } = this
+      const selections = selectionsRef.current
       if (index < 0 || index >= selections.length) {
         return
       }
@@ -361,7 +363,7 @@ export async function create(
         // TODO
         // options.onSelectionChange?.(selection)
         // callAllShikitorPlugins('onSelectionChange', selection)
-        prevSelection = resolvedSelection
+        selections[index] = resolvedSelection
       }
       input.setSelectionRange(resolvedSelection.start.offset, resolvedSelection.end.offset)
     }
