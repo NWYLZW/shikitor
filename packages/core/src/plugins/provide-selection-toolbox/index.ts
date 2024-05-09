@@ -107,7 +107,6 @@ export default () =>
               } else {
                 const selection = shikitor.value.slice(start.offset, end.offset)
                 const { tools: newTools = [], dispose } = await provideSelectionTools(selection) ?? {}
-                console.log(newTools)
                 providerDispose = dispose
                 const oldToolsIndexes = tools
                   .reduce((indexes, tool, index) => {
