@@ -137,6 +137,7 @@ export interface ShikitorBase {
   blur: () => void
 
   readonly selections: readonly ResolvedSelection[]
+  readonly selectionsRef: RefObject<ResolvedSelection[]>
   updateSelection: UpdateDispatcher<Selection, [index: number]>
 
   readonly rawTextHelper: RawTextHelper

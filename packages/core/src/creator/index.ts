@@ -334,6 +334,9 @@ export async function create(
     get selections() {
       return snapshot(selectionsRef).current
     },
+    get selectionsRef() {
+      return selectionsRef
+    },
     updateSelection(index, selectionOrGetSelection) {
       const selections = selectionsRef.current
       if (index < 0 || index >= selections.length) {
