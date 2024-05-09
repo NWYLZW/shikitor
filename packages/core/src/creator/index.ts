@@ -12,8 +12,7 @@ import type {
   Shikitor,
   ShikitorBase,
   ShikitorInternal,
-  ShikitorOptions,
-  ShikitorSupportExtend
+  ShikitorOptions
 } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
 import type { _KeyboardEvent } from '../plugin'
@@ -24,6 +23,7 @@ import { calcTextareaHeight } from '../utils/calcTextareaHeight'
 import { scoped } from '../utils/valtio/scoped'
 import { HIGHLIGHTED } from './classes'
 import { cursorControlled } from './controlled/cursorControlled'
+import { extendControlled } from './controlled/extendControlled'
 import { pluginsControlled } from './controlled/pluginsControlled'
 import { valueControlled } from './controlled/valueControlled'
 import { resolveInputPlugins } from './resolveInputPlugins'
@@ -236,6 +236,9 @@ export async function create(
     callAllShikitorPlugins
   } = pluginsControlled(optionsRef, ee)
   disposes.push(disposePluginsControlled)
+  const {
+    shikitorSupportExtend
+  } = extendControlled(ee)
 
   const autoSizeRef = derive({
     minRows: get => {
@@ -286,71 +289,6 @@ export async function create(
     { valueRef, cursorRef, optionsRef }
   ))
 
-  const installedKeys: string[] = []
-  ee.on('install', key => {
-    if (!key) return
-    installedKeys.push(key)
-  })
-  const shikitorSupportExtend: ShikitorSupportExtend = {
-    extend(key, obj) {
-      const properties = Object.getOwnPropertyDescriptors(obj)
-      const newPropDescs: [string, PropertyDescriptor][] = []
-      for (const [prop, descriptor] of Object.entries(properties)) {
-        if (prop in this) {
-          throw new Error(`Property "${prop}" already exists`)
-        }
-        newPropDescs.push([prop, descriptor])
-        Object.defineProperty(this, prop, descriptor)
-      }
-      return {
-        dispose: () => {
-          // @ts-ignore
-          for (const [prop] of newPropDescs) delete this[prop]
-        }
-      }
-    },
-    depend(keys, listener) {
-      let installed = false
-      let dependInstalledKeys = new Set<string>(installedKeys)
-      let disposeListenerCaller: (() => void) | undefined
-      function allKeysInstalled() {
-        return keys.every(key => dependInstalledKeys.has(key))
-      }
-      if (allKeysInstalled()) {
-        disposeListenerCaller?.()
-        disposeListenerCaller = (listener(this as any) ?? {}).dispose
-        installed = true
-      }
-      const listenPluginsInstalled = () => {
-        dependInstalledKeys = new Set<string>(installedKeys)
-        const offInstallListener = ee.on('install', key => {
-          if (!key) return
-          dependInstalledKeys.add(key)
-          if (allKeysInstalled()) {
-            disposeListenerCaller?.()
-            disposeListenerCaller = (listener(this as any) ?? {}).dispose
-            offInstallListener?.()
-            installed = true
-          }
-        })
-      }
-      listenPluginsInstalled()
-      const offDisposeListener = ee.on('dispose', key => {
-        if (!key) return
-        if (!(keys as string[]).includes(key)) return
-        if (!installed) return
-
-        installed = false
-        listenPluginsInstalled()
-      })
-      return {
-        dispose() {
-          offDisposeListener?.()
-          disposeListenerCaller?.()
-        }
-      }
-    }
-  }
   const shikitorInternal: ShikitorInternal = {
     ee,
     _getCursorAbsolutePosition(cursor, lineOffset = 0): { x: number; y: number } {
