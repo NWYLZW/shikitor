@@ -9,7 +9,6 @@ export default () =>
       const dependDispose = this.depend(['provide-selection-toolbox'], shikitor => {
         shikitor.registerSelectionToolsProvider('markdown', {
           provideSelectionTools(selection) {
-            console.log('selection', selection)
             return {
               tools: [
                 {
