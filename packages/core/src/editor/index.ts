@@ -129,7 +129,7 @@ export interface ShikitorBase {
     & RecursiveReadonly<{
       plugins: ShikitorPlugin[]
     }>
-  optionsRef: RefObject<ShikitorOptions>
+  readonly optionsRef: RefObject<ShikitorOptions>
   updateOptions: UpdateDispatcher<RecursiveReadonly<ShikitorOptions>, [], Promise<void>, Shikitor['options']>
 
   readonly cursor: ResolvedCursor

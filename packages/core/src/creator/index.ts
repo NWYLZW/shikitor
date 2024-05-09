@@ -195,6 +195,21 @@ export async function create(
   })
 
   let prevSelection: ResolvedSelection | undefined
+  disposes.push(listen(document, 'selectionchange', () => {
+    if (document.getSelection()?.focusNode === target) {
+      const { resolvePosition } = shikitor.rawTextHelper
+      const [start, end] = [input.selectionStart, input.selectionEnd]
+      const selection = { start: resolvePosition(start), end: resolvePosition(end) }
+      const pos = selection.start.offset !== prevSelection?.start.offset
+        ? selection.start
+        : selection.end
+      if (optionsRef.current.cursor?.offset !== pos.offset) {
+        optionsRef.current.cursor = resolvePosition(pos)
+      }
+      prevSelection = selection
+      return
+    }
+  }))
 
   disposes.push(outputRenderControlled(
     { target, output },
@@ -258,10 +273,12 @@ export async function create(
     set value(value) {
       optionsRef.current.value = value
     },
+    get optionsRef() {
+      return optionsRef
+    },
     get options() {
       return snapshot(optionsRef).current
     },
-    optionsRef,
     set options(newOptions) {
       this.updateOptions(newOptions)
     },
@@ -309,11 +326,11 @@ export async function create(
     blur() {
       input.blur()
     },
-    get selections() {
-      return [prevSelection!]
-    },
     get rawTextHelper() {
       return snapshot(rawTextHelperRef).current
+    },
+    get selections() {
+      return [prevSelection!]
     },
     updateSelection(index, selectionOrGetSelection) {
       const { selections } = this
@@ -364,21 +381,6 @@ export async function create(
   await installAllPlugins(shikitor)
   checkAborted()
 
-  disposes.push(listen(document, 'selectionchange', () => {
-    if (document.getSelection()?.focusNode === target) {
-      const { resolvePosition } = shikitor.rawTextHelper
-      const [start, end] = [input.selectionStart, input.selectionEnd]
-      const selection = { start: resolvePosition(start), end: resolvePosition(end) }
-      const pos = selection.start.offset !== prevSelection?.start.offset
-        ? selection.start
-        : selection.end
-      if (optionsRef.current.cursor?.offset !== pos.offset) {
-        optionsRef.current.cursor = resolvePosition(pos)
-      }
-      prevSelection = selection
-      return
-    }
-  }))
   input.addEventListener('keydown', e => callAllShikitorPlugins('onKeydown', e as _KeyboardEvent))
   input.addEventListener('keyup', e => callAllShikitorPlugins('onKeyup', e as _KeyboardEvent))
   input.addEventListener('keypress', e => callAllShikitorPlugins('onKeypress', e as _KeyboardEvent))
