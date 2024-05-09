@@ -6,7 +6,7 @@ const symmetryOperatorMapping: Record<string, string> = {
   '{': '}',
   '<': '>',
   '`': '`',
-  '\'': '\'',
+  "'": "'",
   '"': '"'
 }
 function isSymmetryOperatorKey(key: string) {
