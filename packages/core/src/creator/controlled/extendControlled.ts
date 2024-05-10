@@ -4,7 +4,7 @@ export function extendControlled(
   ee: Shikitor['ee']
 ) {
   const installedKeys: string[] = []
-  ee.on('install', key => {
+  ee.on('extended', key => {
     if (!key) return
     installedKeys.push(key)
   })
@@ -20,10 +20,12 @@ export function extendControlled(
           newPropDescs.push([prop, descriptor])
           Object.defineProperty(this, prop, descriptor)
         }
+        ee.emit('extended', key)
         return {
           dispose: () => {
             // @ts-ignore
             for (const [prop] of newPropDescs) delete this[prop]
+            ee.emit('contracted', key)
           }
         }
       },
@@ -36,23 +38,23 @@ export function extendControlled(
         }
         const checkDependInstalled = (callback?: () => void) => {
           if (allKeysInstalled()) {
+            callback?.()
             disposeListenerCaller?.()
             disposeListenerCaller = (listener(this as any) ?? {}).dispose
             installed = true
-            callback?.()
           }
         }
         checkDependInstalled()
         const listenPluginsInstalled = () => {
           dependInstalledKeys = new Set<string>(installedKeys)
-          const offInstallListener = ee.on('install', key => {
+          const offExtendedListener = ee.on('extended', key => {
             if (!key) return
             dependInstalledKeys.add(key)
-            checkDependInstalled(() => offInstallListener?.())
+            checkDependInstalled(() => offExtendedListener?.())
           })
         }
         listenPluginsInstalled()
-        const offDisposeListener = ee.on('dispose', key => {
+        const offContractedListener = ee.on('contracted', key => {
           if (!key) return
           if (!(keys as string[]).includes(key)) return
           if (!installed) return
@@ -62,7 +64,7 @@ export function extendControlled(
         })
         return {
           dispose() {
-            offDisposeListener?.()
+            offContractedListener?.()
             disposeListenerCaller?.()
           }
         }

@@ -41,6 +41,8 @@ export interface ShikitorEventMap extends EventMap {
   change(value: string): Awaitable<void>
   install(name: string | undefined, shikitor: Shikitor): Awaitable<void>
   dispose(name: string | undefined): Awaitable<void>
+  extended(name: ShikitorExtendable | (string & {}) | undefined): Awaitable<void>
+  contracted(name: ShikitorExtendable | (string & {}) | undefined): Awaitable<void>
 }
 
 interface ShikitorEvents {
