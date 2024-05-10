@@ -1,5 +1,5 @@
 type ClassnameItem = string | false | undefined | null
-export function classnames(...args: (ClassnameItem | Record<string, ClassnameItem>)[]) {
+export function classnames(...args: (ClassnameItem | { [k: string]: true | ClassnameItem })[]) {
   const classes: string[] = []
   for (const arg of args) {
     if (typeof arg === 'string') {
