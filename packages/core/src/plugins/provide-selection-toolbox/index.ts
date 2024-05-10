@@ -11,6 +11,8 @@ import { scoped } from '../../utils/valtio/scoped'
 
 const name = 'provide-selection-toolbox'
 
+const uuidSym = Symbol('uuid')
+
 export type ToolInner =
   & {
     title?: string
@@ -20,17 +22,28 @@ export type ToolInner =
       label?: string
       icon?: string
       type?: 'button'
+      onClick?: () => void
     }
     | {
       label?: string
-      type?: 'toggle' | 'select'
+      icon?: string
+      type?: 'toggle'
+      activated?: boolean
+      onToggle?: (activated: boolean) => void
+    }
+    | {
+      label?: string
+      type?: 'select'
     }
   )
 
 function toolItemTemplate(tool: ToolInner) {
   const { prefix } = toolItemTemplate
   if (tool.type === 'button') {
-    return `<div class='${prefix}'>
+    return `<div class='${prefix} ${prefix}-button' data-${prefix}-uuid='${(
+      // @ts-expect-error
+      tool[uuidSym]
+    )}'>
       ${tool.icon ? icon(tool.icon ?? '', `${prefix}__btn`) : ''}
       ${tool.label ? `<div class='${prefix}__label'>${tool.label}</div>` : ''}
     </div>`
@@ -70,6 +83,7 @@ export default () =>
         })
         const { disposeScoped, scopeWatch } = scoped()
         const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
+        const toolMap = new Map<string, ToolInner>()
         const tools = proxy<ToolInner[]>([])
         scopeWatch(get => {
           const toolsSnapshot = snapshot(get(tools))
@@ -109,6 +123,10 @@ export default () =>
                 providerDispose = dispose
                 const oldToolsIndexes = tools
                   .reduce((indexes, tool, index) => {
+                    toolMap.delete(
+                      // @ts-expect-error
+                      tool[uuidSym]
+                    )
                     // @ts-expect-error
                     return tool[sym]
                       ? [...indexes, index]
@@ -119,7 +137,15 @@ export default () =>
                 tools.length = 0
                 tools.push(
                   ...removedTools,
-                  ...newTools.map(tool => ({ ...tool, [sym]: true }))
+                  ...newTools.map(tool => {
+                    const uuid = Math.random().toString(36).slice(2)
+                    toolMap.set(uuid, tool)
+                    return {
+                      [uuidSym]: uuid,
+                      [sym]: true,
+                      ...tool
+                    }
+                  })
                 )
               }
             })
@@ -138,7 +164,35 @@ export default () =>
             popups: [{
               id: 'selection-toolbox',
               render(ele) {
+                const prefix = toolItemTemplate.prefix
                 ele.style.visibility = 'hidden'
+                // prevent focus change
+                ele.addEventListener('mousedown', e => e.preventDefault())
+                ele.addEventListener('click', event => {
+                  const target = (
+                    event.target as HTMLElement
+                  )?.closest(`div.${prefix}`) as HTMLDivElement | null
+                  if (target === null) return
+
+                  const uuid = target.dataset[
+                    `${prefix}-uuid`
+                      // camelcase
+                      .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
+                  ]
+                  if (uuid) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    const tool = toolMap.get(uuid)
+                    switch (tool?.type) {
+                      case 'toggle':
+                        tool.onToggle?.(!tool.activated)
+                        break
+                      case 'button':
+                        tool.onClick?.()
+                        break
+                    }
+                  }
+                })
                 elementRef.current = ref(ele)
               }
             }]
