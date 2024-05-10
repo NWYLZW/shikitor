@@ -34,22 +34,21 @@ export function extendControlled(
         function allKeysInstalled() {
           return keys.every(key => dependInstalledKeys.has(key))
         }
-        if (allKeysInstalled()) {
-          disposeListenerCaller?.()
-          disposeListenerCaller = (listener(this as any) ?? {}).dispose
-          installed = true
+        const checkDependInstalled = (callback?: () => void) => {
+          if (allKeysInstalled()) {
+            disposeListenerCaller?.()
+            disposeListenerCaller = (listener(this as any) ?? {}).dispose
+            installed = true
+            callback?.()
+          }
         }
+        checkDependInstalled()
         const listenPluginsInstalled = () => {
           dependInstalledKeys = new Set<string>(installedKeys)
           const offInstallListener = ee.on('install', key => {
             if (!key) return
             dependInstalledKeys.add(key)
-            if (allKeysInstalled()) {
-              disposeListenerCaller?.()
-              disposeListenerCaller = (listener(this as any) ?? {}).dispose
-              offInstallListener?.()
-              installed = true
-            }
+            checkDependInstalled(() => offInstallListener?.())
           })
         }
         listenPluginsInstalled()
