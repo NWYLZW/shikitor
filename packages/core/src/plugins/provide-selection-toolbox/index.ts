@@ -6,7 +6,7 @@ import { proxy, ref, snapshot } from 'valtio/vanilla'
 
 import { definePlugin } from '../../plugin'
 import type { Nullable } from '../../types'
-import { icon, isUnset, UNSET } from '../../utils' with { 'unbundled-reexport': 'on' }
+import { classnames, icon, isUnset, UNSET } from '../../utils' with { 'unbundled-reexport': 'on' }
 import { scoped } from '../../utils/valtio/scoped'
 
 const name = 'provide-selection-toolbox'
@@ -37,21 +37,6 @@ export type ToolInner =
     }
   )
 
-function toolItemTemplate(tool: ToolInner) {
-  const { prefix } = toolItemTemplate
-  if (tool.type === 'button') {
-    return `<div class='${prefix} ${prefix}-button' data-${prefix}-uuid='${(
-      // @ts-expect-error
-      tool[uuidSym]
-    )}'>
-      ${tool.icon ? icon(tool.icon ?? '', `${prefix}__btn`) : ''}
-      ${tool.label ? `<div class='${prefix}__label'>${tool.label}</div>` : ''}
-    </div>`
-  }
-  return ''
-}
-toolItemTemplate.prefix = `${'shikitor'}-popup-selection-toolbox-item`
-
 declare module '@shikitor/core' {
   export type Tool = ToolInner
   export interface ToolList extends IDisposable {
@@ -67,6 +52,29 @@ declare module '@shikitor/core' {
     'provide-selection-toolbox': ShikitorProvideSelectionTools
   }
 }
+
+function toolItemTemplate(tool: ToolInner) {
+  const { prefix } = toolItemTemplate
+  if (tool.type === 'button' || tool.type === 'toggle') {
+    return `<div class='${
+      classnames(
+        prefix,
+        {
+          [`${prefix}--activated`]: tool.type === 'toggle' && tool.activated
+        },
+        `${prefix}-button`
+      )
+    }' data-${prefix}-uuid='${(
+      // @ts-expect-error
+      tool[uuidSym]
+    )}'>
+      ${tool.icon ? icon(tool.icon ?? '', `${prefix}__btn`) : ''}
+      ${tool.label ? `<div class='${prefix}__label'>${tool.label}</div>` : ''}
+    </div>`
+  }
+  return ''
+}
+toolItemTemplate.prefix = `${'shikitor'}-popup-selection-toolbox-item`
 
 export default () =>
   definePlugin({
