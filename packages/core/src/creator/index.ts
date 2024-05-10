@@ -375,6 +375,13 @@ export async function create(
         selections[index] = resolvedSelection
       }
       input.setSelectionRange(resolvedSelection.start.offset, resolvedSelection.end.offset)
+    },
+    setRangeText({ start, end }, text) {
+      const { resolvePosition } = this.rawTextHelper
+      const resolvedStart = resolvePosition(start)
+      const resolvedEnd = resolvePosition(end)
+      input.setRangeText(text, resolvedStart.offset, resolvedEnd.offset, 'end')
+      input.dispatchEvent(new Event('input'))
     }
   }
   const base = completeAssign(

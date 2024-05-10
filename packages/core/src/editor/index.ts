@@ -1,7 +1,7 @@
 import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
-import type { RefObject } from '../base'
+import type { RefObject, TextRange } from '../base'
 import type { ShikitorPlugin } from '../plugin'
 import type { Awaitable, Pretty, RecursiveReadonly, U2I } from '../types'
 import type { UpdateDispatcher } from '../utils/callUpdateDispatcher'
@@ -141,6 +141,8 @@ export interface ShikitorBase {
   readonly selections: readonly ResolvedSelection[]
   readonly selectionsRef: RefObject<ResolvedSelection[]>
   updateSelection: UpdateDispatcher<Selection, [index: number]>
+
+  setRangeText: (range: TextRange, text: string) => void
 
   readonly rawTextHelper: RawTextHelper
 }
