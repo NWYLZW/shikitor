@@ -102,6 +102,21 @@ export default () =>
             let providerDispose: Nullable<() => void>
             const { provideSelectionTools } = provider
             const sym = Symbol('provideSelectionTools')
+            const getRemovedTools = () => {
+              const oldToolsIndexes = tools
+                .reduce((indexes, tool, index) => {
+                  toolMap.delete(
+                    // @ts-expect-error
+                    tool[uuidSym]
+                  )
+                  // @ts-expect-error
+                  return tool[sym]
+                    ? [...indexes, index]
+                    : indexes
+                }, [] as number[])
+              return tools
+                .filter((_, index) => !oldToolsIndexes.includes(index))
+            }
             const disposeWatcher = scopeWatch(async get => {
               const language = get(languageRef).current
               const selection = get(firstSelectionRef).current
@@ -121,22 +136,9 @@ export default () =>
                 const selectionText = shikitor.value.slice(start.offset, end.offset)
                 const { tools: newTools = [], dispose } = await provideSelectionTools(selectionText, selection) ?? {}
                 providerDispose = dispose
-                const oldToolsIndexes = tools
-                  .reduce((indexes, tool, index) => {
-                    toolMap.delete(
-                      // @ts-expect-error
-                      tool[uuidSym]
-                    )
-                    // @ts-expect-error
-                    return tool[sym]
-                      ? [...indexes, index]
-                      : indexes
-                  }, [] as number[])
-                const removedTools = tools
-                  .filter((_, index) => !oldToolsIndexes.includes(index))
                 tools.length = 0
                 tools.push(
-                  ...removedTools,
+                  ...getRemovedTools(),
                   ...newTools.map(tool => {
                     const uuid = Math.random().toString(36).slice(2)
                     toolMap.set(uuid, tool)
@@ -150,7 +152,12 @@ export default () =>
               }
             })
             return {
-              dispose: () => disposeWatcher()
+              dispose: () => {
+                disposeWatcher()
+                providerDispose?.()
+                tools.length = 0
+                tools.push(...getRemovedTools())
+              }
             }
           }
         }).dispose
