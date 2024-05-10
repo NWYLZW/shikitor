@@ -7,8 +7,8 @@ export default () =>
     async install() {
       const dependDefer = Promise.withResolvers<void>()
       const dependDispose = this.depend(['provide-selection-toolbox'], shikitor => {
-        shikitor.registerSelectionToolsProvider('markdown', {
-          provideSelectionTools(selection) {
+        const disposable = shikitor.registerSelectionToolsProvider('markdown', {
+          provideSelectionTools(selectionText, selection) {
             return {
               tools: [
                 {
@@ -64,6 +64,11 @@ export default () =>
           }
         })
         dependDefer.resolve()
+        return {
+          dispose() {
+            disposable.dispose?.()
+          }
+        }
       })
       await dependDefer.promise
       return {
