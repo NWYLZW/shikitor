@@ -1,5 +1,71 @@
+import type { ResolvedTextRange, Shikitor } from '@shikitor/core'
+
 import { definePlugin } from '../../plugin'
-import type {} from '../provide-selection-toolbox'
+import type { ToolInner } from '../provide-selection-toolbox'
+
+const boldTool = (
+  shikitor: Shikitor,
+  selectionText: string,
+  range: ResolvedTextRange
+) => {
+  const { start, end } = range
+  const value = shikitor.value
+  const startOffset = Math.max(
+    start.offset - 2,
+    Math.max(
+      start.offset - 1,
+      1
+    )
+  ) - 1
+  const endOffset = Math.min(
+    end.offset + 2,
+    Math.min(
+      end.offset + 1,
+      value.length
+    )
+  )
+  let activated = false
+  let textStart = -1
+  let textEnd = -1
+  for (let i = startOffset; i < endOffset; i++) {
+    if (value[i] === '*' && value[i + 1] === '*') {
+      if (textStart === -1) {
+        textStart = i + 2
+        i += 2
+        continue
+      }
+      textEnd = i
+      activated = true
+      break
+    }
+  }
+  const text = activated
+    ? value.slice(textStart, textEnd)
+    : selectionText
+  return {
+    type: 'toggle',
+    activated,
+    icon: 'format_bold',
+    onToggle() {
+      if (!activated) {
+        shikitor.setRangeText(range, `**${text}**`)
+        shikitor.updateSelection(0, {
+          start: range.start.offset + 2,
+          end: range.end.offset + 2
+        })
+      } else {
+        shikitor.setRangeText({
+          start: textStart - 2,
+          end: textEnd + 2
+        }, text)
+        shikitor.updateSelection(0, {
+          start: textStart - 2,
+          end: textEnd - 2
+        })
+      }
+    }
+  } satisfies ToolInner
+}
 
 export default () =>
   definePlugin({
@@ -23,10 +89,7 @@ export default () =>
                     { label: 'Heading 6', value: 'h6' }
                   ]
                 },
-                {
-                  type: 'button',
-                  icon: 'format_bold'
-                },
+                boldTool(shikitor, selectionText, selection),
                 {
                   type: 'button',
                   icon: 'format_italic'
