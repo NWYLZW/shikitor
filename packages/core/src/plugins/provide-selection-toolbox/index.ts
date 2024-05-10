@@ -29,7 +29,7 @@ export type ToolInner =
       icon?: string
       type?: 'toggle'
       activated?: boolean
-      onToggle?: (activated: boolean) => void
+      onToggle?: () => void
     }
     | {
       label?: string
@@ -200,7 +200,7 @@ export default () =>
                     const tool = toolMap.get(uuid)
                     switch (tool?.type) {
                       case 'toggle':
-                        tool.onToggle?.(!tool.activated)
+                        tool.onToggle?.()
                         break
                       case 'button':
                         tool.onClick?.()
