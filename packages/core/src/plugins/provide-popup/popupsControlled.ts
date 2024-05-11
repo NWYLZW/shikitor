@@ -56,11 +56,11 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     ele.style.left = `${x}px`
   }
 }
-function mountPopup(shikitor: Shikitor, container: HTMLElement, popup: ResolvedPopup) {
+function mountPopup(shikitor: Shikitor, popup: ResolvedPopup) {
   const ele = document.createElement('div')
   updatePopupElement(shikitor, ele, popup)
   popup.render(ele)
-  container.appendChild(ele)
+  shikitor.element.appendChild(ele)
   return ele
 }
 
@@ -69,14 +69,13 @@ export function popupsControlled(getShikitor: () => Shikitor) {
   const prevPopupElements = new Map<ResolvedPopup, HTMLDivElement>()
   const dispose = debounceSubscribe(popups, () => {
     const shikitor = getShikitor()
-    const container = shikitor.element
     const newPopupElements = new Map<ResolvedPopup, HTMLDivElement>()
     for (const popup of popups) {
       let ele = prevPopupElements.get(popup)
       if (ele) {
         updatePopupElement(shikitor, ele, popup)
       } else {
-        ele = mountPopup(shikitor, container, popup)
+        ele = mountPopup(shikitor, popup)
       }
       newPopupElements.set(popup, ele)
     }
