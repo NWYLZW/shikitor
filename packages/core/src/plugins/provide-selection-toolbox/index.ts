@@ -308,7 +308,6 @@ export default () =>
                           console.warn('No options provided')
                           return
                         }
-                        console.log(target.dataset['open'])
                         if (target.dataset['open'] === 'true') {
                           const ctx = toolStore.get(uuid) as { close: () => void }
                           ctx.close()
