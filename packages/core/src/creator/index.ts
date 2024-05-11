@@ -382,6 +382,14 @@ export async function create(
       const resolvedEnd = resolvePosition(end)
       input.setRangeText(text, resolvedStart.offset, resolvedEnd.offset, 'end')
       input.dispatchEvent(new Event('input'))
+      const defer = Promise.withResolvers<void>()
+      const dispose = scopeWatch(get => {
+        // noinspection BadExpressionStatementJS
+        get(valueRef).current
+        defer.resolve()
+        dispose()
+      })
+      return defer.promise
     }
   }
   const base = completeAssign(

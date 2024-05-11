@@ -147,7 +147,7 @@ export interface ShikitorBase {
   readonly selectionsRef: RefObject<ResolvedSelection[]>
   updateSelection: UpdateDispatcher<Selection, [index: number]>
 
-  setRangeText: (range: TextRange, text: string) => void
+  setRangeText: (range: TextRange, text: string) => Promise<void>
 
   readonly rawTextHelper: RawTextHelper
 }
