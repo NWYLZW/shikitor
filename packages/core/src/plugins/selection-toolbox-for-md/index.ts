@@ -19,6 +19,7 @@ export default () =>
                   label: 'Heading',
                   type: 'select',
                   options: [
+                    { label: 'Normal', value: 'p', activated: true },
                     { label: 'Heading 1', value: 'h1' },
                     { label: 'Heading 2', value: 'h2' },
                     { label: 'Heading 3', value: 'h3' },
