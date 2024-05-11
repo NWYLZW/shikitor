@@ -1,4 +1,5 @@
 .shikitor-popup {
+  color: var(--shikitor-bg-color);
   background-color: var(--shikitor-fg-color);
   padding: 2px 4px;
   &-relative, &-absolute {
