@@ -107,6 +107,7 @@ const name = 'provide-popup'
 
 declare module '@shikitor/core' {
   interface ShikitorProvidePopup {
+    // TODO support custom mount element: container, body, or passed element
     mountPopup(popup: ResolvedPopup): HTMLDivElement
     registerPopupProvider(provider: PopupProvider): IDisposable
   }
