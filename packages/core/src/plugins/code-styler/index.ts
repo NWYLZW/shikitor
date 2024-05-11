@@ -112,21 +112,22 @@ export default ({
       }
       if (['Tab', 'Enter'].includes(e.key) && !isMultipleKey(e, false)) {
         const { selections: [selection] } = this
+        const mutableSelection = { ...selection }
         if (e.key === 'Enter') {
           // TODO make timeout configurable for this plugin?
           await new Promise(resolve => setTimeout(resolve, 0))
           if (e.defaultPrevented) return
-          selection.start = {
+          mutableSelection.start = {
             offset: selection.start.offset + 1,
             line: selection.start.line + 1,
             character: 1
           }
-          selection.end = selection.start
+          mutableSelection.end = mutableSelection.start
         }
         e.preventDefault()
 
         const { value, rawTextHelper } = this
-        dentSelection(selection, {
+        dentSelection(mutableSelection, {
           codeStyler: { tabSize, insertSpaces },
           direction: !e.shiftKey,
           textarea,
