@@ -9,6 +9,10 @@ export default () =>
       const dependDispose = this.depend(['provide-selection-toolbox'], shikitor => {
         const disposable = shikitor.registerSelectionToolsProvider('markdown', {
           provideSelectionTools(selectionText, selection) {
+            const { rawTextHelper: { line } } = shikitor
+            const lineText = line(selection.start)
+            if (lineText.startsWith('[//]: # (')) return
+
             return {
               tools: [
                 {
