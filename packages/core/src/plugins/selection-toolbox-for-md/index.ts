@@ -18,14 +18,15 @@ export default () =>
                 {
                   label: 'Heading',
                   type: 'select',
+                  activatable: true,
                   options: [
-                    { label: 'Normal', value: 'p', activated: true },
-                    { label: 'Heading 1', value: 'h1' },
-                    { label: 'Heading 2', value: 'h2' },
-                    { label: 'Heading 3', value: 'h3' },
-                    { label: 'Heading 4', value: 'h4' },
-                    { label: 'Heading 5', value: 'h5' },
-                    { label: 'Heading 6', value: 'h6' }
+                    { label: 'Normal', icon: 'text_fields', value: 'p', activated: true },
+                    { label: 'Heading 1', icon: 'tag', value: 'h1' },
+                    { label: 'Heading 2', icon: 'tag', value: 'h2' },
+                    { label: 'Heading 3', icon: 'tag', value: 'h3' },
+                    { label: 'Heading 4', icon: 'tag', value: 'h4' },
+                    { label: 'Heading 5', icon: 'tag', value: 'h5' },
+                    { label: 'Heading 6', icon: 'tag', value: 'h6' }
                   ]
                 },
                 formatTool('**', '**', shikitor, selectionText, selection, {
