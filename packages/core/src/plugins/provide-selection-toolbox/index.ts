@@ -117,7 +117,7 @@ toolItemTemplate.prefix = `${'shikitor'}-popup-selection-toolbox-item`
 function showSelector(
   shikitor: ShikitorWithExtends<'provide-popup'>,
   dom: HTMLElement,
-  { activatable, options, onClose }: ToolInner & { type: 'select' } & { onClose?: () => void }
+  { activatable, options, onClose, onSelect }: ToolInner & { type: 'select' } & { onClose?: () => void }
 ) {
   const prefix = `${'shikitor'}-popup-selector`
   const rect = dom.getBoundingClientRect()
@@ -163,7 +163,11 @@ function showSelector(
       `
       element.addEventListener('mousedown', e => e.preventDefault())
       element.addEventListener('click', e => {
-        console.log(e)
+        const optionEle = (e.target as HTMLElement)?.closest(`.${prefix}__option`) as HTMLDivElement | null
+        if (optionEle === null) return
+        const value = optionEle.getAttribute(`data-${prefix}-value`) as string | undefined
+        const index = options!.findIndex(option => option.value === value)
+        onSelect?.(value, index)
         close()
       })
     }
