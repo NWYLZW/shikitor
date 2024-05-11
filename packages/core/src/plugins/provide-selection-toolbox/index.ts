@@ -35,6 +35,7 @@ export type ToolInner =
       label?: string
       type: 'select'
       placeholder?: string
+      disabled?: boolean
       options?: readonly {
         label: string
         activated?: boolean
@@ -81,7 +82,16 @@ function toolItemTemplate(tool: ToolInner) {
   }
   if (tool.type === 'select') {
     const activatedOption = tool.options?.find(option => option.activated)
-    return `<div class='${prefix} ${prefix}--select' data-${prefix}-uuid='${(
+    return `<div class='${
+      classnames(
+        prefix,
+        `${prefix}--select`,
+        {
+          [`${prefix}--disabled`]: tool.disabled,
+          [`${prefix}--activated`]: !!activatedOption
+        }
+      )
+    }' data-${prefix}-uuid='${(
       // @ts-expect-error
       tool[uuidSym]
     )}'>
