@@ -21,19 +21,26 @@ export type ToolInner =
     | {
       label?: string
       icon?: string
-      type?: 'button'
+      type: 'button'
       onClick?: () => void
     }
     | {
       label?: string
       icon?: string
-      type?: 'toggle'
+      type: 'toggle'
       activated?: boolean
       onToggle?: () => void
     }
     | {
       label?: string
-      type?: 'select'
+      type: 'select'
+      placeholder?: string
+      options?: readonly {
+        label: string
+        activated?: boolean
+        value?: string
+      }[]
+      onSelect?: (value?: string, index?: number) => void
     }
   )
 
@@ -70,6 +77,18 @@ function toolItemTemplate(tool: ToolInner) {
     )}'>
       ${tool.icon ? icon(tool.icon ?? '', `${prefix}__btn`) : ''}
       ${tool.label ? `<div class='${prefix}__label'>${tool.label}</div>` : ''}
+    </div>`
+  }
+  if (tool.type === 'select') {
+    const activatedOption = tool.options?.find(option => option.activated)
+    return `<div class='${prefix} ${prefix}--select' data-${prefix}-uuid='${(
+      // @ts-expect-error
+      tool[uuidSym]
+    )}'>
+      <div class='${prefix}__input'>
+        ${activatedOption?.label ?? tool.placeholder ?? ''}
+      </div>
+      ${icon('expand_more', `${prefix}__input-icon`)}
     </div>`
   }
   return ''
