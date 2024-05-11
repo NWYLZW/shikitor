@@ -14,25 +14,24 @@ export function formatTool(
   const value = shikitor.value
   let activated = false
   let textStart = -1
-  a: for (let i = start.offset;; i--) {
-    if (i - (prefix.length - 1) < 0) break
-
-    for (let j = 0; j < prefix.length; j++) {
-      if (value[i - j] === '\n' || value[i - j] === '\r') break a
-    }
-    if (value.slice(i - prefix.length, i) === prefix) {
-      textStart = i
+  for (let i = start.offset; i >= 0; i--) {
+    if (value[i] === '\n' || value[i] === '\r') break
+    if (value.slice(i, i + prefix.length) === prefix) {
+      textStart = i + prefix.length
       break
     }
   }
   let textEnd = -1
   if (textStart !== -1) {
-    a: for (let i = end.offset;; i++) {
-      if (i + suffix.length > value.length) break
-
-      for (let j = 0; j < suffix.length; j++) {
-        if (value[i + j] === '\n' || value[i + j] === '\r') break a
-      }
+    for (
+      let i = Math.max(
+        end.offset - suffix.length,
+        start.offset
+      );
+      i < value.length;
+      i++
+    ) {
+      if (value[i] === '\n' || value[i] === '\r') break
       if (value.slice(i, i + suffix.length) === suffix) {
         textEnd = i
         activated = true
