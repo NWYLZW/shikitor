@@ -1,6 +1,12 @@
 import './index.scss'
 
-import type { IDisposable, LanguageSelector, ProviderResult, ResolvedTextRange } from '@shikitor/core'
+import type {
+  IDisposable,
+  LanguageSelector,
+  ProviderResult,
+  ResolvedTextRange,
+  ShikitorWithExtends
+} from '@shikitor/core'
 import { derive } from 'valtio/utils'
 import { proxy, ref, snapshot } from 'valtio/vanilla'
 
@@ -36,8 +42,11 @@ export type ToolInner =
       type: 'select'
       placeholder?: string
       disabled?: boolean
+      activatable?: boolean
       options?: readonly {
         label: string
+        icon?: string
+        title?: string
         activated?: boolean
         value?: string
       }[]
@@ -105,6 +114,64 @@ function toolItemTemplate(tool: ToolInner) {
 }
 toolItemTemplate.prefix = `${'shikitor'}-popup-selection-toolbox-item`
 
+function showSelector(
+  shikitor: ShikitorWithExtends<'provide-popup'>,
+  dom: HTMLElement,
+  { activatable, options, onClose }: ToolInner & { type: 'select' } & { onClose?: () => void }
+) {
+  const prefix = `${'shikitor'}-popup-selector`
+  const rect = dom.getBoundingClientRect()
+  const close = () => {
+    popupOptions.remove()
+    onClose?.()
+  }
+  const popupOptions = shikitor.mountPopup({
+    id: 'selector',
+    position: 'absolute',
+    width: 200,
+    offset: {
+      left: rect.left,
+      top: rect.bottom
+    },
+    render(element) {
+      const optionsStr = options!.map(option => {
+        const { label, icon: i, title, activated, value } = option
+        const optionClass = classnames(
+          `${prefix}__option`,
+          {
+            [`${prefix}__option--activated`]: activated
+          }
+        )
+        return `<div
+          class='${optionClass}'
+          ${title ? `title='${title ?? label}'` : ''}
+          data-${prefix}-value='${value}'
+        >
+          ${activated ? icon('check', `${prefix}__option-icon`) : ''}
+          ${i ? icon(i, `${prefix}__option-icon`) : ''}
+          ${label}
+        </div>`
+      }).join('')
+      element.innerHTML = `
+      <div class='${(classnames(
+        `${prefix}__options`,
+        {
+          [`${prefix}__options--activatable`]: activatable
+        }
+      ))}'>${optionsStr}</div>
+      `
+      element.addEventListener('mousedown', e => e.preventDefault())
+      element.addEventListener('click', e => {
+        console.log(e)
+        close()
+      })
+    }
+  })
+  return {
+    close
+  }
+}
+
 export default () =>
   definePlugin({
     name,
@@ -121,6 +188,7 @@ export default () =>
         const { disposeScoped, scopeWatch } = scoped()
         const elementRef = proxy({ current: ref<HTMLDivElement | typeof UNSET>(UNSET) })
         const toolMap = new Map<string, ToolInner>()
+        const toolStore = new Map<string, unknown>()
         const tools = proxy<ToolInner[]>([])
         scopeWatch(get => {
           const toolsSnapshot = snapshot(get(tools))
@@ -234,6 +302,28 @@ export default () =>
                       case 'button':
                         tool.onClick?.()
                         break
+                      case 'select': {
+                        if (tool.disabled) return
+                        if (tool.options === undefined || tool.options.length === 0) {
+                          console.warn('No options provided')
+                          return
+                        }
+                        console.log(target.dataset['open'])
+                        if (target.dataset['open'] === 'true') {
+                          const ctx = toolStore.get(uuid) as { close: () => void }
+                          ctx.close()
+                        } else {
+                          target.dataset['open'] = 'true'
+                          toolStore.set(
+                            uuid,
+                            showSelector(shikitor, target, {
+                              ...tool,
+                              onClose: () => target.dataset['open'] = 'false'
+                            })
+                          )
+                        }
+                        break
+                      }
                     }
                   }
                 })

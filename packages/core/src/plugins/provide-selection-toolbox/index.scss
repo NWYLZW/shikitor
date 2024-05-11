@@ -1,13 +1,18 @@
 .shikitor-popup-selection-toolbox {
+  --elevation-depth: 10;
   display: flex;
   align-items: center;
   gap: 5px;
+
   padding: 2px 4px;
   height: 24px;
-  color: var(--shikitor-bg-color);
-  background-color: var(--shikitor-fg-color);
-  border-radius: 4px;
+
   font-family: var(--font-family, monospace), serif;
+  color: var(--shikitor-bg-color);
+
+  background-color: var(--shikitor-fg-color);
+  box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
+  border-radius: 4px;
   &-item {
     font-size: 12px;
     user-select: none;
@@ -59,6 +64,47 @@
     &--disabled {
       opacity: .6;
       cursor: not-allowed;
+    }
+  }
+}
+.shikitor-popup-selector {
+  --elevation-depth: 50;
+
+  position: fixed;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
+  border-radius: 4px;
+
+  font-size: 12px;
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    overflow: overlay;
+  }
+  &__options--activatable > &__option:not(&__option--activated) {
+    padding-left: 20px;
+  }
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    user-select: none;
+    cursor: pointer;
+    transition: .2s;
+    &:hover {
+      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 90%);
+    }
+    .shikitor-icon {
+      font-size: 14px;
+      width: 16px;
+      height: 16px;
+      line-height: 16px;
     }
   }
 }
