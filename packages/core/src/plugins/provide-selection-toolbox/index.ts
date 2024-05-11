@@ -165,6 +165,7 @@ function showSelector(
       element.addEventListener('click', e => {
         const optionEle = (e.target as HTMLElement)?.closest(`.${prefix}__option`) as HTMLDivElement | null
         if (optionEle === null) return
+        if (optionEle.classList.contains(`${prefix}__option--activated`)) return
         const value = optionEle.getAttribute(`data-${prefix}-value`) as string | undefined
         const index = options!.findIndex(option => option.value === value)
         onSelect?.(value, index)
