@@ -42,11 +42,13 @@
       height: 16px;
       line-height: 16px;
     }
-    &--select > &__input-icon {
+    &--select > &__input-more {
       width: 16px;
       height: 16px;
       text-align: center;
       line-height: 16px;
+
+      transform: rotate(180deg);
     }
     &__btn {
       display: flex;

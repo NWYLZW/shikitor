@@ -107,7 +107,7 @@ function toolItemTemplate(tool: ToolInner) {
       <div class='${prefix}__input'>
         ${activatedOption?.label ?? tool.placeholder ?? ''}
       </div>
-      ${icon('expand_more', `${prefix}__input-icon`)}
+      ${icon('expand_more', classnames(`${prefix}__input-more`))}
     </div>`
   }
   return ''
@@ -129,9 +129,10 @@ function showSelector(
     id: 'selector',
     position: 'absolute',
     width: 200,
+    height: 120,
     offset: {
       left: rect.left,
-      top: rect.bottom
+      top: rect.top - 120
     },
     render(element) {
       const optionsStr = options!.map(option => {
