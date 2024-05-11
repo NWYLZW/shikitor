@@ -23,6 +23,13 @@ type ShikitorExtend<Keys extends ShikitorExtendable> = Pretty<U2I<
     : never
 >>
 
+export type ShikitorWithExtends<
+  Keys extends ShikitorExtendable,
+  ThisKeys extends ShikitorExtendable = never
+> =
+  & Shikitor<ThisKeys>
+  & ShikitorExtend<Keys>
+
 interface Depend<
   ThisKeys extends ShikitorExtendable
 > {
@@ -30,9 +37,7 @@ interface Depend<
     this: Shikitor<ThisKeys>,
     keys: Keys[],
     listener: (
-      shikitor:
-        & Shikitor<ThisKeys>
-        & ShikitorExtend<Keys>
+      shikitor: ShikitorWithExtends<Keys, ThisKeys>
     ) => void | IDisposable
   ): IDisposable
 }
