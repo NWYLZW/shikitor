@@ -4,8 +4,8 @@
   gap: 5px;
   padding: 2px 4px;
   height: 24px;
-  color: var(--bg);
-  background-color: var(--fg);
+  color: var(--shikitor-bg-color);
+  background-color: var(--shikitor-fg-color);
   border-radius: 4px;
   font-family: var(--font-family, monospace), serif;
   &-item {
@@ -15,10 +15,10 @@
       font-size: 16px;
     }
     &--activated > &__btn {
-      background-color: color-mix(in srgb, var(--bg), var(--fg) 70%);
+      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 70%);
     }
     &--activated#{&}--select {
-      background-color: color-mix(in srgb, var(--bg), var(--fg) 70%);
+      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 70%);
     }
     &--select {
       display: flex;
@@ -31,7 +31,7 @@
       transition: .3s;
     }
     &--select:not(&--disabled):hover {
-      background-color: color-mix(in srgb, var(--bg), var(--fg) 90%);
+      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 90%);
     }
     &--select > &__input {
       height: 16px;
@@ -54,7 +54,7 @@
       transition: .3s;
     }
     &__btn:not(&--disabled):hover {
-      background-color: color-mix(in srgb, var(--bg), var(--fg) 90%);
+      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 90%);
     }
     &--disabled {
       opacity: .6;
