@@ -10,33 +10,26 @@ const boldTool = (
 ) => {
   const { start, end } = range
   const value = shikitor.value
-  const startOffset = Math.max(
-    start.offset - 2,
-    Math.max(
-      start.offset - 1,
-      1
-    )
-  ) - 1
-  const endOffset = Math.min(
-    end.offset + 2,
-    Math.min(
-      end.offset + 1,
-      value.length
-    )
-  )
   let activated = false
   let textStart = -1
-  let textEnd = -1
-  for (let i = startOffset; i < endOffset; i++) {
-    if (value[i] === '*' && value[i + 1] === '*') {
-      if (textStart === -1) {
-        textStart = i + 2
-        i += 2
-        continue
-      }
-      textEnd = i
-      activated = true
+  for (let i = start.offset; i > 0; i--) {
+    if (value[i] === '\n' || value[i] === '\r') break
+    if (value[i - 1] === '\n' || value[i - 1] === '\r') break
+    if (value[i] === '*' && value[i - 1] === '*') {
+      textStart = i + 1
       break
+    }
+  }
+  let textEnd = -1
+  if (textStart !== -1) {
+    for (let i = end.offset; i < value.length - 2; i++) {
+      if (value[i] === '\n' || value[i] === '\r') break
+      if (value[i + 1] === '\n' || value[i + 1] === '\r') break
+      if (value[i] === '*' && value[i + 1] === '*') {
+        textEnd = i
+        activated = true
+        break
+      }
     }
   }
   const text = activated
