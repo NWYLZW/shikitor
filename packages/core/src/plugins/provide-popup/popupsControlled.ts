@@ -18,8 +18,8 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
   popup.width && (ele.style.width = `${popup.width}px`)
   popup.height && (ele.style.height = `${popup.height}px`)
   if (popup.position === 'absolute') {
-    ele.style.top = `${popup.offset.top ?? 0}px`
-    ele.style.left = `${popup.offset.left ?? 0}px`
+    popup.offset.top && (ele.style.top = `${popup.offset.top}px`)
+    popup.offset.left && (ele.style.left = `${popup.offset.left}px`)
     popup.offset.bottom && (ele.style.bottom = `${popup.offset.bottom}px`)
     popup.offset.right && (ele.style.right = `${popup.offset.right}px`)
   }
