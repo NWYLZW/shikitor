@@ -56,7 +56,7 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     ele.style.left = `${x}px`
   }
 }
-function mountPopup(shikitor: Shikitor, popup: ResolvedPopup) {
+export function mountPopup(shikitor: Shikitor, popup: ResolvedPopup) {
   const ele = document.createElement('div')
   updatePopupElement(shikitor, ele, popup)
   popup.render(ele)

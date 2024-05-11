@@ -107,6 +107,7 @@ const name = 'provide-popup'
 
 declare module '@shikitor/core' {
   interface ShikitorProvidePopup {
+    mountPopup(popup: ResolvedPopup): HTMLDivElement
     registerPopupProvider(provider: PopupProvider): IDisposable
   }
   interface ShikitorExtends {
@@ -129,6 +130,7 @@ export default () =>
         current: get => get(this.optionsRef).current.cursor
       })
       const extendDisposable = shikitor.extend('provide-popup', {
+        mountPopup: popup => mountPopup(shikitor, popup),
         registerPopupProvider(provider) {
           const { providePopups, ...meta } = provider
           const popupsPromise = Promise.resolve(providePopups())
