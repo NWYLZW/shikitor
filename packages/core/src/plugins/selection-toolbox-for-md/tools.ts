@@ -8,7 +8,7 @@ export function formatTool(
   shikitor: Shikitor,
   selectionText: string,
   range: ResolvedTextRange,
-  tool: ToolInner
+  tool: Omit<ToolInner & { type?: 'toggle' }, 'type'>
 ) {
   const { start, end } = range
   const value = shikitor.value
