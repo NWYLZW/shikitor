@@ -1,64 +1,5 @@
-import type { ResolvedTextRange, Shikitor } from '@shikitor/core'
-
 import { definePlugin } from '../../plugin'
-import type { ToolInner } from '../provide-selection-toolbox'
-
-const boldTool = (
-  shikitor: Shikitor,
-  selectionText: string,
-  range: ResolvedTextRange
-) => {
-  const { start, end } = range
-  const value = shikitor.value
-  let activated = false
-  let textStart = -1
-  for (let i = start.offset; i > 0; i--) {
-    if (value[i] === '\n' || value[i] === '\r') break
-    if (value[i - 1] === '\n' || value[i - 1] === '\r') break
-    if (value[i] === '*' && value[i - 1] === '*') {
-      textStart = i + 1
-      break
-    }
-  }
-  let textEnd = -1
-  if (textStart !== -1) {
-    for (let i = end.offset; i < value.length - 2; i++) {
-      if (value[i] === '\n' || value[i] === '\r') break
-      if (value[i + 1] === '\n' || value[i + 1] === '\r') break
-      if (value[i] === '*' && value[i + 1] === '*') {
-        textEnd = i
-        activated = true
-        break
-      }
-    }
-  }
-  const text = activated
-    ? value.slice(textStart, textEnd)
-    : selectionText
-  return {
-    type: 'toggle',
-    activated,
-    icon: 'format_bold',
-    onToggle() {
-      if (!activated) {
-        shikitor.setRangeText(range, `**${text}**`)
-        shikitor.updateSelection(0, {
-          start: range.start.offset + 2,
-          end: range.end.offset + 2
-        })
-      } else {
-        shikitor.setRangeText({
-          start: textStart - 2,
-          end: textEnd + 2
-        }, text)
-        shikitor.updateSelection(0, {
-          start: textStart - 2,
-          end: textEnd - 2
-        })
-      }
-    }
-  } satisfies ToolInner
-}
+import { formatTool } from './tools'
 
 export default () =>
   definePlugin({
@@ -82,23 +23,21 @@ export default () =>
                     { label: 'Heading 6', value: 'h6' }
                   ]
                 },
-                boldTool(shikitor, selectionText, selection),
-                {
-                  type: 'button',
+                formatTool('**', '**', shikitor, selectionText, selection, {
+                  icon: 'format_bold'
+                }),
+                formatTool('<u>', '</u>', shikitor, selectionText, selection, {
                   icon: 'format_italic'
-                },
-                {
-                  type: 'button',
+                }),
+                formatTool('~~', '~~', shikitor, selectionText, selection, {
                   icon: 'format_strikethrough'
-                },
-                {
-                  type: 'button',
+                }),
+                formatTool('__', '__', shikitor, selectionText, selection, {
                   icon: 'format_underlined'
-                },
-                {
-                  type: 'button',
+                }),
+                formatTool('`', '`', shikitor, selectionText, selection, {
                   icon: 'code'
-                },
+                }),
                 {
                   type: 'button',
                   icon: 'link'
