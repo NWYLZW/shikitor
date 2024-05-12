@@ -38,13 +38,18 @@ export type ToolInner =
       onToggle?: () => void
     }
     | {
-      label?: string
       type: 'select'
       placeholder?: string
       disabled?: boolean
       activatable?: boolean
+      prefixIcon?: string
+      noMoreIcon?: boolean
+      /**
+       * @default 'column'
+       */
+      direction?: 'row' | 'column'
       options?: readonly {
-        label: string
+        label?: string
         icon?: string
         title?: string
         activated?: boolean
@@ -91,6 +96,7 @@ function toolItemTemplate(tool: ToolInner) {
   }
   if (tool.type === 'select') {
     const activatedOption = tool.options?.find(option => option.activated)
+    const label = activatedOption?.label ?? tool.placeholder
     return `<div class='${
       classnames(
         prefix,
@@ -104,10 +110,9 @@ function toolItemTemplate(tool: ToolInner) {
       // @ts-expect-error
       tool[uuidSym]
     )}'>
-      <div class='${prefix}__input'>
-        ${activatedOption?.label ?? tool.placeholder ?? ''}
-      </div>
-      ${icon('expand_more', classnames(`${prefix}__input-more`))}
+      ${tool.prefixIcon ? icon(tool.prefixIcon, classnames(`${prefix}__input-prefix`)) : ''}
+      ${label ? `<div class='${prefix}__input'>${label}</div>` : ''}
+      ${!tool.noMoreIcon ? icon('expand_more', classnames(`${prefix}__input-more`)) : ''}
     </div>`
   }
   return ''
@@ -117,10 +122,12 @@ toolItemTemplate.prefix = `${'shikitor'}-popup-selection-toolbox-item`
 function showSelector(
   shikitor: ShikitorWithExtends<'provide-popup'>,
   dom: HTMLElement,
-  { activatable, options, onClose, onSelect }: ToolInner & { type: 'select' } & { onClose?: () => void }
+  { activatable, direction, options, onClose, onSelect }: ToolInner & { type: 'select' } & { onClose?: () => void }
 ) {
   const prefix = `${'shikitor'}-popup-selector`
   const rect = dom.getBoundingClientRect()
+  const width = direction === 'row' ? undefined : 200
+  const height = direction === 'row' ? 24 : 120
   const close = () => {
     popupOptions.remove()
     onClose?.()
@@ -128,11 +135,11 @@ function showSelector(
   const popupOptions = shikitor.mountPopup({
     id: 'selector',
     position: 'absolute',
-    width: 200,
-    height: 120,
+    width,
+    height,
     offset: {
       left: rect.left,
-      top: rect.top - 120
+      top: rect.top - height
     },
     render(element) {
       const optionsStr = options!.map(option => {
@@ -150,7 +157,7 @@ function showSelector(
         >
           ${activated ? icon('check', `${prefix}__option-icon`) : ''}
           ${i ? icon(i, `${prefix}__option-icon`) : ''}
-          ${label}
+          ${label ? `<span>${label}</span>` : ''}
         </div>`
       }).join('')
       element.innerHTML = `
@@ -158,7 +165,8 @@ function showSelector(
         `${prefix}__options`,
         {
           [`${prefix}__options--activatable`]: activatable
-        }
+        },
+        `${prefix}__options--direction-${direction ?? 'column'}`
       ))}'>${optionsStr}</div>
       `
       element.addEventListener('mousedown', e => e.preventDefault())

@@ -38,6 +38,12 @@
     &--select:not(&--disabled):hover {
       background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 90%);
     }
+    &--select > &__input-prefix {
+      width: 16px;
+      height: 16px;
+      line-height: 16px;
+      margin: 0 -4px;
+    }
     &--select > &__input {
       height: 16px;
       line-height: 16px;
@@ -94,6 +100,18 @@
   }
   &__options--activatable > &__option:not(&__option--activated) {
     padding-left: 24px;
+  }
+  &__options--direction-row {
+    gap: 2px;
+    flex-direction: row;
+    padding: 2px;
+  }
+  &__options--direction-row > &__option {
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    padding: 0;
   }
   &__option {
     display: flex;
