@@ -36,7 +36,9 @@
       transition: .3s;
     }
     &--select:not(&--disabled):hover {
+      --elevation-depth: 20;
       background-color: var(--shikitor-hv-color);
+      box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
     }
     &--select > &__input-prefix {
       width: 16px;
@@ -67,7 +69,9 @@
       transition: .3s;
     }
     &__btn:not(&--disabled):hover {
+      --elevation-depth: 20;
       background-color: var(--shikitor-hv-color);
+      box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
     }
     &--disabled {
       opacity: .6;
