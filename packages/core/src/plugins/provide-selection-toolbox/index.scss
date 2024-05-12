@@ -4,7 +4,7 @@
   --elevation-depth: 10;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--inner-padding);
 
   padding: var(--inner-padding);
   height: 20px;
