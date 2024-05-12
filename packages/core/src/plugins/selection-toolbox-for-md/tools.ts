@@ -2,6 +2,8 @@ import type { ResolvedTextRange } from '../../base'
 import type { Shikitor } from '../../editor'
 import type { ToolInner } from '../provide-selection-toolbox'
 
+// TODO move cursor near when update selection
+
 export const NoToolsError = new Error('No tools provided')
 
 export function headingSelectTool(
