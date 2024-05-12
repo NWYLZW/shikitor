@@ -1,5 +1,5 @@
 import { definePlugin } from '../../plugin'
-import { formatTool, headingSelectTool } from './tools'
+import { formatTool, headingSelectTool, quoteTool } from './tools'
 
 export default () =>
   definePlugin({
@@ -35,10 +35,7 @@ export default () =>
                   type: 'button',
                   icon: 'link'
                 },
-                {
-                  type: 'button',
-                  icon: 'format_quote'
-                },
+                quoteTool(shikitor, selection),
                 {
                   type: 'button',
                   icon: 'format_list_bulleted'

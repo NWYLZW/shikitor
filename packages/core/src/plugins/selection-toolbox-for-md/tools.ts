@@ -57,6 +57,60 @@ export function headingSelectTool(
   }
 }
 
+export function quoteTool(
+  shikitor: Shikitor,
+  range: ResolvedTextRange
+) {
+  const lines = [] as [number, string][]
+  for (let line = range.start.line; line <= range.end.line; line++) {
+    lines.push([
+      line,
+      shikitor.rawTextHelper.line({
+        line,
+        character: 1
+      })
+    ])
+  }
+  // when all lines are quoted, unquote them
+  const activated = lines.every(([, text]) => text.startsWith('> '))
+  return {
+    type: 'toggle',
+    activated,
+    icon: 'format_quote',
+    async onToggle() {
+      if (activated) {
+        for await (const [line, text] of lines) {
+          await shikitor.setRangeText(
+            shikitor.rawTextHelper.resolveTextRange({
+              start: { line, character: 0 },
+              end: { line, character: text.length }
+            }),
+            text.slice(2)
+          )
+        }
+        shikitor.updateSelection(0, {
+          start: range.start.offset - 2,
+          end: range.end.offset - lines.length * 2
+        })
+      } else {
+        for await (const [line, text] of lines) {
+          await shikitor.setRangeText(
+            shikitor.rawTextHelper.resolveTextRange({
+              start: { line, character: 0 },
+              end: { line, character: text.length }
+            }),
+            `> ${text}`
+          )
+        }
+        shikitor.updateSelection(0, {
+          start: range.start.offset + 2,
+          end: range.end.offset + lines.length * 2
+        })
+      }
+    }
+  } satisfies ToolInner
+}
+
 export function formatTool(
   prefix: string,
   suffix: string,
