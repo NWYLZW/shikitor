@@ -48,6 +48,8 @@
       width: 16px;
       height: 16px;
       line-height: 16px;
+    }
+    &--select > &__input-prefix:only-child {
       margin: 0 -4px;
     }
     &--select > &__input {
