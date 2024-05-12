@@ -1,5 +1,5 @@
 import { definePlugin } from '../../plugin'
-import { formatTool, headingSelectTool, quoteTool } from './tools'
+import { formatTool, headingSelectTool, linkTool, NoToolsError, quoteTool } from './tools'
 
 export default () =>
   definePlugin({
@@ -13,38 +13,40 @@ export default () =>
             const lineText = line(selection.start)
             if (lineText.startsWith('[//]: # (')) return
 
-            return {
-              tools: [
-                headingSelectTool(shikitor, selectionText, selection, lineText, lineStart(selection.start)),
-                formatTool('**', '**', shikitor, selectionText, selection, {
-                  icon: 'format_bold'
-                }),
-                formatTool('<u>', '</u>', shikitor, selectionText, selection, {
-                  icon: 'format_italic'
-                }),
-                formatTool('~~', '~~', shikitor, selectionText, selection, {
-                  icon: 'format_strikethrough'
-                }),
-                formatTool('__', '__', shikitor, selectionText, selection, {
-                  icon: 'format_underlined'
-                }),
-                formatTool('`', '`', shikitor, selectionText, selection, {
-                  icon: 'code'
-                }),
-                {
-                  type: 'button',
-                  icon: 'link'
-                },
-                quoteTool(shikitor, selection),
-                {
-                  type: 'button',
-                  icon: 'format_list_bulleted'
-                },
-                {
-                  type: 'button',
-                  icon: 'format_list_numbered'
-                }
-              ]
+            try {
+              return {
+                tools: [
+                  headingSelectTool(shikitor, selectionText, selection, lineText, lineStart(selection.start)),
+                  formatTool('**', '**', shikitor, selectionText, selection, {
+                    icon: 'format_bold'
+                  }),
+                  formatTool('<u>', '</u>', shikitor, selectionText, selection, {
+                    icon: 'format_italic'
+                  }),
+                  formatTool('~~', '~~', shikitor, selectionText, selection, {
+                    icon: 'format_strikethrough'
+                  }),
+                  formatTool('__', '__', shikitor, selectionText, selection, {
+                    icon: 'format_underlined'
+                  }),
+                  formatTool('`', '`', shikitor, selectionText, selection, {
+                    icon: 'code'
+                  }),
+                  linkTool(shikitor, selectionText, selection),
+                  quoteTool(shikitor, selection),
+                  {
+                    type: 'button',
+                    icon: 'format_list_bulleted'
+                  },
+                  {
+                    type: 'button',
+                    icon: 'format_list_numbered'
+                  }
+                ]
+              }
+            } catch (e) {
+              if (e === NoToolsError) return
+              throw e
             }
           }
         })

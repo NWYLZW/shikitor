@@ -2,6 +2,8 @@ import type { ResolvedTextRange } from '../../base'
 import type { Shikitor } from '../../editor'
 import type { ToolInner } from '../provide-selection-toolbox'
 
+export const NoToolsError = new Error('No tools provided')
+
 export function headingSelectTool(
   shikitor: Shikitor,
   selectionText: string,
@@ -105,6 +107,79 @@ export function quoteTool(
         shikitor.updateSelection(0, {
           start: range.start.offset + 2,
           end: range.end.offset + lines.length * 2
+        })
+      }
+    }
+  } satisfies ToolInner
+}
+
+export function linkTool(
+  shikitor: Shikitor,
+  selectionText: string,
+  range: ResolvedTextRange
+) {
+  const { start, end } = range
+  const value = shikitor.value
+  let activated = false
+  let textStart = -1
+  for (let i = start.offset; i >= 0; i--) {
+    if (value[i] === '\n' || value[i] === '\r') break
+    if (value[i] === '[') {
+      textStart = i + 1
+      break
+    }
+  }
+  let textEnd = -1
+  let linkEnd = -1
+  if (textStart !== -1) {
+    a: for (
+      let i = textStart;
+      i < value.length;
+      i++
+    ) {
+      if (value[i] === '\n' || value[i] === '\r') break
+      if (value.slice(i, i + ']('.length) === '](') {
+        textEnd = i
+        for (let j = i + 2; j < value.length; j++) {
+          if (value[j] === '\n' || value[j] === '\r') break
+          if (value[j] === ')') {
+            linkEnd = j
+            activated = true
+            break a
+          }
+        }
+      }
+    }
+  }
+  // [a](bcd)
+  //    ^^^^^
+  // don't support tools in this case
+  if (activated && start.offset > textEnd + 1 && end.offset < linkEnd) {
+    throw NoToolsError
+  }
+
+  const text = activated
+    ? value.slice(textStart, textEnd)
+    : selectionText
+  return {
+    type: 'toggle',
+    activated,
+    icon: 'link',
+    async onToggle() {
+      if (!activated) {
+        await shikitor.setRangeText(range, `[${text}]()`)
+        shikitor.updateSelection(0, {
+          start: range.start.offset + 1,
+          end: range.end.offset + 1
+        })
+      } else {
+        await shikitor.setRangeText({
+          start: textStart - 1,
+          end: linkEnd + 1
+        }, text)
+        shikitor.updateSelection(0, {
+          start: textStart - 1,
+          end: textEnd - 1
         })
       }
     }
