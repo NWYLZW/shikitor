@@ -154,7 +154,7 @@ export function linkTool(
   // [a](bcd)
   //    ^^^^^
   // don't support tools in this case
-  if (activated && start.offset > textEnd + 1 && end.offset < linkEnd) {
+  if (activated && start.offset >= textEnd && end.offset <= linkEnd) {
     throw NoToolsError
   }
 
