@@ -1,10 +1,12 @@
 .shikitor-popup-selection-toolbox {
+  --inner-padding: 4px;
+  --outer-border-radius: 8px;
   --elevation-depth: 10;
   display: flex;
   align-items: center;
   gap: 2px;
 
-  padding: 2px;
+  padding: var(--inner-padding);
   height: 20px;
 
   font-family: var(--font-family, monospace), serif;
@@ -12,8 +14,10 @@
 
   background-color: var(--shikitor-fg-color);
   box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
-  border-radius: 4px;
+  border-radius: var(--outer-border-radius);
   &-item {
+    --inner-border-radius: calc(var(--outer-border-radius) - var(--inner-padding));
+
     font-size: 12px;
     user-select: none;
     .shikitor-icon {
@@ -31,7 +35,7 @@
       gap: 4px;
 
       padding: 2px 6px;
-      border-radius: 2px;
+      border-radius: var(--inner-border-radius);
       cursor: pointer;
       transition: .3s;
     }
@@ -64,7 +68,7 @@
       justify-content: center;
       height: 20px;
       min-width: 20px;
-      border-radius: 2px;
+      border-radius: var(--inner-border-radius);
       cursor: pointer;
       transition: .3s;
     }
