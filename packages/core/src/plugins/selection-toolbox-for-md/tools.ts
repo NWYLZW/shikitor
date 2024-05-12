@@ -13,7 +13,6 @@ export function headingSelectTool(
 ): ToolInner & { type?: 'select' } {
   const headingCount = (lineText.match(/^#+ /)?.[0].length ?? 1) - 1
   return {
-    label: 'Heading',
     type: 'select',
     disabled: selectionText.includes('\n'),
     activatable: true,
