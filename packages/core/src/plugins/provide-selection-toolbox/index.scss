@@ -20,10 +20,10 @@
       font-size: 16px;
     }
     &--activated > &__btn {
-      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 70%);
+      background-color: var(--shikitor-active-color);
     }
     &--activated#{&}--select {
-      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 70%);
+      background-color: var(--shikitor-active-color);
     }
     &--select {
       display: flex;
@@ -36,7 +36,7 @@
       transition: .3s;
     }
     &--select:not(&--disabled):hover {
-      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 90%);
+      background-color: var(--shikitor-hv-color);
     }
     &--select > &__input-prefix {
       width: 16px;
@@ -67,7 +67,7 @@
       transition: .3s;
     }
     &__btn:not(&--disabled):hover {
-      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 90%);
+      background-color: var(--shikitor-hv-color);
     }
     &--disabled {
       opacity: .6;
@@ -124,7 +124,7 @@
     cursor: pointer;
     transition: .2s;
     &:hover {
-      background-color: color-mix(in srgb, var(--shikitor-bg-color), var(--shikitor-fg-color) 90%);
+      background-color: var(--shikitor-hv-color);
     }
     .shikitor-icon {
       font-size: 14px;
