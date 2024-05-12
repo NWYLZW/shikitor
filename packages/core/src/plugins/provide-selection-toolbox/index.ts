@@ -150,12 +150,13 @@ function showSelector(
             [`${prefix}__option--activated`]: activated
           }
         )
+        const displayActivated = activated && direction !== 'row'
         return `<div
           class='${optionClass}'
           ${title ? `title='${title ?? label}'` : ''}
           data-${prefix}-value='${value}'
         >
-          ${activated ? icon('check', `${prefix}__option-icon`) : ''}
+          ${displayActivated ? icon('check', `${prefix}__option-icon`) : ''}
           ${i ? icon(i, `${prefix}__option-icon`) : ''}
           ${label ? `<span>${label}</span>` : ''}
         </div>`

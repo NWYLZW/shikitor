@@ -134,6 +134,9 @@
     &:hover {
       background-color: var(--shikitor-hv-color);
     }
+    &--activated {
+      background-color: var(--shikitor-active-color);
+    }
     .shikitor-icon {
       font-size: 14px;
       width: 16px;
