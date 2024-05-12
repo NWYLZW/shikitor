@@ -16,6 +16,7 @@ export function headingSelectTool(
     type: 'select',
     disabled: selectionText.includes('\n'),
     activatable: true,
+    prefixIcon: headingCount === 0 ? 'text_fields' : `format_h${headingCount}`,
     options: [
       { label: 'Normal', icon: 'text_fields', value: 'p', activated: headingCount === 0 },
       { label: 'Heading 1', icon: 'format_h1', value: 'h1', activated: headingCount === 1 },
