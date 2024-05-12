@@ -127,7 +127,7 @@ function showSelector(
   const prefix = `${'shikitor'}-popup-selector`
   const rect = dom.getBoundingClientRect()
   const width = direction === 'row' ? undefined : 200
-  const height = direction === 'row' ? 24 : 120
+  const height = direction === 'row' ? 28 : 120
   const close = () => {
     popupOptions.remove()
     onClose?.()
