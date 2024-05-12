@@ -1,5 +1,5 @@
 import { definePlugin } from '../../plugin'
-import { formatTool, headingSelectTool, linkTool, NoToolsError, quoteTool } from './tools'
+import { formatTool, headingSelectTool, linkTool, listFormatTool, NoToolsError, quoteTool } from './tools'
 
 export default () =>
   definePlugin({
@@ -34,14 +34,7 @@ export default () =>
                   }),
                   linkTool(shikitor, selectionText, selection),
                   quoteTool(shikitor, selection),
-                  {
-                    type: 'button',
-                    icon: 'format_list_bulleted'
-                  },
-                  {
-                    type: 'button',
-                    icon: 'format_list_numbered'
-                  }
+                  listFormatTool(shikitor, selectionText, selection)
                 ]
               }
             } catch (e) {

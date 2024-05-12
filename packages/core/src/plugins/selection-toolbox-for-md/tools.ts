@@ -59,7 +59,7 @@ export function headingSelectTool(
   }
 }
 
-export function quoteTool(
+function getRangeLines(
   shikitor: Shikitor,
   range: ResolvedTextRange
 ) {
@@ -73,6 +73,14 @@ export function quoteTool(
       })
     ])
   }
+  return lines
+}
+
+export function quoteTool(
+  shikitor: Shikitor,
+  range: ResolvedTextRange
+) {
+  const lines = getRangeLines(shikitor, range)
   // when all lines are quoted, unquote them
   const activated = lines.every(([, text]) => text.startsWith('> '))
   return {
@@ -246,6 +254,91 @@ export function formatTool(
           start: textStart - prefix.length,
           end: textEnd - prefix.length
         })
+      }
+    }
+  } satisfies ToolInner
+}
+
+export function listFormatTool(
+  shikitor: Shikitor,
+  selectionText: string,
+  range: ResolvedTextRange
+) {
+  const lines = getRangeLines(shikitor, range)
+  let activeIcon: string | undefined
+  if (lines.every(([, text]) => text.match(/^\s*[-+*] (?!\[[ x]]\s)/)?.[0])) {
+    activeIcon = 'format_list_bulleted'
+  }
+  if (lines.every(([, text]) => text.match(/^\s*\d+\. (?!\[[ x]]\s)/)?.[0])) {
+    activeIcon = 'format_list_numbered'
+  }
+  if (lines.every(([, text]) => text.match(/^\s*([-+*]|\d+\.) \[[ x]] /)?.[0])) {
+    activeIcon = 'checklist'
+  }
+  return {
+    type: 'select',
+    direction: 'row',
+    prefixIcon: activeIcon ?? 'format_list_bulleted',
+    noMoreIcon: true,
+    options: [
+      {
+        icon: 'format_list_bulleted',
+        value: 'ul',
+        activated: activeIcon === 'format_list_bulleted'
+      },
+      {
+        icon: 'format_list_numbered',
+        value: 'ol',
+        activated: activeIcon === 'format_list_numbered'
+      },
+      {
+        icon: 'checklist',
+        value: 'task',
+        activated: activeIcon === 'checklist'
+      }
+    ],
+    async onSelect(value) {
+      switch (value) {
+        case 'ul': {
+          if (!activeIcon) {
+            let firstStartOffset: number | undefined
+            for await (const [line, text] of lines) {
+              let spaces = text.match(/^\s*/)![0]
+              if (spaces.length === text.length) {
+                spaces = ''
+              }
+              const pos = shikitor.rawTextHelper.resolveTextRange({
+                start: { line, character: spaces.length },
+                end: { line, character: spaces.length }
+              })
+              if (firstStartOffset === undefined) {
+                firstStartOffset = pos.start.offset
+              }
+              // TODO configurable
+              await shikitor.setRangeText(pos, '- ')
+            }
+            shikitor.updateSelection(0, {
+              start: firstStartOffset! > range.start.offset
+                ? firstStartOffset! + 2
+                : range.start.offset + 2,
+              end: range.end.offset + lines.length * 2
+            })
+          } else {
+            alert('Unimplemented')
+            // TODO
+          }
+          break
+        }
+        case 'ol': {
+          alert('Unimplemented')
+          // TODO
+          break
+        }
+        case 'task': {
+          alert('Unimplemented')
+          // TODO
+          break
+        }
       }
     }
   } satisfies ToolInner
