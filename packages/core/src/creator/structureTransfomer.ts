@@ -4,8 +4,7 @@ import { cssvar } from '../base'
 import { classnames } from '../utils/classnames'
 
 export function shikitorStructureTransformer(
-  target: HTMLElement,
-  cursorLine: number
+  target: HTMLElement
 ): ShikiTransformer {
   return {
     name: 'shikitor',
@@ -40,11 +39,9 @@ export function shikitorStructureTransformer(
         'data-line'?: string
         class?: string
       }
-      const isCursor = !!cursorLine && cursorLine === line
       props.class = classnames(
         props.class,
-        'shikitor-output-line',
-        isCursor && 'shikitor-output-line-highlighted'
+        'shikitor-output-line'
       )
       props['data-line'] = String(line)
       if (ele.children.length === 0) {

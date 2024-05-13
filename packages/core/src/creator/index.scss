@@ -1,10 +1,14 @@
 .shikitor {
   --gutter-width: 3em;
   --line-height: 22px;
+
   position: relative;
+  display: flex;
+
   line-height: var(--line-height);
   transition: .1s;
 
+  overflow: hidden;
   &-bg-lighting {
     position: relative;
     &::before {
@@ -19,7 +23,6 @@
       pointer-events: none;
     }
   }
-
   &.line-numbers &-output-line::before {
     visibility: visible;
   }
@@ -30,17 +33,39 @@
     margin: 0;
     padding: 0;
     border: 0;
-    font-family: var(--font-family, monospace);
+    font-family: var(--font-family, monospace), serif;
     font-size: inherit;
   }
-  &.line-numbers &-output, &.line-numbers &-input {
-    width: calc(100% - var(--gutter-width));
+  &-lines {
+    width: 20px;
+    padding: 0 10px;
   }
-  &.line-numbers &-output {
-    padding-left: var(--gutter-width);
+  &-gutter-line {
+    display: flex;
+    &-number {
+      width: 0;
+      flex-grow: 1;
+
+      user-select: none;
+      text-align: right;
+      font-family: var(--font-family, monospace), serif;
+    }
+    &-highlighted::before {
+      z-index: 10;
+      position: absolute;
+      content: '';
+      left: 0;
+      width: 100%;
+      height: var(--line-height);
+      background-color: var(--shikitor-fg-color);
+      opacity: .3;
+      pointer-events: none;
+    }
   }
-  &.line-numbers &-input {
-    margin-left: var(--gutter-width);
+  &-container {
+    position: relative;
+    flex-grow: 1;
+    width: 0;
   }
   &-input {
     resize: none;
@@ -66,27 +91,6 @@
     &-line {
       position: relative;
       min-width: calc(100% - var(--gutter-width));
-      &::after {
-        position: absolute;
-        content: attr(data-line);
-        left: calc(var(--gutter-width) * -1);
-        width: calc(var(--gutter-width) - .5em);
-        padding-right: .5em;
-        text-align: right;
-      }
-      &-highlighted {
-        display: inline-block;
-      }
-      &-highlighted::before {
-        position: absolute;
-        content: '';
-        top: -1px;
-        left: calc(var(--gutter-width) * -1);
-        width: calc(100% + var(--gutter-width) * 2);
-        height: calc(100% + 2px);
-        background-color: var(--shikitor-fg-color);
-        opacity: .1;
-      }
     }
     .tab, .space {
       position: relative;

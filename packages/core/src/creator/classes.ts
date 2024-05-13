@@ -1,1 +1,1 @@
-export const HIGHLIGHTED = 'shikitor-output-line-highlighted'
+export const HIGHLIGHTED = 'shikitor-gutter-line-highlighted'

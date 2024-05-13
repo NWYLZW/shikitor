@@ -28,8 +28,12 @@ export default () =>
   definePlugin({
     name,
     install: shikitor => {
-      const input = shikitor.element.querySelector(':scope > .shikitor-input') as HTMLTextAreaElement
-      const output = shikitor.element.querySelector(':scope > .shikitor-output') as HTMLElement
+      const input = shikitor.element.querySelector(
+        `:scope > .${'shikitor'}-container > .${'shikitor'}-input`
+      ) as HTMLTextAreaElement
+      const output = shikitor.element.querySelector(
+        `:scope > .${'shikitor'}-container > .${'shikitor'}-output`
+      ) as HTMLElement
       let prevOutputHoverElement: Element | null = null
       input.addEventListener(
         'mousemove',

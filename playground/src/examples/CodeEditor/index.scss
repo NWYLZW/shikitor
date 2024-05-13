@@ -19,10 +19,6 @@
     flex-grow: 1;
     height: 0;
     padding: 10px 0;
-    &-input, &-output {
-      padding-top: 10px;
-      height: calc(100% - 10px);
-    }
   }
 }
 body.fullview #app > .code-editor {

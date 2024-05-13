@@ -49,11 +49,16 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
       cursor,
       popup.placement === 'top' ? -1 : 0
     )
-    ele.style.top = `${y}px`
+    const paddingTop = getComputedStyle(shikitor.element).paddingTop
+    ele.style.top = `${y + parseInt(paddingTop)}px`
     if (popup.placement === 'top') {
       ele.style.transform = 'translateY(-100%)'
     }
-    ele.style.left = `${x}px`
+    const lines = shikitor.element.querySelector(`:scope > .${'shikitor'}-lines`)
+    ele.style.left = `${
+      (lines?.clientWidth ?? 0)
+      + x
+    }px`
   }
 }
 export function mountPopup(shikitor: Shikitor, popup: ResolvedPopup) {

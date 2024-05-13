@@ -5,13 +5,15 @@ import { snapshot } from 'valtio/vanilla'
 
 import type { RefObject } from '../../base'
 import type { ResolvedCursor, ShikitorOptions } from '../../editor'
+import { classnames } from '../../utils'
 import { scoped } from '../../utils/valtio/scoped'
 import { HIGHLIGHTED } from '../classes'
 import { shikitorStructureTransformer } from '../structureTransfomer'
 
 export function outputRenderControlled(
-  { target, output }: {
+  { target, lines, output }: {
     target: HTMLElement
+    lines: HTMLElement
     output: HTMLElement
   },
   { valueRef, cursorRef, optionsRef }: {
@@ -65,18 +67,40 @@ export function outputRenderControlled(
       theme: theme,
       decorations,
       transformers: [
-        shikitorStructureTransformer(target, cursorRef.current.line),
+        shikitorStructureTransformer(target),
         transformerRenderWhitespace()
       ]
     })
+    let lineCounts = 1
+    for (let i = 0; i < value.length; i++) {
+      if (value[i] === '\n') lineCounts++
+    }
+
+    const gutterLinePrefix = `${'shikitor'}-gutter-line`
+    const cursorLine = cursorRef.current.line
+    const lineClass = (index: number) => {
+      const isCursor = !!cursorLine && cursorLine === index
+      return classnames(
+        gutterLinePrefix,
+        {
+          [HIGHLIGHTED]: isCursor
+        }
+      )
+    }
+    lines.innerHTML = Array
+      .from({ length: lineCounts })
+      .map((_, i) => (`<div class="${lineClass(i + 1)}" data-line="${i + 1}">
+        <div class="${gutterLinePrefix}-number">${i + 1}</div>
+      </div>`))
+      .join('')
   })
   scopeSubscribe(cursorRef, () => {
     const cursor = snapshot(cursorRef).current
     if (cursor.line === undefined) return
-    const line = output.querySelector(`[data-line="${cursor.line}"]`)
+    const line = lines.querySelector(`[data-line="${cursor.line}"]`)
     if (!line) return
 
-    const oldLine = output.querySelector(`.${HIGHLIGHTED}`)
+    const oldLine = lines.querySelector(`.${HIGHLIGHTED}`)
     if (oldLine === line) return
     if (oldLine) {
       oldLine.classList.remove(HIGHLIGHTED)

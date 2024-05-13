@@ -38,6 +38,7 @@ function initDom(target: HTMLElement) {
       // wait the output renders, whether not wait it, the scrollTop can't be set
       output.scrollTop = input.scrollTop
       output.scrollLeft = input.scrollLeft
+      lines.style.marginTop = `-${input.scrollTop}px`
     }, 10)
   })
   input.addEventListener('keydown', e => {
@@ -65,8 +66,24 @@ function initDom(target: HTMLElement) {
   })
 
   placeholder.classList.add('shikitor-placeholder')
-  target.append(output, placeholder, input)
-  return [input, output, placeholder] as const
+
+  const lines = document.createElement('div')
+  lines.classList.add('shikitor-lines')
+
+  const container = document.createElement('div')
+  container.classList.add('shikitor-container')
+  container.append(
+    output,
+    placeholder,
+    input
+  )
+  target.append(lines, container)
+  return [
+    input,
+    output,
+    placeholder,
+    lines
+  ] as const
 }
 
 export interface CreateOptions {
@@ -109,7 +126,7 @@ export async function create(
   await new Promise(resolve => setTimeout(resolve, 0))
   checkAborted()
 
-  const [input, output, placeholder] = initDom(target)
+  const [input, output, placeholder, lines] = initDom(target)
 
   const optionsRef = proxy({
     current: {
@@ -198,7 +215,9 @@ export async function create(
     current: [] as ResolvedSelection[]
   })
   disposes.push(listen(document, 'selectionchange', () => {
-    if (document.getSelection()?.focusNode !== target) return
+    const { focusNode } = document.getSelection() ?? {}
+
+    if (!(focusNode instanceof HTMLElement) || focusNode.closest(`.${'shikitor'}`) !== target) return
 
     const { resolvePosition } = shikitor.rawTextHelper
     const selections = selectionsRef.current
@@ -220,7 +239,7 @@ export async function create(
   }))
 
   disposes.push(outputRenderControlled(
-    { target, output },
+    { target, lines, output },
     { valueRef, cursorRef, optionsRef }
   ))
 
