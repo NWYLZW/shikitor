@@ -11,8 +11,8 @@
 
   background-color: var(--bg, black);
   border-radius: 4px;
-  border: var(--border-size) solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border: var(--border-size) solid rgba(0, 0, 0, .1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, .2);
   overflow: hidden;
   transition: .1s;
   .shikitor {
@@ -31,6 +31,6 @@ body.fullview #app > .code-editor {
   left: 0;
   top: 0;
   border-radius: 0;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 16px rgba(0, 0, 0, .2);
   border: none;
 }
