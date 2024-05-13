@@ -55,6 +55,7 @@
   &-output {
     height: 100%;
     overflow: hidden;
+    user-select: none;
     > pre {
       margin: 0;
     }
