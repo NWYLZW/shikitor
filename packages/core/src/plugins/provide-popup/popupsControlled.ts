@@ -2,7 +2,6 @@ import './popupsControlled.scss'
 
 import { proxy } from 'valtio/vanilla'
 
-import { cssvar } from '../../base'
 import type { Shikitor } from '../../editor'
 import { classnames } from '../../utils/classnames'
 import { debounceSubscribe } from '../../utils/valtio/debounceSubscribe'
@@ -18,12 +17,27 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
   )
   popup.width && (ele.style.width = `${popup.width}px`)
   popup.height && (ele.style.height = `${popup.height}px`)
-  if (popup.position === 'absolute') {
-    popup.offset.top && (ele.style.top = `${popup.offset.top}px`)
-    popup.offset.left && (ele.style.left = `${popup.offset.left}px`)
-    popup.offset.bottom && (ele.style.bottom = `${popup.offset.bottom}px`)
-    popup.offset.right && (ele.style.right = `${popup.offset.right}px`)
+  const passedOffset = {
+    top: undefined,
+    left: undefined,
+    bottom: undefined,
+    right: undefined
+  } as {
+    top?: number
+    left?: number
+    bottom?: number
+    right?: number
   }
+  const passedKeys = Object.keys(passedOffset) as (keyof typeof passedOffset)[]
+  if (popup.position === 'absolute') {
+    for (const key of passedKeys) {
+      const value = popup.offset[key]
+      if (value !== undefined) {
+        passedOffset[key] = value
+      }
+    }
+  }
+  const containerRect = shikitor.element.getBoundingClientRect()
   if (popup.position === 'relative') {
     if (!popup.cursors) return
     if (!popup.selections) return
@@ -46,7 +60,6 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
         ele.style.display = ''
       }
     }
-    const containerRect = shikitor.element.getBoundingClientRect()
     const { x: _x, y: _y } = shikitor._getCursorAbsolutePosition(
       cursor,
       popup.placement === 'top' ? -1 : 0
@@ -54,15 +67,21 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     const x = _x + containerRect.left
     const y = _y + containerRect.top
     const paddingTop = getComputedStyle(shikitor.element).paddingTop
-    ele.style.top = `${y + parseInt(paddingTop)}px`
     if (popup.placement === 'top') {
-      ele.style.setProperty(cssvar('popup-translate-y'), '-100%')
+      ele.style.transform = `translateY(-100%)`
     }
     const lines = shikitor.element.querySelector(`:scope > .${'shikitor'}-lines`)
-    ele.style.left = `${
-      (lines?.clientWidth ?? 0)
-      + x
-    }px`
+    passedOffset.top = y + parseInt(paddingTop)
+    passedOffset.left = (lines?.clientWidth ?? 0) + x
+  }
+  for (const key of passedKeys) {
+    if (passedOffset[key] !== undefined) {
+      ele.style.setProperty(`--${key}`, `${passedOffset[key]}px`)
+      const realOffset = `calc(var(--${key}, 0px) + var(--offset-${
+        key === 'top' || key === 'bottom' ? 'y' : 'x'
+      }, 0px))`
+      ele.style[key] = `max(${realOffset}, ${containerRect[key]}px)`
+    }
   }
 }
 export function mountPopup(shikitor: Shikitor, popup: ResolvedPopup) {
