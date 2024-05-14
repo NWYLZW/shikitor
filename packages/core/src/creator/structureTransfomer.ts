@@ -16,14 +16,17 @@ export function shikitorStructureTransformer(
       target.style.setProperty(cssvar('fg-color'), fg)
       target.style.setProperty(cssvar('bg-color'), bg)
       target.style.setProperty(
-        cssvar('hv-color'),
+        cssvar('caret-color'),
         `color-mix(in srgb, var(${cssvar('bg-color')}), var(${cssvar('fg-color')}) 90%)`
       )
       target.style.setProperty(
-        cssvar('active-color'),
-        `color-mix(in srgb, var(${cssvar('bg-color')}), var(${cssvar('fg-color')}) 70%)`
+        cssvar('hv-color'),
+        `color-mix(in srgb, var(${cssvar('bg-color')}), var(${cssvar('fg-color')}) 80%)`
       )
-      target.style.setProperty(cssvar('caret-color'), fg)
+      target.style.setProperty(
+        cssvar('active-color'),
+        `color-mix(in srgb, var(${cssvar('bg-color')}), var(${cssvar('fg-color')}) 60%)`
+      )
       target.style.color = fg
       target.style.backgroundColor = bg
       target.style.cssText += ele.properties.style
