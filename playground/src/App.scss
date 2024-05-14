@@ -9,11 +9,11 @@
   justify-content: center;
   gap: 20px;
   position: absolute;
-  top: 0;
+  top: 50%;
   right: 0;
   margin-right: -30px;
   width: 220px;
-  height: 100%;
+  transform: translateY(-50%);
   .example {
     position: relative;
     right: 0;
