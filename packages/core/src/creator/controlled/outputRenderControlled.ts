@@ -67,12 +67,19 @@ export function initDom(target: HTMLElement) {
   const lines = document.createElement('div')
   lines.classList.add('shikitor-lines')
 
+  const cursors = document.createElement('div')
+  cursors.classList.add('shikitor-cursors')
+  const defaultCursor = document.createElement('div')
+  defaultCursor.classList.add('shikitor-cursor')
+  cursors.append(defaultCursor)
+
   const container = document.createElement('div')
   container.classList.add('shikitor-container')
   container.append(
     output,
     placeholder,
-    input
+    input,
+    cursors
   )
   target.append(lines, container)
   return [

@@ -67,7 +67,7 @@
   &-input {
     resize: none;
     color: transparent;
-    caret-color: var(--shikitor-caret-color, white);
+    caret-color: transparent;
     background-color: transparent;
     outline: none;
     overflow: auto;
@@ -107,5 +107,28 @@
     position: absolute;
     top: 0;
     color: color-mix(in srgb, var(--fg), var(--bg) 50%);
+  }
+  &-cursors {}
+  &-cursor {
+    --width: 2px;
+
+    position: absolute;
+    left: 9ch;
+    width: var(--width);
+    height: calc(var(--line-height) - 2px);
+    background-color: var(--shikitor-caret-color, white);
+    transform: translateY(1px);
+    z-index: 10;
+    pointer-events: none;
+    visibility: visible;
+    animation-timing-function: step-end;
+    transition-duration: .1s;
+    transition-property: left, top, width, height;
+    transition-timing-function: ease;
+    &--ch { --width: 1ch }
+    &:first-child {
+      top: calc(var(--line-height) * (var(--shikitor-cursor-line, 0) - 1));
+      left: var(--shikitor-cursor-char, 0);
+    }
   }
 }

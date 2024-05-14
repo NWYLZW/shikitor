@@ -82,6 +82,7 @@ export async function create(
     dispose: disposeCursorControlled,
     cursorRef
   } = cursorControlled(
+    target,
     rawTextHelperRef,
     optionsRef,
     cursor => {
