@@ -45,6 +45,7 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
       }
     }
   }
+  // TODO watch shikitor.element resize
   const containerRect = shikitor.element.getBoundingClientRect()
   if (popup.position === 'relative') {
     if (!popup.cursors) return
