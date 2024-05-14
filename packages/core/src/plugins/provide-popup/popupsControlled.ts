@@ -2,6 +2,7 @@ import './popupsControlled.scss'
 
 import { proxy } from 'valtio/vanilla'
 
+import { cssvar } from '../../base'
 import type { Shikitor } from '../../editor'
 import { classnames } from '../../utils/classnames'
 import { debounceSubscribe } from '../../utils/valtio/debounceSubscribe'
@@ -55,7 +56,7 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     const paddingTop = getComputedStyle(shikitor.element).paddingTop
     ele.style.top = `${y + parseInt(paddingTop)}px`
     if (popup.placement === 'top') {
-      ele.style.transform = 'translateY(-100%)'
+      ele.style.setProperty(cssvar('popup-translate-y'), '-100%')
     }
     const lines = shikitor.element.querySelector(`:scope > .${'shikitor'}-lines`)
     ele.style.left = `${

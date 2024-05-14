@@ -3,6 +3,7 @@ import './index.scss'
 import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
 
+import { cssvar } from '../base'
 import type { ResolvedSelection, Shikitor, ShikitorBase, ShikitorInternal, ShikitorOptions } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
 import type { _KeyboardEvent } from '../plugin'
@@ -35,6 +36,8 @@ function initDom(target: HTMLElement) {
   output.classList.add('shikitor-output')
   input.addEventListener('scroll', () => {
     setTimeout(() => {
+      target.style.setProperty(cssvar('scroll-t'), `${input.scrollTop}px`)
+      target.style.setProperty(cssvar('scroll-l'), `${input.scrollLeft}px`)
       // wait the output renders, whether not wait it, the scrollTop can't be set
       output.scrollTop = input.scrollTop
       output.scrollLeft = input.scrollLeft
