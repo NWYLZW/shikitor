@@ -6,7 +6,7 @@
 
 轻量化、可扩展的 web 代码编辑器。
 
-|[en-US](./README.md)|中文｜
+| [en-US](./README.md) | 中文 |
 
 ## 如何使用
 

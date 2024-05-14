@@ -6,7 +6,7 @@
 
 A simple and lightweight code editor for the web.
 
-｜en-US|[中文](./README.zh-CN.md)｜
+| en-US | [中文](./README.zh-CN.md) |
 
 ## How to use
 
