@@ -23,9 +23,6 @@
       pointer-events: none;
     }
   }
-  &.line-numbers &-output-line::before {
-    visibility: visible;
-  }
   &-input, &-output {
     position: absolute;
     width: 100%;
@@ -38,12 +35,12 @@
   }
   &.line-numbers &-gutter-line-number {
     margin: 0 10px;
+    width: var(--shikitor-line-digit-count, 0px);
   }
   &-gutter-line {
     display: flex;
     &-number {
       width: 0;
-      flex-grow: 1;
 
       user-select: none;
       text-align: right;

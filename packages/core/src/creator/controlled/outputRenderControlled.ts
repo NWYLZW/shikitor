@@ -4,6 +4,7 @@ import { derive } from 'valtio/utils'
 import { snapshot } from 'valtio/vanilla'
 
 import type { RefObject } from '../../base'
+import { cssvar } from '../../base'
 import type { ResolvedCursor, ShikitorOptions } from '../../editor'
 import { classnames } from '../../utils'
 import { scoped } from '../../utils/valtio/scoped'
@@ -87,7 +88,7 @@ export function outputRenderControlled(
         }
       )
     }
-    lines.style.width = `${lineCounts.toString().length}ch`
+    lines.style.setProperty(cssvar('line-digit-count'), `${lineCounts.toString().length}ch`)
     lines.innerHTML = Array
       .from({ length: lineCounts })
       .map((_, i) => (`<div class="${lineClass(i + 1)}" data-line="${i + 1}">
