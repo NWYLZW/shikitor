@@ -1,5 +1,5 @@
 import type { MutableRefObject } from 'react'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import React from 'react'
 import { createContext, useCallback, useRef, useState } from 'react'
 
@@ -35,7 +35,22 @@ export function QueriesProvider({ children }: { children: React.ReactNode }) {
       return rest
     })
   }, [])
-  // TODO listen history change
+  useEffect(() => {
+    function listener() {
+      const search = new URLSearchParams(location.search)
+      const entries = search.entries()
+      const result: Record<string, string> = {}
+      for (const [key, value] of entries) {
+        result[key] = value
+      }
+      searchRef.current = search
+      setValue(result as Record<string, string>)
+    }
+    window.addEventListener('popstate', listener)
+    return () => {
+      window.removeEventListener('popstate', listener)
+    }
+  })
   return (
     <QueriesContext.Provider value={{ searchRef, value, set, del }}>
       {children}
