@@ -3,91 +3,20 @@ import './index.scss'
 import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
 
-import { cssvar } from '../base'
 import type { ResolvedSelection, Shikitor, ShikitorBase, ShikitorInternal, ShikitorOptions } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
 import type { _KeyboardEvent } from '../plugin'
-import { callUpdateDispatcher, completeAssign, isMultipleKey, isWhatBrowser, listen } from '../utils' with {
+import { callUpdateDispatcher, completeAssign, listen } from '../utils' with {
   'unbundled-reexport': 'on'
 }
 import { calcTextareaHeight } from '../utils/calcTextareaHeight'
 import { scoped } from '../utils/valtio/scoped'
 import { cursorControlled } from './controlled/cursorControlled'
 import { extendControlled } from './controlled/extendControlled'
-import { outputRenderControlled } from './controlled/outputRenderControlled'
+import { initDom, outputRenderControlled } from './controlled/outputRenderControlled'
 import { pluginsControlled } from './controlled/pluginsControlled'
 import { valueControlled } from './controlled/valueControlled'
 import { resolveInputPlugins } from './resolveInputPlugins'
-
-function initDom(target: HTMLElement) {
-  target.classList.add('shikitor')
-  target.innerHTML = ''
-
-  const input = document.createElement('textarea')
-  const output = document.createElement('div')
-  const placeholder = document.createElement('div')
-
-  input.classList.add('shikitor-input')
-  input.setAttribute('autocapitalize', 'off')
-  input.setAttribute('autocomplete', 'off')
-  input.setAttribute('autocorrect', 'off')
-  input.setAttribute('spellcheck', 'false')
-
-  output.classList.add('shikitor-output')
-  input.addEventListener('scroll', () => {
-    setTimeout(() => {
-      target.style.setProperty(cssvar('scroll-t'), `${input.scrollTop}px`)
-      target.style.setProperty(cssvar('scroll-l'), `${input.scrollLeft}px`)
-      // wait the output renders, whether not wait it, the scrollTop can't be set
-      output.scrollTop = input.scrollTop
-      output.scrollLeft = input.scrollLeft
-      lines.style.marginTop = `-${input.scrollTop}px`
-    }, 10)
-  })
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !isMultipleKey(e)) {
-      if (input.selectionStart !== input.selectionEnd) {
-        e.preventDefault()
-        input.setSelectionRange(input.selectionStart, input.selectionStart)
-      }
-    }
-    // The Chrome browser never fires a selectionchange event when backspace or delete is pressed.
-    // So we need to handle this case separately.
-    // https://issues.chromium.org/41321247
-    // https://issues.chromium.org/41399759
-    if (isWhatBrowser('chrome')) {
-      if (['Backspace', 'Delete', 'Enter'].includes(e.key) && !isMultipleKey(e)) {
-        const s = { start: input.selectionStart, end: input.selectionEnd }
-        setTimeout(() => {
-          if (s.start !== input.selectionStart || s.end !== input.selectionEnd) {
-            input.setSelectionRange(input.selectionStart, input.selectionEnd)
-            document.dispatchEvent(new Event('selectionchange'))
-          }
-        }, 10)
-      }
-    }
-  })
-
-  placeholder.classList.add('shikitor-placeholder')
-
-  const lines = document.createElement('div')
-  lines.classList.add('shikitor-lines')
-
-  const container = document.createElement('div')
-  container.classList.add('shikitor-container')
-  container.append(
-    output,
-    placeholder,
-    input
-  )
-  target.append(lines, container)
-  return [
-    input,
-    output,
-    placeholder,
-    lines
-  ] as const
-}
 
 export interface CreateOptions {
   abort?: AbortSignal
