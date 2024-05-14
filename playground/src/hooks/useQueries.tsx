@@ -35,6 +35,7 @@ export function QueriesProvider({ children }: { children: React.ReactNode }) {
       return rest
     })
   }, [])
+  // TODO listen history change
   return (
     <QueriesContext.Provider value={{ searchRef, value, set, del }}>
       {children}
