@@ -48,6 +48,7 @@
       user-select: none;
       text-align: right;
       font-family: var(--font-family, monospace), serif;
+      overflow: hidden;
     }
     &-highlighted::before {
       z-index: 10;
