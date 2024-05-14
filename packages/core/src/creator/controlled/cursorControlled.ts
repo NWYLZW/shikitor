@@ -32,9 +32,9 @@ export function cursorControlled(
     const cursor = cursorRef.current
     target.style.setProperty(cssvar('cursor-line'), cursor.line.toString())
     target.style.setProperty(cssvar('cursor-char'), `${cursor.character}ch`)
-    defaultCursor.style.visibility = 'visible'
+    defaultCursor.classList.add('shikitor-cursor--visible')
     cursorBlinkInterval = setInterval(() => {
-      defaultCursor.style.visibility = defaultCursor.style.visibility === 'visible' ? 'hidden' : 'visible'
+      defaultCursor.classList.toggle('shikitor-cursor--visible')
     }, 700) // 0.5s visible, 0.2s hidden
   }
   const dispose = subscribe(cursorRef, () => {
