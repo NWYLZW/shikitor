@@ -87,6 +87,7 @@ export function outputRenderControlled(
         }
       )
     }
+    lines.style.width = `${lineCounts.toString().length}ch`
     lines.innerHTML = Array
       .from({ length: lineCounts })
       .map((_, i) => (`<div class="${lineClass(i + 1)}" data-line="${i + 1}">
