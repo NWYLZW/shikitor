@@ -36,8 +36,8 @@
     font-family: var(--font-family, monospace), serif;
     font-size: inherit;
   }
-  &-lines {
-    padding: 0 10px;
+  &.line-numbers &-gutter-line-number {
+    margin: 0 10px;
   }
   &-gutter-line {
     display: flex;
