@@ -9,6 +9,13 @@ import type { ResolvedPopup } from './index'
 
 const prefix = `${'shikitor'}-popup`
 
+const REVERSE_MAP = {
+  top: 'bottom',
+  bottom: 'top',
+  left: 'right',
+  right: 'left'
+} as const
+
 function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: ResolvedPopup) {
   ele.className = classnames(
     prefix,
@@ -80,7 +87,7 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
       const realOffset = `calc(var(--${key}, 0px) + var(--offset-${
         key === 'top' || key === 'bottom' ? 'y' : 'x'
       }, 0px))`
-      ele.style[key] = `max(${realOffset}, ${containerRect[key]}px)`
+      ele.style[key] = `min(max(${realOffset}, ${containerRect[key]}px), ${containerRect[REVERSE_MAP[key]]}px)`
     }
   }
 }
