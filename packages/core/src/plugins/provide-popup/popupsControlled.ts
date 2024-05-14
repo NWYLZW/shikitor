@@ -45,10 +45,13 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
         ele.style.display = ''
       }
     }
-    const { x, y } = shikitor._getCursorAbsolutePosition(
+    const containerRect = shikitor.element.getBoundingClientRect()
+    const { x: _x, y: _y } = shikitor._getCursorAbsolutePosition(
       cursor,
       popup.placement === 'top' ? -1 : 0
     )
+    const x = _x + containerRect.left
+    const y = _y + containerRect.top
     const paddingTop = getComputedStyle(shikitor.element).paddingTop
     ele.style.top = `${y + parseInt(paddingTop)}px`
     if (popup.placement === 'top') {

@@ -4,6 +4,6 @@
   background-color: var(--shikitor-fg-color);
   padding: 2px 4px;
   &-relative, &-absolute {
-    position: absolute;
+    position: fixed;
   }
 }
