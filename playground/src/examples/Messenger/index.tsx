@@ -46,7 +46,7 @@ export default function Messenger() {
       </div>
       <div className='message-sender'>
         <div className='avatar'>
-          <img src='favicon.svg' width={24} height={24} />
+          <img src={`${import.meta.env.BASE_URL}public/favicon.svg`} width={24} height={24} alt='avatar' />
         </div>
         <WithoutCoreEditor
           ref={shikitorRef}
