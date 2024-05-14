@@ -27,6 +27,7 @@ export async function create(
   inputOptions: ShikitorOptions = {},
   options: CreateOptions = {}
 ): Promise<Shikitor> {
+  let shikitor: Shikitor | undefined = undefined
   const ee = new EventEmitter()
   const {
     onChange,
@@ -82,6 +83,7 @@ export async function create(
     dispose: disposeCursorControlled,
     cursorRef
   } = cursorControlled(
+    () => shikitor,
     target,
     rawTextHelperRef,
     optionsRef,
@@ -148,8 +150,8 @@ export async function create(
     current: [] as ResolvedSelection[]
   })
   disposes.push(listen(document, 'selectionchange', () => {
+    if (!shikitor) return
     const { focusNode } = document.getSelection() ?? {}
-
     if (!(focusNode instanceof HTMLElement) || focusNode.closest(`.${'shikitor'}`) !== target) return
 
     const { resolvePosition } = shikitor.rawTextHelper
@@ -352,7 +354,7 @@ export async function create(
     base,
     shikitorInternal
   )
-  const shikitor: Shikitor = completeAssign(
+  shikitor = completeAssign(
     baseWithInternal,
     completeAssign(shikitorSupportExtend, shikitorSupportPlugin)
   )

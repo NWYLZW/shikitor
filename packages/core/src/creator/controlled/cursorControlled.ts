@@ -3,10 +3,11 @@ import { subscribe } from 'valtio/vanilla'
 
 import type { RefObject } from '../../base'
 import { cssvar } from '../../base'
-import type { Cursor, ResolvedCursor } from '../../editor'
+import type { Cursor, ResolvedCursor, Shikitor } from '../../editor'
 import type { RawTextHelper } from '../../utils/getRawTextHelper'
 
 export function cursorControlled(
+  getShikitor: () => Shikitor | undefined,
   target: HTMLElement,
   rthRef: RefObject<RawTextHelper>,
   ref: RefObject<{ cursor?: Cursor }>,
@@ -29,9 +30,16 @@ export function cursorControlled(
     if (cursorBlinkInterval) {
       clearInterval(cursorBlinkInterval)
     }
+    const shikitorInstance = getShikitor()
     const cursor = cursorRef.current
-    target.style.setProperty(cssvar('cursor-line'), cursor.line.toString())
-    target.style.setProperty(cssvar('cursor-char'), `${cursor.character}ch`)
+    let [top, left] = ['0px', '0px']
+    if (shikitorInstance) {
+      const pos = shikitorInstance._getCursorAbsolutePosition(cursor, -1)
+      top = `${pos.y}px`
+      left = `${pos.x}px`
+    }
+    target.style.setProperty(cssvar('cursor-t'), top)
+    target.style.setProperty(cssvar('cursor-l'), left)
     defaultCursor.classList.add('shikitor-cursor--visible')
     cursorBlinkInterval = setInterval(() => {
       defaultCursor.classList.toggle('shikitor-cursor--visible')

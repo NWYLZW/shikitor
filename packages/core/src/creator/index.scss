@@ -78,7 +78,6 @@
     height: 100%;
     overflow: hidden;
     user-select: none;
-    scroll-behavior: smooth;
     > pre {
       margin: 0;
     }
@@ -128,8 +127,8 @@
     transition-timing-function: ease;
     &--ch { --width: 1ch }
     &:first-child {
-      top: calc(var(--line-height) * (var(--shikitor-cursor-line, 0) - 1));
-      left: calc(var(--shikitor-cursor-char, 0));
+      top: var(--shikitor-cursor-t, 0);
+      left: var(--shikitor-cursor-l, 0);
     }
     &#{&}--visible::after {
       visibility: visible;
