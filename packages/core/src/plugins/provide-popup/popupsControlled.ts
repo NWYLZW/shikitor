@@ -22,8 +22,9 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     `${prefix}-${popup.id}`,
     `${prefix}-${popup.position}`
   )
-  popup.width && (ele.style.width = `${popup.width}px`)
-  popup.height && (ele.style.height = `${popup.height}px`)
+  const { width, height } = popup
+  width && (ele.style.width = `${width}px`)
+  height && (ele.style.height = `${height}px`)
   const passedOffset = {
     top: undefined,
     left: undefined,
@@ -81,14 +82,31 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     passedOffset.top = y + parseInt(paddingTop)
     passedOffset.left = (lines?.clientWidth ?? 0) + x
   }
+  // watch ele width and height change
+  if (width === undefined || height === undefined) {
+    const observer = new ResizeObserver(() => {
+      ele.style.setProperty(`--width`, `${ele.clientWidth}px`)
+      ele.style.setProperty(`--height`, `${ele.clientHeight}px`)
+    })
+    observer.observe(ele)
+  } else {
+    ele.style.setProperty(`--width`, `${width}px`)
+    ele.style.setProperty(`--height`, `${height}px`)
+  }
   for (const key of passedKeys) {
-    if (passedOffset[key] !== undefined) {
-      ele.style.setProperty(`--${key}`, `${passedOffset[key]}px`)
-      const realOffset = `calc(var(--${key}, 0px) + var(--offset-${
-        key === 'top' || key === 'bottom' ? 'y' : 'x'
-      }, 0px))`
-      ele.style[key] = `min(max(${realOffset}, ${containerRect[key]}px), ${containerRect[REVERSE_MAP[key]]}px)`
-    }
+    if (passedOffset[key] === undefined) continue
+
+    ele.style.setProperty(`--${key}`, `${passedOffset[key]}px`)
+    const realOffset = `calc(var(--${key}, 0px) + var(--offset-${key === 'top' || key === 'bottom' ? 'y' : 'x'}, 0px))`
+    const rkey = REVERSE_MAP[key]
+    ele.style[key] = `min(max(${realOffset}, ${containerRect[key]}px), ${
+      {
+        top: `calc(${containerRect[rkey]}px - var(--height, 0px))`,
+        bottom: `${containerRect[rkey]}px`,
+        left: `calc(${containerRect[rkey]}px - var(--width, 0px))`,
+        right: `${containerRect[rkey]}px`
+      }[key]
+    })`
   }
 }
 export function mountPopup(shikitor: Shikitor, popup: ResolvedPopup) {
