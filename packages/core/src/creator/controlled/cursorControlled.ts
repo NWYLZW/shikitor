@@ -30,11 +30,11 @@ export function cursorControlled(
     if (cursorBlinkInterval) {
       clearInterval(cursorBlinkInterval)
     }
-    const shikitorInstance = getShikitor()
+    const shikitor = getShikitor()
     const cursor = cursorRef.current
     let [top, left] = ['0px', '0px']
-    if (shikitorInstance) {
-      const pos = shikitorInstance._getCursorAbsolutePosition(cursor, -1)
+    if (shikitor) {
+      const pos = shikitor._getCursorAbsolutePosition(cursor, -1)
       top = `${pos.y}px`
       left = `${pos.x}px`
     }
