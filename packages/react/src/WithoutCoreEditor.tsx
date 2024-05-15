@@ -1,4 +1,4 @@
-import type { create, Shikitor } from '@shikitor/core'
+import type { create, Shikitor, ShikitorOptions } from '@shikitor/core'
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
 
 import { useDefault } from './hooks/useDefault'
@@ -25,18 +25,31 @@ export const WithoutCoreEditor = forwardRef<
   const {
     value,
     defaultValue,
-    onChange,
     options,
     defaultOptions,
     plugins,
     create,
-    onMounted,
-    onColorChange,
     style,
     className
   } = props
-  const emitChange = useEvent(onChange)
-  const emitMounted = useEvent(onMounted)
+  const {
+    onChange,
+    onMounted,
+    onColorChange,
+    onKeydown,
+    onKeyup,
+    onBlur,
+    onFocus
+  } = props
+  const emitsRef = useRef({
+    change: useEvent(onChange),
+    mounted: useEvent(onMounted),
+    colorChange: useEvent(onColorChange),
+    keydown: useEvent(onKeydown),
+    keyup: useEvent(onKeyup),
+    blur: useEvent(onBlur),
+    focus: useEvent(onFocus)
+  })
   const shikitorRef = useRef<Shikitor | null>(null)
   const eleRef = useRef<HTMLDivElement>(null)
 
@@ -49,9 +62,10 @@ export const WithoutCoreEditor = forwardRef<
         ref.current = shikitor
       }
     }
-    shikitor.ee.on('change', emitChange)
-    emitMounted(shikitor)
-  }, [emitChange, emitMounted, ref])
+    const emits = emitsRef.current
+    shikitor.ee.on('change', emits.change)
+    emits.mounted(shikitor)
+  }, [ref])
 
   const { vRef: valueRef } = useDefault(value, defaultValue, v => {
     const shikitor = shikitorRef.current
@@ -90,10 +104,11 @@ export const WithoutCoreEditor = forwardRef<
 
     const abortController = new AbortController()
     const abortSignal = abortController.signal
+    const options = optionsRef.current
     const overrideOpts = {
-      ...optionsRef.current,
+      ...options,
       plugins
-    }
+    } satisfies ShikitorOptions
     if (valueRef.current) {
       overrideOpts.value = valueRef.current
     }

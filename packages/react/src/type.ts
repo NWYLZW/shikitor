@@ -18,6 +18,10 @@ export interface EditorProps {
     bg: string
     fg: string
   }): void
+  onKeydown?(e: KeyboardEvent): void
+  onKeyup?(e: KeyboardEvent): void
+  onFocus?(e: FocusEvent): void
+  onBlur?(e: FocusEvent): void
 }
 
 export type EditorRef = Partial<Shikitor>
