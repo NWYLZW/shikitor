@@ -205,6 +205,7 @@ export default () =>
         const toolMap = new Map<string, ToolInner>()
         const toolStore = new Map<string, unknown>()
         const tools = proxy<ToolInner[]>([])
+        let visibleTimer: ReturnType<typeof setTimeout> | undefined
         scopeWatch(get => {
           const toolsSnapshot = snapshot(get(tools))
           const element = elementRef.current
@@ -214,8 +215,25 @@ export default () =>
             element.innerHTML = ''
             return
           }
-          element.style.visibility = 'visible'
+          clearTimeout(visibleTimer)
+          visibleTimer = setTimeout(() => {
+            element.style.visibility = 'visible'
+            visibleTimer = undefined
+          }, 200)
           element.innerHTML = toolsSnapshot.map(toolItemTemplate).join('')
+        })
+        scopeWatch(get => {
+          const selection = get(firstSelectionRef).current
+          if (selection === undefined) return
+          if (visibleTimer !== undefined) {
+            clearTimeout(visibleTimer)
+            visibleTimer = setTimeout(() => {
+              if (isUnset(elementRef.current)) return
+
+              elementRef.current.style.visibility = 'hidden'
+              visibleTimer = undefined
+            })
+          }
         })
         const disposeSelectionToolsExtend = shikitor.extend('provide-selection-toolbox', {
           registerSelectionToolsProvider(selector, provider) {
