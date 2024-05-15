@@ -2,6 +2,7 @@ import './popupsControlled.scss'
 
 import { proxy } from 'valtio/vanilla'
 
+import { cssvar } from '../../base'
 import type { Shikitor } from '../../editor'
 import { classnames } from '../../utils/classnames'
 import { debounceSubscribe } from '../../utils/valtio/debounceSubscribe'
@@ -98,7 +99,9 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
     if (passedOffset[key] === undefined) continue
 
     ele.style.setProperty(`--${key}`, `${passedOffset[key]}px`)
-    const realOffset = `calc(var(--${key}, 0px) + var(--offset-${key === 'top' || key === 'bottom' ? 'y' : 'x'}, 0px))`
+    const realOffset = `calc(var(--${key}, 0px) + var(${
+      cssvar(`offset-${key === 'top' || key === 'bottom' ? 'y' : 'x'}`)
+    }, 0px))`
     const rkey = REVERSE_MAP[key]
     ele.style[key] = `min(max(${realOffset}, ${containerRect[key]}px), ${
       {

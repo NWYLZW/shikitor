@@ -32,6 +32,8 @@ export function initDom(target: HTMLElement) {
     setTimeout(() => {
       target.style.setProperty(cssvar('scroll-t'), `${input.scrollTop}px`)
       target.style.setProperty(cssvar('scroll-l'), `${input.scrollLeft}px`)
+      target.style.setProperty(cssvar('offset-x'), 'calc(-1 * var(--shikitor-scroll-l, 0px))')
+      target.style.setProperty(cssvar('offset-y'), 'calc(-1 * var(--shikitor-scroll-t, 0px))')
       // wait the output renders, whether not wait it, the scrollTop can't be set
       output.scrollTop = input.scrollTop
       output.scrollLeft = input.scrollLeft
