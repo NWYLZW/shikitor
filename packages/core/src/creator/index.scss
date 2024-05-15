@@ -1,6 +1,7 @@
 .shikitor {
   --gutter-width: 3em;
   --line-height: 22px;
+  --cursor-width: 2px;
 
   position: relative;
   display: flex;
@@ -108,28 +109,22 @@
     top: 0;
     color: color-mix(in srgb, var(--fg), var(--bg) 50%);
   }
-  &-cursors {}
-  &-cursor {
-    --width: 2px;
-
+  &-cursors {
     position: absolute;
-    width: var(--width);
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+  }
+  &-cursor {
+    position: absolute;
+    width: var(--cursor-width);
     height: calc(var(--line-height) - 2px);
-    transform:
-      translateY(calc(-1 * var(--shikitor-scroll-t, 0px) + 1px))
-      translateX(calc(-1 * var(--shikitor-scroll-l, 0px)));
+    margin-top: calc(var(--shikitor-cursor-t, 0px) + -1 * var(--shikitor-scroll-t, 0px) + 1px);
+    margin-left: calc(var(--shikitor-cursor-l, 0px) + -1 * var(--shikitor-scroll-l, 0px));
     z-index: 10;
     pointer-events: none;
-    visibility: visible;
-    animation-timing-function: step-end;
-    transition-duration: .1s;
-    transition-property: left, top, width, height;
-    transition-timing-function: ease;
-    &--ch { --width: 1ch }
-    &:first-child {
-      top: var(--shikitor-cursor-t, 0);
-      left: var(--shikitor-cursor-l, 0);
-    }
+    &--ch { --cursor-width: 1ch }
     &#{&}--visible::after {
       visibility: visible;
     }
@@ -145,29 +140,55 @@
       pointer-events: none;
     }
     &__username {
-      position: absolute;
-      font-size: 12px;
-      height: 12px;
-      line-height: 12px;
-      font-weight: bold;
-      color: var(--shikitor-bg-color, white);
-      background-color: var(--shikitor-caret-color, white);
-      padding: 1px 2px;
-      z-index: 10;
+      --h: 14px;
+
       pointer-events: none;
-      transform: scale(.8) translate(-5%, -80%);
-      border-radius: 3px 3px 3px 0;
+      z-index: 10;
+
+      position: sticky;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      margin-top: calc(
+        var(--shikitor-cursor-t, 0px)
+        + -1 * var(--shikitor-scroll-t, 0px)
+        - 14px
+      );
+      margin-left: calc(
+        var(--shikitor-cursor-l, 0px)
+        + -1 * var(--shikitor-scroll-l, 0px)
+      );
+
+      width: 0;
+      height: 0;
       &::before {
         content: '';
         position: absolute;
-        top: 100%;
-        left: 0;
+        top: var(--h);
+        left: var(--cursor-width);
         width: 0;
         height: 0;
         border: 5px solid transparent;
         border-top-color: var(--shikitor-caret-color, white);
         transform: translateX(-50%) rotate(-90deg);
         transform-origin: 50% 0;
+      }
+      &::after {
+        display: inline-block;
+        content: attr(data-username);
+
+        position: absolute;
+        top: 0;
+        left: var(--cursor-width);
+        padding: 1px 2px;
+        border-radius: 3px 3px 3px 0;
+        background-color: var(--shikitor-caret-color, white);
+
+        font-size: 12px;
+        line-height: 12px;
+        font-weight: bold;
+        color: var(--shikitor-bg-color, white);
       }
     }
   }

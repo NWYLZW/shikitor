@@ -75,9 +75,8 @@ export function initDom(target: HTMLElement) {
   defaultCursor.classList.add('shikitor-cursor')
   const userName = document.createElement('div')
   userName.classList.add('shikitor-cursor__username')
-  userName.innerText = 'You'
-  defaultCursor.append(userName)
-  cursors.append(defaultCursor)
+  userName.dataset.username = 'You'
+  cursors.append(defaultCursor, userName)
 
   const container = document.createElement('div')
   container.classList.add('shikitor-container')
