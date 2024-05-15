@@ -6,8 +6,11 @@ import providePopup from '@shikitor/core/plugins/provide-popup'
 import provideSelectionToolbox from '@shikitor/core/plugins/provide-selection-toolbox'
 import selectionToolboxForMd from '@shikitor/core/plugins/selection-toolbox-for-md'
 import { WithoutCoreEditor } from '@shikitor/react'
+import type { ClientOptions } from 'openai'
+import OpenAI from 'openai'
 import React, { useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
+import { Button, Input, MessagePlugin, Select } from 'tdesign-react'
 
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
@@ -38,11 +41,69 @@ export default function Messenger() {
   }>()
   const [text, setText] = useState('')
 
+  const storageConfig = JSON.parse(
+    localStorage.getItem('openai-config') ?? '{ "baseURL": "https://api.openai.com/v1" }'
+  )
+  const [config, setConfig] = useState(
+    {
+      ...storageConfig,
+      dangerouslyAllowBrowser: true
+    } as ClientOptions
+  )
+  const openaiRef = useRef<OpenAI | null>(null)
+  function createOpenAI() {
+    if (!config.apiKey || !config.baseURL) return
+    openaiRef.current = new OpenAI(config)
+  }
+  openaiRef.current === null && createOpenAI()
+
+  const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>([])
+
   const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
   return (
     <div className='chatroom'>
       <div className='messages'>
+        {messages.length > 0
+          ? messages.map((message, i) => (
+            <div key={i} className='message'>
+              {typeof message.content === 'string'
+                ? message.content
+                : 'Cannot display message'}
+            </div>
+          ))
+          : (
+            <div className='config'>
+              <div className='config-item'>
+                <label>API Key</label>
+                <Input value={config.apiKey} onChange={v => setConfig(old => ({ ...old, apiKey: v }))} />
+              </div>
+              <div className='config-item'>
+                <label>Base URL</label>
+                <Select
+                  filterable
+                  creatable
+                  options={[
+                    { label: 'OpenAI', value: 'https://api.openai.com/v1' },
+                    { label: 'AIProxy', value: 'https://api.aiproxy.io/v1' }
+                  ]}
+                  value={config.baseURL ?? ''}
+                  onChange={v => setConfig(old => ({ ...old, baseURL: v as string }))}
+                />
+              </div>
+              <Button
+                style={{
+                  marginTop: 8
+                }}
+                onClick={() => {
+                  createOpenAI()
+                  localStorage.setItem('openai-config', JSON.stringify(config))
+                }}
+              >
+                Confirm
+              </Button>
+            </div>
+          )}
       </div>
       <div className='message-sender'>
         <div className='avatar'>
@@ -57,7 +118,7 @@ export default function Messenger() {
             theme,
             language: 'markdown',
             lineNumbers: 'off',
-            placeholder: 'Message here...',
+            placeholder: 'Typing here...',
             autoSize: { maxRows: 10 }
           }), [theme])}
           plugins={bundledPlugins}
@@ -74,6 +135,43 @@ export default function Messenger() {
             style.setProperty('--td-gray-color-1', hoverColor)
           }}
           onMounted={shikitor => shikitor.focus()}
+          onKeydown={async e => {
+            if (e.key === 'Enter' && e.metaKey && text.length !== 0) {
+              e.preventDefault()
+              let newMessages = [...messages, {
+                role: 'user',
+                content: text
+              }] satisfies OpenAI.ChatCompletionMessageParam[]
+              setMessages(newMessages)
+              setText('')
+              if (!openaiRef.current) {
+                await MessagePlugin.error('OpenAI not initialized')
+                return
+              }
+              const completions = await openaiRef.current.chat.completions.create({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                  {
+                    role: 'system',
+                    content: 'You are a shikitor document helper bot. You can ask me anything about shikitor.'
+                  },
+                  ...newMessages
+                ],
+                stream: true
+              })
+              newMessages = [...newMessages, { role: 'assistant', content: 'Thinking...' }]
+              setMessages(newMessages)
+              const streamMessage = {
+                role: 'assistant',
+                content: ''
+              } satisfies OpenAI.ChatCompletionMessageParam
+              for await (const { choices: [{ delta }] } of completions) {
+                streamMessage.content += delta.content ?? ''
+                newMessages[newMessages.length - 1] = streamMessage
+                setMessages([...newMessages])
+              }
+            }
+          }}
         />
         <div className='send-tooltip'>
           <kbd>⌘ enter</kbd>

@@ -17,6 +17,7 @@
     "react-dom": "^18.2.0",
     "rollup-plugin-unbundled-reexport": "^0.2.0",
     "sass": "^1.72.0",
+    "openai": "^4.47.1",
     "shiki": "^1.2.0",
     "tdesign-icons-react": "^0.3.2",
     "tdesign-react": "^1.5.5",
