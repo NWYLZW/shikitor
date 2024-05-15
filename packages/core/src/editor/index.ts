@@ -1,7 +1,7 @@
 import type { DecorationItem, ResolvedPosition } from '@shikijs/core'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 
-import type { RefObject, TextRange } from '../base'
+import type { _KeyboardEvent, RefObject, TextRange } from '../base'
 import type { ShikitorPlugin } from '../plugin'
 import type { Awaitable, Pretty, RecursiveReadonly, U2I } from '../types'
 import type { UpdateDispatcher } from '../utils/callUpdateDispatcher'
@@ -54,6 +54,11 @@ interface ShikitorEvents {
   onChange?: (value: string) => void
   onCursorChange?: (cursor?: ResolvedCursor) => void
   onDispose?: () => void
+  onFocused?: () => void
+  onBlurred?: () => void
+  onSelectionChange?: (selections: readonly ResolvedSelection[]) => void
+  onKeydown?: (e: _KeyboardEvent) => void
+  onKeyup?: (e: _KeyboardEvent) => void
 }
 
 export type InputShikitorPlugin =

@@ -32,7 +32,12 @@ export async function create(
   const {
     onChange,
     onCursorChange,
-    onDispose
+    onDispose,
+    onFocused,
+    onBlurred,
+    onSelectionChange,
+    onKeydown,
+    onKeyup
   } = inputOptions
   const {
     abort
@@ -361,8 +366,20 @@ export async function create(
   await installAllPlugins(shikitor)
   checkAborted()
 
-  input.addEventListener('keydown', e => callAllShikitorPlugins('onKeydown', e as _KeyboardEvent))
-  input.addEventListener('keyup', e => callAllShikitorPlugins('onKeyup', e as _KeyboardEvent))
+  scopeWatch(get => {
+    const selections = get(selectionsRef).current
+    onSelectionChange?.(selections)
+  })
+  input.addEventListener('focus', () => onFocused?.())
+  input.addEventListener('blur', () => onBlurred?.())
+  input.addEventListener('keydown', e => {
+    callAllShikitorPlugins('onKeydown', e as _KeyboardEvent)
+    onKeydown?.(e as _KeyboardEvent)
+  })
+  input.addEventListener('keyup', e => {
+    callAllShikitorPlugins('onKeyup', e as _KeyboardEvent)
+    onKeyup?.(e as _KeyboardEvent)
+  })
   input.addEventListener('keypress', e => callAllShikitorPlugins('onKeypress', e as _KeyboardEvent))
 
   return shikitor
