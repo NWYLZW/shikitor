@@ -38,8 +38,8 @@ export const WithoutCoreEditor = forwardRef<
     onColorChange,
     onKeydown,
     onKeyup,
-    onBlur,
-    onFocus
+    onFocused,
+    onBlurred
   } = props
   const emitsRef = useRef({
     change: useEvent(onChange),
@@ -47,8 +47,8 @@ export const WithoutCoreEditor = forwardRef<
     colorChange: useEvent(onColorChange),
     keydown: useEvent(onKeydown),
     keyup: useEvent(onKeyup),
-    blur: useEvent(onBlur),
-    focus: useEvent(onFocus)
+    focus: useEvent(onFocused),
+    blur: useEvent(onBlurred)
   })
   const shikitorRef = useRef<Shikitor | null>(null)
   const eleRef = useRef<HTMLDivElement>(null)
@@ -105,8 +105,25 @@ export const WithoutCoreEditor = forwardRef<
     const abortController = new AbortController()
     const abortSignal = abortController.signal
     const options = optionsRef.current
+    const emits = emitsRef.current
     const overrideOpts = {
       ...options,
+      onKeydown: e => {
+        emits.keydown(e)
+        options?.onKeydown?.(e)
+      },
+      onKeyup: e => {
+        emits.keyup(e)
+        options?.onKeyup?.(e)
+      },
+      onFocused: () => {
+        emits.focus()
+        options?.onFocused?.()
+      },
+      onBlurred: () => {
+        emits.blur()
+        options?.onBlurred?.()
+      },
       plugins
     } satisfies ShikitorOptions
     if (valueRef.current) {

@@ -1,4 +1,4 @@
-import type { Shikitor, ShikitorOptions } from '@shikitor/core'
+import type { _KeyboardEvent, Shikitor, ShikitorOptions } from '@shikitor/core'
 import type React from 'react'
 
 export interface StyledProps {
@@ -18,10 +18,10 @@ export interface EditorProps {
     bg: string
     fg: string
   }): void
-  onKeydown?(e: KeyboardEvent): void
-  onKeyup?(e: KeyboardEvent): void
-  onFocus?(e: FocusEvent): void
-  onBlur?(e: FocusEvent): void
+  onKeydown?(e: _KeyboardEvent): void
+  onKeyup?(e: _KeyboardEvent): void
+  onFocused?(): void
+  onBlurred?(): void
 }
 
 export type EditorRef = Partial<Shikitor>
