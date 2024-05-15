@@ -1,5 +1,9 @@
 import type { OffsetOrPosition, ResolvedPosition } from '@shikijs/core'
 
+export type _KeyboardEvent = KeyboardEvent & {
+  target: HTMLTextAreaElement
+}
+
 export interface RefObject<T> {
   current: T
 }

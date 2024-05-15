@@ -3,9 +3,9 @@ import './index.scss'
 import { derive } from 'valtio/utils'
 import { proxy, snapshot } from 'valtio/vanilla'
 
+import type { _KeyboardEvent } from '../base'
 import type { ResolvedSelection, Shikitor, ShikitorBase, ShikitorInternal, ShikitorOptions } from '../editor'
 import { EventEmitter } from '../editor/base.eventEmitter'
-import type { _KeyboardEvent } from '../plugin'
 import { callUpdateDispatcher, completeAssign, listen } from '../utils' with {
   'unbundled-reexport': 'on'
 }

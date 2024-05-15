@@ -1,11 +1,9 @@
 import type { ResolvedPosition } from '@shikijs/core'
 
+import type { _KeyboardEvent } from './base'
 import type { IDisposable, Shikitor } from './editor'
 import type { Awaitable } from './types'
 
-export type _KeyboardEvent = KeyboardEvent & {
-  target: HTMLTextAreaElement
-}
 interface Keyboards {
   onKeyup?: (this: Shikitor, e: _KeyboardEvent) => void
   onKeydown?: (this: Shikitor, e: _KeyboardEvent) => void
