@@ -10,7 +10,7 @@ import type { ClientOptions } from 'openai'
 import OpenAI from 'openai'
 import React, { useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
-import { Button, Input, MessagePlugin, Select } from 'tdesign-react'
+import { Avatar, Button, Input, MessagePlugin, Select } from 'tdesign-react'
 
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
@@ -57,19 +57,44 @@ export default function Messenger() {
   }
   openaiRef.current === null && createOpenAI()
 
-  const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>([])
+  const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>([
+    {
+      role: 'system',
+      content: 'You are a shikitor document helper bot. You can ask me anything about shikitor.'
+    }
+  ])
+  const filteredMessages = useMemo(() => messages.filter(({ role }) => role !== 'system'), [messages])
 
   const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
   return (
     <div className='chatroom'>
       <div className='messages'>
-        {messages.length > 0
-          ? messages.map((message, i) => (
+        {filteredMessages.length > 0
+          ? filteredMessages.map((message, i) => (
             <div key={i} className='message'>
-              {typeof message.content === 'string'
-                ? message.content
-                : 'Cannot display message'}
+              {{
+                'system': () => <></>,
+                'tool': () => <></>,
+                'function': () => <></>,
+                'user': () => (
+                  <>
+                    <Avatar size='small'>
+                      YiJie
+                    </Avatar>
+                    {message.content}
+                  </>
+                ),
+                'assistant': () => (
+                  <>
+                    <Avatar
+                      size='small'
+                      image={`${import.meta.env.BASE_URL}public/favicon.svg`}
+                    />
+                    {message.content}
+                  </>
+                )
+              }[message.role]?.()}
             </div>
           ))
           : (
@@ -106,9 +131,7 @@ export default function Messenger() {
           )}
       </div>
       <div className='message-sender'>
-        <div className='avatar'>
-          <img src={`${import.meta.env.BASE_URL}public/favicon.svg`} width={24} height={24} alt='avatar' />
-        </div>
+        <Avatar size='small'>YiJie</Avatar>
         <WithoutCoreEditor
           ref={shikitorRef}
           create={shikitorCreate}
@@ -145,13 +168,7 @@ export default function Messenger() {
               }
               const completions = await openaiRef.current.chat.completions.create({
                 model: 'gpt-3.5-turbo',
-                messages: [
-                  {
-                    role: 'system',
-                    content: 'You are a shikitor document helper bot. You can ask me anything about shikitor.'
-                  },
-                  ...newMessages
-                ],
+                messages: newMessages,
                 stream: true
               })
               newMessages = [...newMessages, { role: 'assistant', content: 'Thinking...' }]

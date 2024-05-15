@@ -4,16 +4,12 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  .avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .t-avatar {
     min-width: 32px;
+    max-width: 32px;
     min-height: 32px;
-    border-radius: 50%;
-    background-color: white;
+    max-height: 32px;
     border: 2px solid color-mix(in srgb, var(--bg), var(--fg) 50%);
-    overflow: hidden;
   }
 }
 .messages {
@@ -21,6 +17,11 @@
   height: 0;
   overflow-y: auto;
   padding: 0 50px;
+  .message {
+    display: flex;
+    gap: 10px;
+    margin: 10px 50px;
+  }
 }
 .message-sender {
   position: relative;
