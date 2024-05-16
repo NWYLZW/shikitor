@@ -64,6 +64,34 @@ export default function Messenger() {
     }
   ])
   const filteredMessages = useMemo(() => messages.filter(({ role }) => role !== 'system'), [messages])
+  const sendMessage = async (message: string) => {
+    let newMessages = [...messages, {
+      role: 'user',
+      content: message
+    }] satisfies OpenAI.ChatCompletionMessageParam[]
+    setMessages(newMessages)
+    setText('')
+    if (!openaiRef.current) {
+      await MessagePlugin.error('OpenAI not initialized')
+      return
+    }
+    const completions = await openaiRef.current.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: newMessages,
+      stream: true
+    })
+    newMessages = [...newMessages, { role: 'assistant', content: 'Thinking...' }]
+    setMessages(newMessages)
+    const streamMessage = {
+      role: 'assistant',
+      content: ''
+    } satisfies OpenAI.ChatCompletionMessageParam
+    for await (const { choices: [{ delta }] } of completions) {
+      streamMessage.content += delta.content ?? ''
+      newMessages[newMessages.length - 1] = streamMessage
+      setMessages([...newMessages])
+    }
+  }
 
   const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
@@ -153,35 +181,11 @@ export default function Messenger() {
             style.setProperty('--hover', hoverColor)
           }}
           onMounted={shikitor => shikitor.focus()}
-          onKeydown={async e => {
+          onKeydown={e => {
             if (e.key === 'Enter' && e.metaKey && text.length !== 0) {
               e.preventDefault()
-              let newMessages = [...messages, {
-                role: 'user',
-                content: text
-              }] satisfies OpenAI.ChatCompletionMessageParam[]
-              setMessages(newMessages)
-              setText('')
-              if (!openaiRef.current) {
-                await MessagePlugin.error('OpenAI not initialized')
-                return
-              }
-              const completions = await openaiRef.current.chat.completions.create({
-                model: 'gpt-3.5-turbo',
-                messages: newMessages,
-                stream: true
-              })
-              newMessages = [...newMessages, { role: 'assistant', content: 'Thinking...' }]
-              setMessages(newMessages)
-              const streamMessage = {
-                role: 'assistant',
-                content: ''
-              } satisfies OpenAI.ChatCompletionMessageParam
-              for await (const { choices: [{ delta }] } of completions) {
-                streamMessage.content += delta.content ?? ''
-                newMessages[newMessages.length - 1] = streamMessage
-                setMessages([...newMessages])
-              }
+              sendMessage(text)
+              return
             }
           }}
         />
