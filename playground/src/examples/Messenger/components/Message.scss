@@ -962,7 +962,7 @@
   &:hover &-actions { opacity: 1; }
   &-time {
     position: absolute;
-    bottom: 0;
+    bottom: -5px;
     right: 0;
     font-size: 12px;
     opacity: 0;
