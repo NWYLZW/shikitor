@@ -1,15 +1,44 @@
 .chatroom {
+  --elevation-depth: 10;
+
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
+
+  position: absolute;
+  width: 60vw;
+  height: 80vh;
+  left: 20vw;
+  top: 10vh;
   overflow: hidden;
+
+  border-radius: 8px;
+  box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
   .t-avatar {
     min-width: 32px;
     max-width: 32px;
     min-height: 32px;
     max-height: 32px;
     border: 2px solid color-mix(in srgb, var(--bg), var(--fg) 50%);
+  }
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  color: var(--fg);
+  background-color: var(--bg);
+  border-bottom: 1px solid color-mix(in srgb, var(--fg), var(--bg) 50%);
+  > .left, > .right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  > .left {
+    flex-grow: 1;
+    .t-button--variant-text {
+      color: var(--fg);
+    }
   }
 }
 .messages {
@@ -22,6 +51,8 @@
   padding: 10px 50px;
 
   overflow-y: auto;
+  color: var(--bg);
+  background-color: var(--fg);
 }
 .message-sender {
   position: relative;

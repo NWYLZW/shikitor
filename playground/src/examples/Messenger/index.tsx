@@ -130,6 +130,27 @@ export default function Messenger() {
   const shikitorCreate = useShikitorCreate()
   return (
     <div className='chatroom'>
+      <div className='header'>
+        <div className='left'>
+          <Avatar
+            size='small'
+            image={bots.documentHelper.avatar}
+          />
+          <div className='title'>Shikitor Chatroom</div>
+        </div>
+        <div className='right'>
+          <Button
+            variant='dashed'
+            shape='square'
+            onClick={() => {
+              setMessages([])
+              localStorage.removeItem('openai-config')
+            }}
+          >
+            <span className='shikitor-icon'>delete_forever</span>
+          </Button>
+        </div>
+      </div>
       <div className='messages'>
         {!isEmpty
           ? messages.map((message, i) => (
@@ -192,6 +213,7 @@ export default function Messenger() {
             style.setProperty('--fg', fg)
             const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
             style.setProperty('--hover', hoverColor)
+            style.setProperty('--td-text-color-primary', bg)
           }}
           onMounted={shikitor => shikitor.focus()}
           onKeydown={e => {
