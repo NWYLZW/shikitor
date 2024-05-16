@@ -28,6 +28,7 @@ export type MessageProps = NestedPropsGenerator<'onClick', OnClicks> & {
   value: IMessage
   onChange?(value: IMessage): void
   onDelete?(): void
+  textRender?(text: string): React.ReactNode
 }
 
 const ClickableAvatar = forwardRef<
@@ -54,7 +55,7 @@ const ClickableAvatar = forwardRef<
 })
 
 export function Message(props: MessageProps) {
-  const { value, onChange, onDelete } = props
+  const { value, onChange, onDelete, textRender } = props
   const callFunc = <P extends keyof MessageProps & (`onClick:${string}`)>(
     key: P,
     ...args: Parameters<NonNullable<MessageProps[P]>>
@@ -81,7 +82,7 @@ export function Message(props: MessageProps) {
                   {user.name}
                 </div>
               </div>
-              <pre className='message-text'>{value.text}</pre>
+              {textRender?.(value.text) ?? value.text}
             </div>
             <div className='message-actions'>
               <Button variant='dashed' shape='square' onClick={() => onChange?.(value)}>

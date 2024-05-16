@@ -1,11 +1,13 @@
 import './index.scss'
 
+import MarkdownItPluginShiki from '@shikijs/markdown-it'
 import type { Shikitor } from '@shikitor/core'
 import provideCompletions from '@shikitor/core/plugins/provide-completions'
 import providePopup from '@shikitor/core/plugins/provide-popup'
 import provideSelectionToolbox from '@shikitor/core/plugins/provide-selection-toolbox'
 import selectionToolboxForMd from '@shikitor/core/plugins/selection-toolbox-for-md'
 import { WithoutCoreEditor } from '@shikitor/react'
+import MarkdownIt from 'markdown-it'
 import type { ClientOptions } from 'openai'
 import OpenAI from 'openai'
 import React, { useMemo, useRef, useState } from 'react'
@@ -46,7 +48,8 @@ const bots = {
   documentHelper: {
     name: 'Document Helper Bot',
     avatar: `${import.meta.env.BASE_URL}public/favicon.svg`,
-    description: 'You can ask me anything about shikitor.'
+    description:
+      'A bot that helps you document your to code. The shikitor is a editor that supports markdown and code highlighting.'
   }
 } satisfies Record<string, Bot>
 
@@ -67,6 +70,15 @@ export default function Messenger() {
     theme: BundledTheme
     language: BundledLanguage
   }>()
+  const mdRef = useRef<MarkdownIt>()
+  if (!mdRef.current) {
+    mdRef.current = MarkdownIt()
+    MarkdownItPluginShiki({
+      themes: {
+        light: theme
+      }
+    }).then(plugin => mdRef.current?.use(plugin))
+  }
   const [text, setText] = useState('')
 
   const storageConfig = JSON.parse(
@@ -191,6 +203,16 @@ export default function Messenger() {
           <Message
             key={i}
             value={message}
+            textRender={text => (
+              <div className='message-text'>
+                <div
+                  className='s-md'
+                  dangerouslySetInnerHTML={{
+                    __html: mdRef.current?.render(text) ?? ''
+                  }}
+                />
+              </div>
+            )}
           />
         ))}
         {messages.length === 0 && (
