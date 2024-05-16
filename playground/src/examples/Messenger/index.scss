@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
+  padding: 10px 50px;
   color: var(--fg);
   background-color: var(--bg);
   border-bottom: 1px solid color-mix(in srgb, var(--fg), var(--bg) 50%);
@@ -53,6 +53,12 @@
   overflow-y: auto;
   color: var(--bg);
   background-color: var(--fg);
+  .not-initialized {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
 }
 .message-sender {
   position: relative;

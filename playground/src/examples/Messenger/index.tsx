@@ -10,7 +10,7 @@ import type { ClientOptions } from 'openai'
 import OpenAI from 'openai'
 import React, { useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
-import { Avatar, Button, Input, MessagePlugin, Select } from 'tdesign-react'
+import { Avatar, Button, Drawer, Input, Link, MessagePlugin, Select } from 'tdesign-react'
 
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
@@ -86,7 +86,6 @@ export default function Messenger() {
   openaiRef.current === null && createOpenAI()
 
   const [messages, setMessages] = useState<MessageItem[]>([])
-  const isEmpty = useMemo(() => messages.length === 0, [messages])
   const sendMessage = async (message: string) => {
     const newMessages = [...messages, {
       text: message,
@@ -128,14 +127,43 @@ export default function Messenger() {
 
   const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
+
+  const [configDrawerVisible, setConfigDrawerVisible] = useState(false)
   return (
     <div className='chatroom'>
+      <Drawer
+        visible={configDrawerVisible}
+        size='40vw'
+        header='OpenAI Config'
+        footer={null}
+        onClose={() => {
+          setConfigDrawerVisible(false)
+          createOpenAI()
+          localStorage.setItem('openai-config', JSON.stringify(config))
+        }}
+      >
+        <div className='config'>
+          <div className='config-item'>
+            <label>API Key</label>
+            <Input value={config.apiKey} onChange={v => setConfig(old => ({ ...old, apiKey: v }))} />
+          </div>
+          <div className='config-item'>
+            <label>Base URL</label>
+            <Select
+              filterable
+              creatable
+              options={[
+                { label: 'OpenAI', value: 'https://api.openai.com/v1' },
+                { label: 'AIProxy', value: 'https://api.aiproxy.io/v1' }
+              ]}
+              value={config.baseURL ?? ''}
+              onChange={v => setConfig(old => ({ ...old, baseURL: v as string }))}
+            />
+          </div>
+        </div>
+      </Drawer>
       <div className='header'>
         <div className='left'>
-          <Avatar
-            size='small'
-            image={bots.documentHelper.avatar}
-          />
           <div className='title'>Shikitor Chatroom</div>
         </div>
         <div className='right'>
@@ -149,48 +177,42 @@ export default function Messenger() {
           >
             <span className='shikitor-icon'>delete_forever</span>
           </Button>
+          <Button
+            variant='dashed'
+            shape='square'
+            onClick={() => setConfigDrawerVisible(true)}
+          >
+            <span className='shikitor-icon'>settings</span>
+          </Button>
         </div>
       </div>
       <div className='messages'>
-        {!isEmpty
-          ? messages.map((message, i) => (
-            <Message
-              key={i}
-              value={message}
-            />
-          ))
-          : (
-            <div className='config'>
-              <div className='config-item'>
-                <label>API Key</label>
-                <Input value={config.apiKey} onChange={v => setConfig(old => ({ ...old, apiKey: v }))} />
-              </div>
-              <div className='config-item'>
-                <label>Base URL</label>
-                <Select
-                  filterable
-                  creatable
-                  options={[
-                    { label: 'OpenAI', value: 'https://api.openai.com/v1' },
-                    { label: 'AIProxy', value: 'https://api.aiproxy.io/v1' }
-                  ]}
-                  value={config.baseURL ?? ''}
-                  onChange={v => setConfig(old => ({ ...old, baseURL: v as string }))}
-                />
-              </div>
-              <Button
-                style={{
-                  marginTop: 8
-                }}
-                onClick={() => {
-                  createOpenAI()
-                  localStorage.setItem('openai-config', JSON.stringify(config))
-                }}
-              >
-                Confirm
-              </Button>
-            </div>
-          )}
+        {messages.map((message, i) => (
+          <Message
+            key={i}
+            value={message}
+          />
+        ))}
+        {messages.length === 0 && (
+          <>
+            {(!config.apiKey || !config.baseURL)
+              ? (
+                <div className='not-initialized'>
+                  Not initialized OpenAI config, please
+                  <Link theme='primary' onClick={() => setConfigDrawerVisible(true)}>
+                    &nbsp;
+                    <span className='shikitor-icon'>settings</span>
+                    set it&nbsp;
+                  </Link>
+                  up first
+                </div>
+              )
+              : (
+                <div className='initialized'>
+                </div>
+              )}
+          </>
+        )}
       </div>
       <div className='message-sender'>
         <Avatar size='small'>YiJie</Avatar>
