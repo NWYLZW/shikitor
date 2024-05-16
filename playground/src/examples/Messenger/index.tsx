@@ -15,7 +15,13 @@ import { Avatar, Button, Input, MessagePlugin, Select } from 'tdesign-react'
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
 
+import type { IMessage, IUser } from './components/Message'
+import { Message } from './components/Message'
 import atUser from './plugins/at-user'
+
+type MessageItem = IMessage & {
+  hidden?: boolean
+}
 
 const bundledPlugins = [
   providePopup,
@@ -29,6 +35,28 @@ const bundledPlugins = [
   provideSelectionToolbox,
   selectionToolboxForMd
 ]
+
+const currentUser = {
+  name: 'YiJie'
+} as IUser
+type Bot = IUser & {
+  description: string
+}
+const bots = {
+  documentHelper: {
+    name: 'Document Helper Bot',
+    avatar: `${import.meta.env.BASE_URL}public/favicon.svg`,
+    description: 'You can ask me anything about shikitor.'
+  }
+} satisfies Record<string, Bot>
+
+function messageTransform(bot: Bot, m: MessageItem): OpenAI.ChatCompletionMessageParam {
+  const isBot = m.user?.name === bot.name
+  return {
+    role: isBot ? 'assistant' : 'user',
+    content: `${isBot ? '' : `${m.user?.name}:\n`}${m.text}`
+  }
+}
 
 export default function Messenger() {
   const {
@@ -57,38 +85,43 @@ export default function Messenger() {
   }
   openaiRef.current === null && createOpenAI()
 
-  const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>([
-    {
-      role: 'system',
-      content: 'You are a shikitor document helper bot. You can ask me anything about shikitor.'
-    }
-  ])
-  const filteredMessages = useMemo(() => messages.filter(({ role }) => role !== 'system'), [messages])
+  const [messages, setMessages] = useState<MessageItem[]>([])
+  const isEmpty = useMemo(() => messages.length === 0, [messages])
   const sendMessage = async (message: string) => {
-    let newMessages = [...messages, {
-      role: 'user',
-      content: message
-    }] satisfies OpenAI.ChatCompletionMessageParam[]
+    const newMessages = [...messages, {
+      text: message,
+      user: currentUser,
+      ctime: Date.now()
+    }] satisfies MessageItem[]
     setMessages(newMessages)
     setText('')
     if (!openaiRef.current) {
       await MessagePlugin.error('OpenAI not initialized')
       return
     }
+    const bot = bots.documentHelper
     const completions = await openaiRef.current.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      messages: newMessages,
+      messages: [
+        {
+          content: `Your name is "${bot.name}" and your description is "${bot.description}".\n`
+            + 'Every message except yours has a corresponding username, in the format where the current message username appears at the beginning of each message.',
+          role: 'system'
+        },
+        ...newMessages.map(messageTransform.bind(null, bots.documentHelper))
+      ],
       stream: true
     })
-    newMessages = [...newMessages, { role: 'assistant', content: 'Thinking...' }]
-    setMessages(newMessages)
-    const streamMessage = {
-      role: 'assistant',
-      content: ''
-    } satisfies OpenAI.ChatCompletionMessageParam
+    newMessages.push({
+      text: '',
+      user: bots.documentHelper,
+      ctime: Date.now()
+    })
+    const latestMessage = newMessages[newMessages.length - 1]
+    let streamMessage = ''
     for await (const { choices: [{ delta }] } of completions) {
-      streamMessage.content += delta.content ?? ''
-      newMessages[newMessages.length - 1] = streamMessage
+      streamMessage += delta.content ?? ''
+      latestMessage.text = streamMessage
       setMessages([...newMessages])
     }
   }
@@ -98,32 +131,12 @@ export default function Messenger() {
   return (
     <div className='chatroom'>
       <div className='messages'>
-        {filteredMessages.length > 0
-          ? filteredMessages.map((message, i) => (
-            <div key={i} className='message'>
-              {{
-                'system': () => <></>,
-                'tool': () => <></>,
-                'function': () => <></>,
-                'user': () => (
-                  <>
-                    <Avatar size='small'>
-                      YiJie
-                    </Avatar>
-                    {message.content}
-                  </>
-                ),
-                'assistant': () => (
-                  <>
-                    <Avatar
-                      size='small'
-                      image={`${import.meta.env.BASE_URL}public/favicon.svg`}
-                    />
-                    {message.content}
-                  </>
-                )
-              }[message.role]?.()}
-            </div>
+        {!isEmpty
+          ? messages.map((message, i) => (
+            <Message
+              key={i}
+              value={message}
+            />
           ))
           : (
             <div className='config'>

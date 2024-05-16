@@ -1,0 +1,46 @@
+.message {
+  display: flex;
+  gap: 10px;
+
+  position: relative;
+  padding: 10px 0;
+  font-size: 14px;
+  &:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 20px;
+    width: calc(100% - 40px);
+    height: 2px;
+    background-color: var(--bg);
+    opacity: .3;
+    border-radius: 2px;
+  }
+  &-content {
+    flex-grow: 1;
+    width: 0;
+  }
+  &-text {
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  &-actions {
+    display: flex;
+    gap: 5px;
+    position: absolute;
+    top: -5px;
+    right: 0;
+    opacity: 0;
+    transition: .3s;
+  }
+  &:hover &-actions { opacity: 1; }
+  &-time {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 12px;
+    opacity: 0;
+    transition: .3s;
+  }
+  &:hover &-time { opacity: 1; }
+}
