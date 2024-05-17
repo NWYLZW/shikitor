@@ -154,10 +154,19 @@ export async function create(
   const selectionsRef = proxy({
     current: [] as ResolvedSelection[]
   })
-  disposes.push(listen(document, 'selectionchange', () => {
+  disposes.push(listen(document, 'selectionchange', e => {
     if (!shikitor) return
     const { focusNode } = document.getSelection() ?? {}
-    if (!(focusNode instanceof HTMLElement) || focusNode.closest(`.${'shikitor'}`) !== target) return
+    if (
+      (
+        !(focusNode instanceof HTMLElement)
+        || focusNode.closest(`.${'shikitor'}`) !== target
+      )
+      && (
+        !(e.target instanceof HTMLElement)
+        || e.target.closest(`.${'shikitor'}`) !== target
+      )
+    ) return
 
     const { resolvePosition } = shikitor.rawTextHelper
     const selections = selectionsRef.current
