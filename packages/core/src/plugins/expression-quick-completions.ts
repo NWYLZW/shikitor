@@ -1,4 +1,5 @@
-import { definePlugin } from '../plugin'
+import { definePlugin } from '@shikitor/core'
+
 import type {} from './provide-completions'
 
 export default definePlugin({

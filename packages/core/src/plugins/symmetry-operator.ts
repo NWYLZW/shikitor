@@ -1,4 +1,4 @@
-import { definePlugin } from '../plugin'
+import { definePlugin } from '@shikitor/core'
 
 const symmetryOperatorMapping: Record<string, string> = {
   '(': ')',

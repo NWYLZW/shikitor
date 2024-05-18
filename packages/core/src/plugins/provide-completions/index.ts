@@ -2,17 +2,18 @@ import './index.scss'
 
 import type { ResolvedPosition } from '@shikijs/core'
 import type { IDisposable, LanguageSelector, ProviderResult, Shikitor } from '@shikitor/core'
+import type { TextRange } from '@shikitor/core'
+import { definePlugin } from '@shikitor/core'
+import type {} from '@shikitor/core/plugins/provide-popup'
+import type { RecursiveReadonly } from '@shikitor/core/types'
+import { classnames, icon, isMultipleKey, isUnset, UNSET } from '@shikitor/core/utils' with {
+  'unbundled-reexport': 'on'
+}
+import { refProxy, scoped } from '@shikitor/core/utils/valtio'
 import { derive } from 'valtio/utils'
 import { proxy, ref, snapshot } from 'valtio/vanilla'
 
-import type { TextRange } from '../../base'
-import { definePlugin } from '../../plugin'
-import type { RecursiveReadonly } from '../../types'
-import { classnames, icon, isMultipleKey, isUnset, UNSET } from '../../utils' with { 'unbundled-reexport': 'on' }
 import type { RawTextHelper } from '../../utils/getRawTextHelper'
-import { refProxy } from '../../utils/valtio/refProxy'
-import { scoped } from '../../utils/valtio/scoped'
-import type {} from '../provide-popup'
 
 const name = 'provide-completions'
 

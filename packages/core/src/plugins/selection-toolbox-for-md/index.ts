@@ -1,4 +1,5 @@
-import { definePlugin } from '../../plugin'
+import { definePlugin } from '@shikitor/core'
+
 import { formatTool, headingSelectTool, linkTool, listFormatTool, NoToolsError, quoteTool } from './tools'
 
 export default () =>

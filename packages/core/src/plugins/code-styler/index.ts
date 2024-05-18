@@ -1,5 +1,6 @@
+import { definePlugin } from '@shikitor/core'
+
 import type { ResolvedSelection } from '../../editor'
-import { definePlugin } from '../../plugin'
 import type { RawTextHelper } from '../../utils/getRawTextHelper'
 import { isMultipleKey } from '../../utils/isMultipleKey'
 import { indent, outdent } from './dent'
