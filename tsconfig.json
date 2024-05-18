@@ -8,10 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
-    "paths": {
-      "@shikitor/*": ["./packages/*/src"],
-      "@shikitor/core/plugins/*": ["./packages/core/src/plugins/*"]
-    },
+    "rootDir": ".",
     "jsx": "react"
   },
   "exclude": ["node_modules", "**/dist"]

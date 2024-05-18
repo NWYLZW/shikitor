@@ -1,10 +1,9 @@
+import type { IDisposable, ResolvedCursor, ResolvedTextRange } from '@shikitor/core'
+import { definePlugin } from '@shikitor/core'
+import type { Awaitable, RecursiveReadonly } from '@shikitor/core/types'
+import { scoped } from '@shikitor/core/utils/valtio'
 import { derive } from 'valtio/utils'
 
-import type { ResolvedTextRange } from '../../base'
-import type { IDisposable, ResolvedCursor } from '../../editor'
-import { definePlugin } from '../../plugin'
-import type { Awaitable, RecursiveReadonly } from '../../types'
-import { scoped } from '../../utils/valtio/scoped'
 import { mountPopup, popupsControlled } from './popupsControlled'
 
 export type RelativePopupPlacement = 'top' | 'bottom'

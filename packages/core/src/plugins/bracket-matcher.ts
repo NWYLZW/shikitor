@@ -1,9 +1,7 @@
 import type { DecorationItem } from '@shikijs/core'
-
-import type { Shikitor } from '../editor'
-import type { ResolvedCursor } from '../editor/base'
-import { definePlugin } from '../plugin'
-import { isMultipleKey } from '../utils/isMultipleKey'
+import type { ResolvedCursor, Shikitor } from '@shikitor/core'
+import { definePlugin } from '@shikitor/core'
+import { isMultipleKey } from '@shikitor/core/utils'
 
 const bracketMap: Record<string, string | undefined> = {
   '(': ')',

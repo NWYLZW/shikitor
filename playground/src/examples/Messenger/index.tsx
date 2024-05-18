@@ -112,7 +112,9 @@ export default function Messenger() {
     }
     const bot = bots.documentHelper
     const completions = await openaiRef.current.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
+      // eslint-disable-next-line camelcase
+      max_tokens: 4096,
       messages: [
         {
           content: `Your name is "${bot.name}" and your description is "${bot.description}".\n`

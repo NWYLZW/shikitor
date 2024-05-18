@@ -7,13 +7,15 @@ import type {
   ResolvedTextRange,
   ShikitorWithExtends
 } from '@shikitor/core'
+import { definePlugin } from '@shikitor/core'
+import type {} from '@shikitor/core/plugins/provide-popup'
+import type { Nullable } from '@shikitor/core/types'
+import { classnames, icon, isUnset, UNSET } from '@shikitor/core/utils' with {
+  'unbundled-reexport': 'on'
+}
+import { scoped } from '@shikitor/core/utils/valtio'
 import { derive } from 'valtio/utils'
 import { proxy, ref, snapshot } from 'valtio/vanilla'
-
-import { definePlugin } from '../../plugin'
-import type { Nullable } from '../../types'
-import { classnames, icon, isUnset, UNSET } from '../../utils' with { 'unbundled-reexport': 'on' }
-import { scoped } from '../../utils/valtio/scoped'
 
 const name = 'provide-selection-toolbox'
 

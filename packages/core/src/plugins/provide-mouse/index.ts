@@ -1,6 +1,7 @@
+import { definePlugin } from '@shikitor/core'
+
 import type { ResolvedTextRange } from '../../base'
 import type { IDisposable } from '../../editor'
-import { definePlugin } from '../../plugin'
 import type { Awaitable } from '../../types'
 import { throttle } from '../../utils'
 
