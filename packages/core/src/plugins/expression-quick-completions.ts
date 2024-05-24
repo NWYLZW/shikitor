@@ -1,6 +1,5 @@
 import { definePlugin } from '@shikitor/core'
-
-import type {} from './provide-completions'
+import type {} from '@shikitor/core/plugins/provide-completions'
 
 export default definePlugin({
   name: 'expression-quick-completions',
