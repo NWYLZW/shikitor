@@ -11,9 +11,12 @@ importers:
       '@types/node':
         specifier: ^20.11.30
         version: 20.11.30
+      esbuild-register:
+        specifier: ^3.5.0
+        version: 3.5.0(esbuild@0.20.2)
       jiek:
-        specifier: 0.4.2
-        version: 0.4.2(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
+        specifier: 0.4.3
+        version: 0.4.3(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
       standard:
         specifier: workspace:*
         version: link:packages/standard
@@ -3124,7 +3127,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-    optional: true
 
   /esbuild@0.20.2:
     resolution: {integrity: sha512-WdOOppmUNU+IbZ0PaDiTst80zjnrOkyJNHoKupIcVyU8Lvla3Ugx94VzkQ32Ijqd7UhHJy75gNWDMUekcrSJ6g==}
@@ -4155,8 +4157,8 @@ packages:
       set-function-name: 2.0.2
     dev: false
 
-  /jiek@0.4.2(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
-    resolution: {integrity: sha512-TQ/FjZA42bQawEmxMp2+6fsTh69++pMPY4VKhYtMtyW2lga4WFX+WV7WSyyUS0HG95LxR28FfkcTu1o1vAjO5A==}
+  /jiek@0.4.3(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
+    resolution: {integrity: sha512-YOELS8lbUBvktyJXRDXctIzRp1Qs011wHtTIj9xxS0vppGTGeluOJdVx65Pf42lj6mrVXTI1e+hm4GZ9HkgMgg==}
     hasBin: true
     dependencies:
       '@jiek/pkger': 0.1.9
