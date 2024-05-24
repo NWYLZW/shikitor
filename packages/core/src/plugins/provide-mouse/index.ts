@@ -1,9 +1,9 @@
+import type { IDisposable, ResolvedTextRange } from '@shikitor/core'
 import { definePlugin } from '@shikitor/core'
-
-import type { ResolvedTextRange } from '../../base'
-import type { IDisposable } from '../../editor'
-import type { Awaitable } from '../../types'
-import { throttle } from '../../utils'
+import type { Awaitable } from '@shikitor/core/types'
+import { throttle } from '@shikitor/core/utils' with {
+  'unbundled-reexport': 'on'
+}
 
 const name = 'provide-mouse'
 
