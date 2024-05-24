@@ -5,8 +5,7 @@
     "incremental": false,
     "emitDeclarationOnly": true,
     "declaration": true,
-    "stripInternal": true,
-    "outDir": "temp"
+    "stripInternal": true
   },
   "exclude": ["**/tests", "**/dist"]
 }
