@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.75",
-    "@types/react-dom": "^18.2.24"
+    "@types/react-dom": "^18.2.24",
+    "@shikitor/react": "workspace:^*"
   }
 }
