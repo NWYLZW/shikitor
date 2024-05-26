@@ -10,12 +10,13 @@ import { WithoutCoreEditor } from '@shikitor/react'
 import MarkdownIt from 'markdown-it'
 import type { ClientOptions } from 'openai'
 import OpenAI from 'openai'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
 import { Avatar, Button, Drawer, Input, Link, MessagePlugin, Select } from 'tdesign-react'
 
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
+import { useColor } from '../../hooks/useColor'
 
 import type { IMessage, IUser } from './components/Message'
 import { Message } from './components/Message'
@@ -143,34 +144,13 @@ export default function Messenger() {
   const shikitorCreate = useShikitorCreate()
 
   const [configDrawerVisible, setConfigDrawerVisible] = useState(false)
-  const [color, setColor] = useState<{
-    bg: string
-    fg: string
-    hover?: string
-  }>(() => {
-    const style = document.documentElement.style
-    return {
-      bg: style.getPropertyValue('--bg'),
-      fg: style.getPropertyValue('--fg'),
-      hover: style.getPropertyValue('--hover')
-    }
-  })
-  const initialColor = useRef(color)
-  useEffect(() => {
-    const { bg, fg } = color
-    const style = document.documentElement.style
-    style.setProperty('--bg', bg)
-    style.setProperty('--fg', fg)
-    const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
-    style.setProperty('--hover', hoverColor)
-    return () => {
-      if (!initialColor.current) return
-      style.setProperty('--bg', initialColor.current.bg)
-      style.setProperty('--fg', initialColor.current.fg)
-      initialColor.current.hover
-        && style.setProperty('--hover', initialColor.current.hover)
-    }
-  }, [color])
+  const { setColor } = useColor(
+    useCallback((style, { fg, bg }) => {
+      const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
+      style.setProperty('--hover', hoverColor)
+    }, []),
+    ['hover']
+  )
   return (
     <div className='chatroom'>
       <Drawer
