@@ -27,23 +27,28 @@ export function useColor(
       }), {})
     }
   })
-  const initialColor = useRef(color)
+  const initialColorRef = useRef(color)
+  useEffect(() => {
+    const style = document.documentElement.style
+    const initialColor = initialColorRef.current
+    return () => {
+      if (!initialColor) return
+      style.setProperty('--bg', initialColor.bg)
+      style.setProperty('--fg', initialColor.fg)
+      restoreKeys.forEach(key => {
+        initialColor[key]
+          ? style.setProperty(`--${key}`, initialColor[key])
+          : style.removeProperty(`--${key}`)
+      })
+    }
+  }, [restoreKeys])
   useEffect(() => {
     const { bg, fg } = color
     const style = document.documentElement.style
     style.setProperty('--bg', bg)
     style.setProperty('--fg', fg)
     onColorChange(style, color)
-    return () => {
-      if (!initialColor.current) return
-      style.setProperty('--bg', initialColor.current.bg)
-      style.setProperty('--fg', initialColor.current.fg)
-      restoreKeys.forEach(key => {
-        initialColor.current[key]
-          && style.setProperty(`--${key}`, initialColor.current[key])
-      })
-    }
-  }, [color, onColorChange])
+  }, [color, restoreKeys, onColorChange])
   return {
     setColor
   }
