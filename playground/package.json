@@ -26,7 +26,7 @@
     "tdesign-react": "^1.5.5",
     "typed-query-selector": "^2.11.2",
     "vite": "^5.2.8",
-    "vite-plugin-glob-accept": "^0.0.10",
+    "vite-plugin-glob-accept": "^0.1.0",
     "vite-plugin-replacer": "^1.0.0"
   },
   "imports": {
