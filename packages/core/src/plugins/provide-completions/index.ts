@@ -145,6 +145,10 @@ export interface ProvideCompletionsOptions {
    * @default true
    */
   footer?: boolean
+  /**
+   * @internal TODO support group completions popup
+   */
+  groups?: Record<string, ProvideCompletionsOptions>
 }
 export default (options: ProvideCompletionsOptions = {}) => {
   const {
