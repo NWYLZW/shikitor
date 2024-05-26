@@ -8,7 +8,6 @@
   align-items: center;
   gap: var(--inner-padding);
 
-  margin-left: var(--cursor-width);
   padding: var(--inner-padding);
   height: 20px;
 
@@ -42,7 +41,29 @@
     &--select:not(&--disabled):hover {
       --elevation-depth: 20;
       background-color: var(--shikitor-hv-color);
-      box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
+      box-shadow:
+        0 calc(.400 * var(--elevation-depth, 0) * 1px) calc(
+        .900 * var(--elevation-depth, 0) * 1px
+      ) 0 rgba(
+        0,
+        0,
+        0,
+        calc(
+          .13441 - .00063 * var(--elevation-depth, 0) +
+            .00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)
+        )
+      ),
+        0 calc(.075 * var(--elevation-depth, 0) * 1px) calc(
+        .225 * var(--elevation-depth, 0) * 1px
+      ) 0 rgba(
+        0,
+        0,
+        0,
+        calc(
+          .10997 - .00051 * var(--elevation-depth, 0) +
+            .00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)
+        )
+      );
     }
     &--select > &__input-prefix {
       width: 16px;
@@ -77,7 +98,29 @@
     &__btn:not(&--disabled):hover {
       --elevation-depth: 20;
       background-color: var(--shikitor-hv-color);
-      box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
+      box-shadow:
+        0 calc(.400 * var(--elevation-depth, 0) * 1px) calc(
+        .900 * var(--elevation-depth, 0) * 1px
+      ) 0 rgba(
+        0,
+        0,
+        0,
+        calc(
+          .13441 - .00063 * var(--elevation-depth, 0) +
+            .00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)
+        )
+      ),
+        0 calc(.075 * var(--elevation-depth, 0) * 1px) calc(
+        .225 * var(--elevation-depth, 0) * 1px
+      ) 0 rgba(
+        0,
+        0,
+        0,
+        calc(
+          .10997 - .00051 * var(--elevation-depth, 0) +
+            .00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)
+        )
+      );
     }
     &--disabled {
       opacity: .6;
