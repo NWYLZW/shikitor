@@ -18,7 +18,7 @@ export function cursorControlled(
   const optionsCursorRef = derive({
     current: get => get(ref).current.cursor
   })
-  const cursorRef = derive({
+  const cursorRef: RefObject<ResolvedCursor> = derive({
     current: get => {
       const { resolvePosition } = get(rthRef).current
       return resolvePosition(get(optionsCursorRef).current ?? 0)
