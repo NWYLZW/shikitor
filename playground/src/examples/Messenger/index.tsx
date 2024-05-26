@@ -12,7 +12,7 @@ import type { ClientOptions } from 'openai'
 import OpenAI from 'openai'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { BundledLanguage, BundledTheme } from 'shiki'
-import { Avatar, Button, Drawer, Input, Link, MessagePlugin, Select } from 'tdesign-react'
+import { Avatar, Button, Drawer, Input, Link, MessagePlugin, Popconfirm, Select } from 'tdesign-react'
 
 import { useQueries } from '#hooks/useQueries.tsx'
 import { useShikitorCreate } from '#hooks/useShikitorCreate.ts'
@@ -189,16 +189,25 @@ export default function Messenger() {
           <div className='title'>Shikitor Chatroom</div>
         </div>
         <div className='right'>
-          <Button
-            variant='text'
-            shape='square'
-            onClick={() => {
+          <Popconfirm
+            placement='bottom-right'
+            content='Are you sure to clear all messages?'
+            popupProps={{
+              popperOptions: {
+                modifiers: [
+                  { name: 'offset', options: { offset: [-4, -14] } }
+                ]
+              }
+            }}
+            onConfirm={() => {
               setMessages([])
               localStorage.removeItem('openai-config')
             }}
           >
-            <span className='shikitor-icon'>delete_forever</span>
-          </Button>
+            <Button variant='text' shape='square'>
+              <span className='shikitor-icon'>delete_forever</span>
+            </Button>
+          </Popconfirm>
           <Button
             variant='text'
             shape='square'
