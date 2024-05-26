@@ -3,50 +3,55 @@
   height: 100%;
 }
 .examples {
+  --elevation-depth: 30;
+
+  z-index: 100;
   display: flex;
-  flex-direction: column;
-  align-items: start;
   justify-content: center;
   gap: 20px;
   position: absolute;
-  top: 50%;
-  right: 0;
-  margin-right: -30px;
-  width: 220px;
-  transform: translateY(-50%);
+  top: 1vh;
+  left: 50%;
+  padding: 10px;
+  border-radius: 16px;
+  border: 2px solid var(--td-brand-color);
+  transform: translateX(-50%);
+  background-color: var(--bg);
+  // dprint-ignore
+  box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
   .example {
     position: relative;
     right: 0;
-    padding: 10px;
-    width: calc(100% - 20px);
+    padding: 15px 20px;
+    width: 150px;
     cursor: pointer;
-    border: 1px solid color-mix(in srgb, var(--bg), var(--fg) 50%);
-    border-radius: 4px;
-    background-color: var(--fg);
+    border-radius: 6px;
     transition: .3s;
     h4 {
       user-select: none;
-      color: var(--bg);
-      margin: 0 0 5px;
+      margin: 0;
       font-weight: normal;
+      text-align: center;
     }
-    &:not(.active):hover {
-      box-shadow: 0 0 8px rgba(0, 0, 0, .2);
+    &.active, &:hover {
+      color: var(--td-text-color-anti);
     }
     &.active {
+      background-color: var(--td-brand-color-active);
       cursor: default;
     }
-    &:hover, &.active {
-      right: 30px;
-      scale: 1.1;
-      h4 {
-        font-weight: bold;
+    &:hover {
+      background-color: var(--td-brand-color-hover);
+      .preview {
+        max-height: 60px;
       }
     }
-  }
-  .preview {
-    font-size: 12px;
-    user-select: none;
-    overflow: hidden;
+    .preview {
+      font-size: 12px;
+      user-select: none;
+      overflow: hidden;
+      max-height: 0;
+      transition: .2s;
+    }
   }
 }
