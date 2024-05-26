@@ -204,7 +204,7 @@ export default function Messenger() {
               localStorage.removeItem('openai-config')
             }}
           >
-            <Button variant='text' shape='square'>
+            <Button variant='text' shape='square' disabled={messages.length === 0}>
               <span className='shikitor-icon'>delete_forever</span>
             </Button>
           </Popconfirm>
