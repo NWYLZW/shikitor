@@ -15,8 +15,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0(esbuild@0.20.2)
       jiek:
-        specifier: 0.4.4
-        version: 0.4.4(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
+        specifier: 0.4.5
+        version: 0.4.5(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
       standard:
         specifier: workspace:*
         version: link:packages/standard
@@ -743,8 +743,8 @@ packages:
       '@sinclair/typebox': 0.27.8
     dev: true
 
-  /@jiek/pkger@0.1.9:
-    resolution: {integrity: sha512-G2bZwjG/wSWn2byM6UROF7YRgkSVUWl/e8wRwxYDSls3mNiot03Zqc5ZTQj5MdaP0jcvabBRBX/WGVzKJIDWZQ==}
+  /@jiek/pkger@0.1.10:
+    resolution: {integrity: sha512-8QP6lnWPEzJJqFecxtIqi2hOOYahYRqNTH4OqcH2TF0dJ9OfGvHY5Dw75OMMr0FD6VNhjvTdXjH72O005jzahQ==}
     dependencies:
       fast-glob: 3.3.2
     dev: true
@@ -4174,11 +4174,11 @@ packages:
       set-function-name: 2.0.2
     dev: false
 
-  /jiek@0.4.4(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
-    resolution: {integrity: sha512-ufmhiIlTGz7XK/BdVt3Hrq+/VQiRBhBJp74Tzl3Y54bZ/C+rBQTY2R7GukMyhVwRwC68is0MaldUS7dkdz3rJA==}
+  /jiek@0.4.5(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
+    resolution: {integrity: sha512-zlt/XPglrvuYhuvDinOvEYo2Sr/khbw70Nrr+7rLcSqmuia2WT63UfzhaLWXgooFHg1ARRAcHnx3lWpfqteGdg==}
     hasBin: true
     dependencies:
-      '@jiek/pkger': 0.1.9
+      '@jiek/pkger': 0.1.10
       '@jiek/rollup-plugin-dts': 6.1.1(rollup@4.16.0)(typescript@5.4.3)
       '@jiek/utils': 0.2.0
       '@rollup/plugin-json': 6.1.0(rollup@4.16.0)
