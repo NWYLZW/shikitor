@@ -98,12 +98,16 @@ function updatePopupElement(shikitor: Shikitor, ele: HTMLElement, popup: Resolve
   for (const key of passedKeys) {
     if (passedOffset[key] === undefined) continue
 
+    console.log('passedOffset', passedOffset)
     ele.style.setProperty(`--${key}`, `${passedOffset[key]}px`)
     const realOffset = `calc(var(--${key}, 0px) + var(${
       cssvar(`offset-${key === 'top' || key === 'bottom' ? 'y' : 'x'}`)
     }, 0px))`
+    const realOffsetWithCursorWidth = ['left', 'right'].includes(key)
+      ? `calc(${realOffset} + var(--cursor-width, 0px))`
+      : realOffset
     const rkey = REVERSE_MAP[key]
-    ele.style[key] = `min(max(${realOffset}, ${containerRect[key]}px), ${
+    ele.style[key] = `min(max(${realOffsetWithCursorWidth}, ${containerRect[key]}px), ${
       {
         top: `calc(${containerRect[rkey]}px - var(--height, 0px))`,
         bottom: `${containerRect[rkey]}px`,
