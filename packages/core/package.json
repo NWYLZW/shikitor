@@ -13,7 +13,8 @@
     "./types": "./src/types.ts",
     "./utils": "./src/utils/index.ts",
     "./utils/valtio": "./src/utils/valtio/index.ts",
-    "./plugins/*": ["./src/plugins/*/index.ts", "./src/plugins/*.ts"]
+    "./plugins/*": ["./src/plugins/*/index.ts", "./src/plugins/*.ts"],
+    "./*.css": "./dist/*.css"
   },
   "repository": {
     "type": "git",
