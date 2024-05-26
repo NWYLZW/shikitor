@@ -8,6 +8,9 @@ import replacer from 'vite-plugin-replacer'
 
 export default defineConfig({
   base: process.env.BASE ?? '/',
+  server: {
+    port: 31971
+  },
   build: {
     rollupOptions: {
       external: ['shiki']
