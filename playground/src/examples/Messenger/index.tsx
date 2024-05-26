@@ -190,7 +190,7 @@ export default function Messenger() {
         </div>
         <div className='right'>
           <Button
-            variant='dashed'
+            variant='text'
             shape='square'
             onClick={() => {
               setMessages([])
@@ -200,7 +200,7 @@ export default function Messenger() {
             <span className='shikitor-icon'>delete_forever</span>
           </Button>
           <Button
-            variant='dashed'
+            variant='text'
             shape='square'
             onClick={() => setConfigDrawerVisible(true)}
           >

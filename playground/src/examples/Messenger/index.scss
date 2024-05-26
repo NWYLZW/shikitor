@@ -27,7 +27,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 50px;
+  padding: 10px 20px;
   color: var(--td-text-color-primary);
   background-color: var(--td-bg-color-secondarycomponent);
   border-bottom: 1px solid color-mix(in srgb, var(--fg), var(--bg) 50%);
@@ -67,7 +67,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px;
-  margin: 10px 50px;
+  margin: 20px;
+  border: 2px solid color-mix(in srgb, var(--bg), var(--fg) 50%);
   background-color: var(--bg);
   border-radius: 5px;
   .send-tooltip {
