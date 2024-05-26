@@ -12,6 +12,7 @@ import { bundledPluginsInfo } from '#plugins'
 import { analyzeHash, DEFAULT_CODE } from '#utils/analyzeHash.ts'
 import type { GistFile } from '#utils/gist.ts'
 import { getGist } from '#utils/gist.ts'
+import { useColor } from '../../hooks/useColor'
 
 import { CardHeader } from './components/CardHeader'
 
@@ -66,6 +67,22 @@ export default function CodeEditor() {
   const shikitorRef = useRef<Shikitor>(null)
   const shikitorCreate = useShikitorCreate()
   usePlugins(shikitorRef)
+  const { setColor } = useColor((style, { bg, fg }) => {
+    style.setProperty('--td-font-gray-1', bg)
+    style.setProperty('--td-text-color-anti', bg)
+    style.setProperty('--td-bg-color-container', fg)
+    style.setProperty('--td-gray-color-13', fg)
+    const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
+    style.setProperty('--hover', hoverColor)
+    style.setProperty('--td-gray-color-1', hoverColor)
+  }, [
+    'td-font-gray-1',
+    'td-text-color-anti',
+    'td-bg-color-container',
+    'td-gray-color-13',
+    'hover',
+    'td-gray-color-1'
+  ])
   return (
     <div className='code-editor'>
       <CardHeader />
@@ -79,18 +96,7 @@ export default function CodeEditor() {
           language
         }), [theme, language])}
         plugins={plugins}
-        onColorChange={({ bg, fg }) => {
-          const style = document.documentElement.style
-          style.setProperty('--bg', bg)
-          style.setProperty('--td-font-gray-1', bg)
-          style.setProperty('--td-text-color-anti', bg)
-          style.setProperty('--fg', fg)
-          style.setProperty('--td-bg-color-container', fg)
-          style.setProperty('--td-gray-color-13', fg)
-          const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
-          style.setProperty('--hover', hoverColor)
-          style.setProperty('--td-gray-color-1', hoverColor)
-        }}
+        onColorChange={setColor}
         onMounted={initPlaygroundShikitor}
       />
     </div>
