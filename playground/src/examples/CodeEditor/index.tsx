@@ -69,7 +69,6 @@ export default function CodeEditor() {
   usePlugins(shikitorRef)
   const { setColor } = useColor((style, { bg, fg }) => {
     style.setProperty('--td-font-gray-1', bg)
-    style.setProperty('--td-text-color-anti', bg)
     style.setProperty('--td-bg-color-container', fg)
     style.setProperty('--td-gray-color-13', fg)
     const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
@@ -77,7 +76,6 @@ export default function CodeEditor() {
     style.setProperty('--td-gray-color-1', hoverColor)
   }, [
     'td-font-gray-1',
-    'td-text-color-anti',
     'td-bg-color-container',
     'td-gray-color-13',
     'hover',
