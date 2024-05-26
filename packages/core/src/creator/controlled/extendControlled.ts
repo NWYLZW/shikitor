@@ -53,7 +53,8 @@ export function extendControlled(
             checkDependInstalled(() => offExtendedListener?.())
           })
         }
-        listenPluginsInstalled()
+        !installed
+          && listenPluginsInstalled()
         const offContractedListener = ee.on('contracted', key => {
           if (!key) return
           if (!(keys as string[]).includes(key)) return
