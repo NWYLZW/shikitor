@@ -1,9 +1,9 @@
 import type { create, Shikitor, ShikitorOptions } from '@shikitor/core'
+import type { EditorProps, EditorRef, StyledProps } from '@shikitor/react'
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
 
 import { useDefault } from './hooks/useDefault'
 import { useEvent } from './hooks/useEvent'
-import type { EditorProps, EditorRef, StyledProps } from './type'
 
 export interface WithoutCoreEditorProps extends EditorProps, StyledProps {
   create?: typeof create
