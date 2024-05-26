@@ -8,7 +8,7 @@
   "repository": "https://github.com/NWYLZW/shikitor",
   "devDependencies": {
     "@types/node": "^20.11.30",
-    "jiek": "0.4.3",
+    "jiek": "0.4.4",
     "esbuild-register": "^3.5.0",
     "typescript": "^5.4.3",
     "vite-tsconfig-paths": "^4.3.2",
