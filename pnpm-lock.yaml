@@ -15,8 +15,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0(esbuild@0.20.2)
       jiek:
-        specifier: 0.4.3
-        version: 0.4.3(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
+        specifier: 0.4.4
+        version: 0.4.4(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3)
       standard:
         specifier: workspace:*
         version: link:packages/standard
@@ -744,6 +744,20 @@ packages:
     resolution: {integrity: sha512-G2bZwjG/wSWn2byM6UROF7YRgkSVUWl/e8wRwxYDSls3mNiot03Zqc5ZTQj5MdaP0jcvabBRBX/WGVzKJIDWZQ==}
     dependencies:
       fast-glob: 3.3.2
+    dev: true
+
+  /@jiek/rollup-plugin-dts@6.1.1(rollup@4.16.0)(typescript@5.4.3):
+    resolution: {integrity: sha512-TILGtvW9iAI5RdnLYt3YCobWss8Z24Lh/u0JD9v/uYpjnKE90XBWMEW0PlXPAGDOQGTtJeRXC7RdRNw2y7O64w==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      rollup: ^3.29.4 || ^4
+      typescript: ^4.5 || ^5.0
+    dependencies:
+      magic-string: 0.30.10
+      rollup: 4.16.0
+      typescript: 5.4.3
+    optionalDependencies:
+      '@babel/code-frame': 7.24.2
     dev: true
 
   /@jiek/utils@0.2.0:
@@ -4157,11 +4171,12 @@ packages:
       set-function-name: 2.0.2
     dev: false
 
-  /jiek@0.4.3(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
-    resolution: {integrity: sha512-YOELS8lbUBvktyJXRDXctIzRp1Qs011wHtTIj9xxS0vppGTGeluOJdVx65Pf42lj6mrVXTI1e+hm4GZ9HkgMgg==}
+  /jiek@0.4.4(@pnpm/logger@5.0.0)(esbuild@0.20.2)(postcss@8.4.38)(typescript@5.4.3):
+    resolution: {integrity: sha512-ufmhiIlTGz7XK/BdVt3Hrq+/VQiRBhBJp74Tzl3Y54bZ/C+rBQTY2R7GukMyhVwRwC68is0MaldUS7dkdz3rJA==}
     hasBin: true
     dependencies:
       '@jiek/pkger': 0.1.9
+      '@jiek/rollup-plugin-dts': 6.1.1(rollup@4.16.0)(typescript@5.4.3)
       '@jiek/utils': 0.2.0
       '@rollup/plugin-json': 6.1.0(rollup@4.16.0)
       '@rollup/plugin-terser': 0.4.4(rollup@4.16.0)
@@ -4175,7 +4190,6 @@ packages:
       micromatch: 4.0.5
       rollup: 4.16.0
       rollup-plugin-copy: 3.5.0
-      rollup-plugin-dts: 6.1.0(rollup@4.16.0)(typescript@5.4.3)
       rollup-plugin-esbuild: 6.1.1(esbuild@0.20.2)(rollup@4.16.0)
       rollup-plugin-postcss: 4.0.2(postcss@8.4.38)
     optionalDependencies:
@@ -5653,20 +5667,6 @@ packages:
       fs-extra: 8.1.0
       globby: 10.0.1
       is-plain-object: 3.0.1
-    dev: true
-
-  /rollup-plugin-dts@6.1.0(rollup@4.16.0)(typescript@5.4.3):
-    resolution: {integrity: sha512-ijSCPICkRMDKDLBK9torss07+8dl9UpY9z1N/zTeA1cIqdzMlpkV3MOOC7zukyvQfDyxa1s3Dl2+DeiP/G6DOw==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      rollup: ^3.29.4 || ^4
-      typescript: ^4.5 || ^5.0
-    dependencies:
-      magic-string: 0.30.10
-      rollup: 4.16.0
-      typescript: 5.4.3
-    optionalDependencies:
-      '@babel/code-frame': 7.24.2
     dev: true
 
   /rollup-plugin-esbuild@6.1.1(esbuild@0.20.2)(rollup@4.16.0):
