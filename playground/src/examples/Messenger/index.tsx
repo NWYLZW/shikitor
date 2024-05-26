@@ -259,7 +259,6 @@ export default function Messenger() {
             style.setProperty('--fg', fg)
             const hoverColor = `color-mix(in srgb, ${fg}, ${bg} 10%)`
             style.setProperty('--hover', hoverColor)
-            style.setProperty('--td-text-color-primary', bg)
           }}
           onMounted={shikitor => shikitor.focus()}
           onKeydown={e => {
