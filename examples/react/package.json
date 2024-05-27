@@ -1,0 +1,17 @@
+{
+  "name": "react-demo",
+  "scripts": {
+    "dev": "vite --port 20001",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@shikitor/react": "0.1.1-alpha.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.75",
+    "@types/react-dom": "^18.2.24",
+    "vite": "^5.2.8"
+  }
+}
