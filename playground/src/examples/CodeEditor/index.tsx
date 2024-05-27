@@ -12,8 +12,8 @@ import { bundledPluginsInfo } from '#plugins'
 import { analyzeHash, DEFAULT_CODE } from '#utils/analyzeHash.ts'
 import type { GistFile } from '#utils/gist.ts'
 import { getGist } from '#utils/gist.ts'
-import { useColor } from '../../hooks/useColor'
 
+import { useColor } from '../../hooks/useColor'
 import { CardHeader } from './components/CardHeader'
 
 const plugins = bundledPluginsInfo.map(({ module: { default: d } }) => d)
