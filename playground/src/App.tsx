@@ -1,20 +1,17 @@
 import './App.scss'
 
 import { classnames } from '@shikitor/core/utils'
-import React, { useMemo } from 'react'
+import React, { lazy, Suspense, useMemo } from 'react'
 
-import CodeEditor from './examples/CodeEditor'
 import CodeEditorPreview from './examples/CodeEditor/Preview'
-import MarkdownEditor from './examples/MarkdownEditor'
 import MarkdownEditorPreview from './examples/MarkdownEditor/Preview'
-import Messenger from './examples/Messenger'
 import MessengerPreview from './examples/Messenger/Preview'
 import { useQueries } from './hooks/useQueries'
 
 const examples = [
-  ['Code Editor', CodeEditor, CodeEditorPreview],
-  ['Markdown Editor', MarkdownEditor, MarkdownEditorPreview],
-  ['Messenger', Messenger, MessengerPreview]
+  ['Code Editor', lazy(() => import('./examples/CodeEditor')), CodeEditorPreview],
+  ['Markdown Editor', lazy(() => import('./examples/MarkdownEditor')), MarkdownEditorPreview],
+  ['Messenger', lazy(() => import('./examples/Messenger')), MessengerPreview]
 ] as const
 
 export default function App() {
@@ -34,7 +31,9 @@ export default function App() {
   return (
     <>
       {ActiveComponent
-        ? <ActiveComponent />
+        ? <Suspense fallback={<div className='loading'>Loading...</div>}>
+          <ActiveComponent />
+        </Suspense>
         : <div>Unknown component: {active}</div>}
       <div className={classnames(
         'examples', topBarVisible === 'false' && 'examples__hide')}>
