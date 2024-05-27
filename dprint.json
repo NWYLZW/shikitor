@@ -3,7 +3,10 @@
     "quoteStyle": "preferSingle",
     "semiColons": "asi",
     "trailingCommas": "never",
-    "conditionalType.operatorPosition": "nextLine"
+    "conditionalType.operatorPosition": "nextLine",
+    "exportDeclaration": {
+      "sortNamedExports": "maintain"
+    }
   },
   "malva": {
     "ignoreCommentDirective": "dprint-ignore",
