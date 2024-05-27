@@ -1,5 +1,6 @@
 import './App.scss'
 
+import { classnames } from '@shikitor/core/utils'
 import React, { useMemo } from 'react'
 
 import CodeEditor from './examples/CodeEditor'
@@ -19,11 +20,13 @@ const examples = [
 export default function App() {
   const {
     value: {
-      active = 'Code Editor'
+      active = 'Code Editor',
+      topBarVisible = 'true'
     },
     set
   } = useQueries<{
     active: 'Code Editor' | 'Markdown Editor' | 'Messenger'
+    topBarVisible: string
   }>()
   const ActiveComponent = useMemo(() => {
     return examples.find(([n]) => n === active)?.[1]
@@ -33,7 +36,8 @@ export default function App() {
       {ActiveComponent
         ? <ActiveComponent />
         : <div>Unknown component: {active}</div>}
-      <div className='examples'>
+      <div className={classnames(
+        'examples', topBarVisible === 'false' && 'examples__hide')}>
         {examples.map(([name, _, Preview]) => (
           <div
             key={name}
@@ -46,6 +50,11 @@ export default function App() {
             </div>
           </div>
         ))}
+        <div className='switch' onClick={() => {
+          set('topBarVisible', topBarVisible === 'true' ? 'false' : 'true')
+        }}>
+          <span className='shikitor-icon'>keyboard_arrow_up</span>
+        </div>
       </div>
     </>
   )

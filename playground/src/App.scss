@@ -15,10 +15,11 @@
   padding: 10px;
   border-radius: 16px;
   border: 2px solid var(--td-brand-color);
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(0);
   background-color: var(--td-bg-color-component);
   // dprint-ignore
   box-shadow: 0 calc(0.400 * var(--elevation-depth, 0) * 1px) calc(0.900 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.13441 - 0.00063 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0))), 0 calc(0.075 * var(--elevation-depth, 0) * 1px) calc(0.225 * var(--elevation-depth, 0) * 1px) 0 rgba(0, 0, 0, calc(0.10997 - 0.00051 * var(--elevation-depth, 0) + 0.00003 * var(--elevation-depth, 0) * var(--elevation-depth, 0)));
+  transition: .2s;
   .example {
     position: relative;
     right: 0;
@@ -52,6 +53,44 @@
       overflow: hidden;
       max-height: 0;
       transition: .2s;
+    }
+  }
+  &__hide {
+    transform: translateX(-50%) translateY(-100%);
+    .switch > .shikitor-icon {
+      transform: rotate(180deg);
+    }
+  }
+  &:not(&__hide) {
+    &:hover .switch {
+      opacity: 1;
+    }
+    .switch {
+      opacity: 0;
+    }
+  }
+  .switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 100%;
+    right: 50%;
+    transform: translateX(50%);
+    width: 30px;
+    height: 16px;
+    cursor: pointer;
+    color: var(--td-bg-color-component);
+    background-color: var(--td-text-color-primary);
+    border-radius: 0 0 6px 6px;
+    border: 2px solid var(--td-brand-color);
+    transition: .2s;
+    &:hover {
+      background-color: var(--td-brand-color-hover);
+    }
+    .shikitor-icon {
+      font-size: 20px;
+      user-select: none;
     }
   }
 }
