@@ -3,10 +3,15 @@
   "version": "0.1.1",
   "description": "Shikitor for react",
   "license": "MIT",
-  "files": ["dist"],
+  "files": ["dist", "index.css"],
   "exports": {
     ".": "./src/index.ts",
     "./WithoutCoreEditor": "./src/WithoutCoreEditor.tsx"
+  },
+  "publishConfig": {
+    "exports": {
+      "./index.css": "./index.css"
+    }
   },
   "homepage": "https://github.com/NWYLZW/shikitor/blob/master/packages/react/README.md",
   "repository": {
