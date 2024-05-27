@@ -13,8 +13,7 @@
     "./types": "./src/types.ts",
     "./utils": "./src/utils/index.ts",
     "./utils/valtio": "./src/utils/valtio/index.ts",
-    "./plugins/*": ["./src/plugins/*/index.ts", "./src/plugins/*.ts"],
-    "./*.css": "./dist/*.css"
+    "./plugins/*": ["./src/plugins/*/index.ts", "./src/plugins/*.ts"]
   },
   "repository": {
     "type": "git",
@@ -35,5 +34,10 @@
   "files": [
     "dist",
     "README.md"
-  ]
+  ],
+  "publishConfig": {
+    "exports": {
+      "./*.css": "./dist/*.css"
+    }
+  }
 }
