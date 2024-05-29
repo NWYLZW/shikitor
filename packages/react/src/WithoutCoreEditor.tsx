@@ -67,18 +67,23 @@ export const WithoutCoreEditor = forwardRef<
     emits.mounted(shikitor)
   }, [ref])
 
-  const { vRef: valueRef } = useDefault(value, defaultValue, v => {
+  const vRefHandle = useCallback((v: string) => {
     const shikitor = shikitorRef.current
     if (!shikitor) return
 
     shikitor.value = v
-  })
-  const { vRef: optionsRef } = useDefault(options, defaultOptions, opts => {
+  }, [])
+
+  const { vRef: valueRef } = useDefault(value, defaultValue, vRefHandle)
+
+  const optionRefHandle = useCallback((opts: Omit<ShikitorOptions, "plugins">) => {
     const shikitor = shikitorRef.current
     if (!shikitor) return
 
     shikitor.updateOptions(old => ({ ...old, ...opts }))
-  })
+  }, [])
+
+  const { vRef: optionsRef } = useDefault(options, defaultOptions, optionRefHandle)
 
   useEffect(() => {
     if (!eleRef.current) return
