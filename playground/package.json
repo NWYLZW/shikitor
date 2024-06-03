@@ -7,7 +7,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@shikijs/markdown-it": "^1.5.2",
+    "@shikijs/markdown-it": "^1.6.2",
     "@shikitor/core": "workspace:*",
     "@shikitor/react": "workspace:*",
     "@types/markdown-it": "^14.1.1",
@@ -21,7 +21,7 @@
     "react-dom": "^18.2.0",
     "rollup-plugin-unbundled-reexport": "^0.2.0",
     "sass": "^1.72.0",
-    "shiki": "^1.2.0",
+    "shiki": "^1.6.2",
     "tdesign-icons-react": "^0.3.2",
     "tdesign-react": "^1.5.5",
     "typed-query-selector": "^2.11.2",

@@ -75,6 +75,8 @@ export default function Messenger() {
   if (!mdRef.current) {
     mdRef.current = MarkdownIt()
     MarkdownItPluginShiki({
+      // @ts-ignore
+      fallbackLanguage: 'text',
       themes: {
         light: theme
       }
