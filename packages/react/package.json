@@ -1,6 +1,6 @@
 {
   "name": "@shikitor/react",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Shikitor for react",
   "license": "MIT",
   "files": ["dist", "index.css"],
@@ -24,7 +24,7 @@
     "react": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "dependencies": {
-    "@shikitor/core": "workspace:^*"
+    "@shikitor/core": "workspace:^"
   },
   "devDependencies": {
     "@types/react": "^18.2.75",
