@@ -6,7 +6,7 @@ export interface StyledProps {
   style?: React.CSSProperties
 }
 
-export interface EditorProps {
+export interface EditorProps extends StyledProps {
   options?: Omit<ShikitorOptions, 'plugins'>
   defaultOptions?: Omit<ShikitorOptions, 'plugins'>
   plugins?: ShikitorOptions['plugins']
