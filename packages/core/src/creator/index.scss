@@ -34,10 +34,10 @@
     border: 0;
     font-family: var(--font-family, monospace), serif;
     font-size: inherit;
-  }
-  &-input::selection {
-    color: transparent;
-    background: rgba($color: var(--shikitor-fg-color, black), $alpha: 0.3);
+    &::selection {
+      color: transparent;
+      background-color: var(--shikitor-fg-color-op6, black);
+    }
   }
   &.line-numbers &-gutter-line-number {
     margin: 0 10px;
