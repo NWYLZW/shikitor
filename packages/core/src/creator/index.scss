@@ -34,6 +34,10 @@
     border: 0;
     font-family: var(--font-family, monospace), serif;
     font-size: inherit;
+    &::selection {
+      color: transparent;
+      background-color: var(--shikitor-fg-color-op6, black);
+    }
   }
   &.line-numbers &-gutter-line-number {
     margin: 0 10px;
