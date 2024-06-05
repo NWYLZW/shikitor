@@ -2,6 +2,8 @@
   <img src="./playground/public/favicon.svg" width='256' alt='Shikitor Logo'>
 </p>
 
+<h1 align="center">四季多(Shikitor)</h1>
+
 ## 介绍
 
 轻量化、可扩展的 web 代码编辑器。
