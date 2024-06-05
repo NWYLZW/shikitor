@@ -35,6 +35,10 @@
     font-family: var(--font-family, monospace), serif;
     font-size: inherit;
   }
+  &-input::selection {
+    color: transparent;
+    background: var(rgba($color: white, $alpha: 0.3), rgba($color: black, $alpha: 0.2));
+  }
   &.line-numbers &-gutter-line-number {
     margin: 0 10px;
     width: var(--shikitor-line-digit-count, 0px);
