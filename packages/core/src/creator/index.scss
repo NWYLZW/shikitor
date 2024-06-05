@@ -37,7 +37,7 @@
   }
   &-input::selection {
     color: transparent;
-    background: var(rgba($color: white, $alpha: 0.3), rgba($color: black, $alpha: 0.2));
+    background: rgba($color: var(--shikitor-fg-color, black), $alpha: 0.3);
   }
   &.line-numbers &-gutter-line-number {
     margin: 0 10px;
