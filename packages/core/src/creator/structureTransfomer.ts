@@ -14,6 +14,16 @@ export function shikitorStructureTransformer(
       const bg = div.style.backgroundColor
       const fg = div.style.color
       target.style.setProperty(cssvar('fg-color'), fg)
+      for (let i = 1; i <= 9; i++) {
+        target.style.setProperty(
+          cssvar(`fg-color-op${i}`),
+          `color-mix(in oklch, var(${cssvar('fg-color')}), transparent ${i * 10}%)`
+        )
+        target.style.setProperty(
+          cssvar(`bg-color-op${i}`),
+          `color-mix(in oklch, var(${cssvar('bg-color')}), transparent ${i * 10}%)`
+        )
+      }
       target.style.setProperty(cssvar('bg-color'), bg)
       target.style.setProperty(
         cssvar('caret-color'),
