@@ -269,6 +269,7 @@ export default function Messenger() {
             language: 'markdown',
             lineNumbers: 'off',
             placeholder: 'Typing here...',
+            hideSelfCursorUsername: true,
             autoSize: { maxRows: 10 }
           }), [theme])}
           plugins={bundledPlugins}
