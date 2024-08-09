@@ -74,7 +74,7 @@ export function initDom(target: HTMLElement) {
   const defaultCursor = document.createElement('div')
   defaultCursor.classList.add('shikitor-cursor')
   const userName = document.createElement('div')
-  userName.classList.add('shikitor-cursor__username')
+  userName.classList.add('shikitor-cursor__username', 'shikitor-cursor__username--you')
   userName.dataset.username = 'You'
   cursors.append(defaultCursor, userName)
 
@@ -111,13 +111,16 @@ export function outputRenderControlled(
   scopeWatch(get => {
     const {
       readOnly,
-      lineNumbers = 'on'
+      lineNumbers = 'on',
+      hideSelfCursorUsername = false
     } = get(derive({
       readOnly: get => get(optionsRef).current.readOnly,
-      lineNumbers: get => get(optionsRef).current.lineNumbers
+      lineNumbers: get => get(optionsRef).current.lineNumbers,
+      hideSelfCursorUsername: get => get(optionsRef).current.hideSelfCursorUsername
     }))
-    target.classList.toggle('line-numbers', lineNumbers === 'on')
     target.classList.toggle('read-only', readOnly === true)
+    target.classList.toggle('line-numbers', lineNumbers === 'on')
+    target.classList.toggle('hide-self-cursor-username', hideSelfCursorUsername)
   })
   let highlighter: ReturnType<typeof getHighlighter> | undefined
   const highlighterDeps = derive({

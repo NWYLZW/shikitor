@@ -201,4 +201,9 @@
       }
     }
   }
+  &.hide-self-cursor-username {
+    .shikitor-cursor__username {
+      display: none;
+    }
+  }
 }
