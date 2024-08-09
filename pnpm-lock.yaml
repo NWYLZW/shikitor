@@ -30,17 +30,17 @@ importers:
   packages/core:
     dependencies:
       '@shikijs/core':
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.12.1
+        version: 1.12.1
       '@shikijs/transformers':
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.12.1
+        version: 1.12.1
       derive-valtio:
         specifier: ^0.1.0
         version: 0.1.0(valtio@1.13.2)
       shiki:
-        specifier: ^1.6.2
-        version: 1.6.2
+        specifier: ^1.12.1
+        version: 1.12.1
       valtio:
         specifier: ^1.13.2
         version: 1.13.2(react@18.2.0)
@@ -52,7 +52,7 @@ importers:
   packages/react:
     dependencies:
       '@shikitor/core':
-        specifier: workspace:^*
+        specifier: workspace:^
         version: link:../core
     devDependencies:
       '@shikitor/react':
@@ -98,8 +98,8 @@ importers:
   playground:
     devDependencies:
       '@shikijs/markdown-it':
-        specifier: ^1.6.2
-        version: 1.6.2
+        specifier: ^1.12.1
+        version: 1.12.1
       '@shikitor/core':
         specifier: workspace:*
         version: link:../packages/core
@@ -1526,32 +1526,27 @@ packages:
     dev: true
     optional: true
 
-  /@shikijs/core@1.3.0:
-    resolution: {integrity: sha512-7fedsBfuILDTBmrYZNFI8B6ATTxhQAasUHllHmjvSZPnoq4bULWoTpHwmuQvZ8Aq03/tAa2IGo6RXqWtHdWaCA==}
-    dev: false
+  /@shikijs/core@1.12.1:
+    resolution: {integrity: sha512-biCz/mnkMktImI6hMfMX3H9kOeqsInxWEyCHbSlL8C/2TR1FqfmGxTLRNwYCKsyCyxWLbB8rEqXRVZuyxuLFmA==}
+    dependencies:
+      '@types/hast': 3.0.4
 
   /@shikijs/core@1.6.2:
     resolution: {integrity: sha512-guW5JeDzZ7uwOjTfCOFZ2VtVXk5tmkMzBYbKGfXsmAH1qYOej49L5jQDcGmwd6/OgvpmWhzO2GNJkQIFnbwLPQ==}
+    dev: true
 
-  /@shikijs/markdown-it@1.6.2:
-    resolution: {integrity: sha512-VhY7XJepbcb7ORS7uOyK0E3cgt7Ov8yMxyhZLbTm09SjfGlWUyLULHXzzyutCEOLWW4LWnemK521xJiG7dC1HQ==}
+  /@shikijs/markdown-it@1.12.1:
+    resolution: {integrity: sha512-BE6QyPnh7SPW2n53iwgba+I3Xpx0JWPJfcc70Ds/wu0QaP0Kkb6W8IlYeNv7HR+YcKBObGJsCyd4XW8xm1JE8A==}
     dependencies:
-      '@shikijs/transformers': 1.6.2
+      '@shikijs/transformers': 1.12.1
       markdown-it: 14.1.0
-      shiki: 1.6.2
+      shiki: 1.12.1
     dev: true
 
-  /@shikijs/transformers@1.3.0:
-    resolution: {integrity: sha512-3mlpg2I9CjhjE96dEWQOGeCWoPcyTov3s4aAsHmgvnTHa8MBknEnCQy8/xivJPSpD+olqOqIEoHnLfbNJK29AA==}
+  /@shikijs/transformers@1.12.1:
+    resolution: {integrity: sha512-zOpj/S2thBvnJV4Ty3EE8aRs/VqCbV+lgtEYeBRkPxTW22uLADEIZq0qjt5W2Rfy2KSu29e73nRyzp4PefjUTg==}
     dependencies:
-      shiki: 1.3.0
-    dev: false
-
-  /@shikijs/transformers@1.6.2:
-    resolution: {integrity: sha512-ndqTWyHnxmsLkowhKWTam26opw8hg5a34y6FAUG/Xf6E49n3MM//nenKxXiWpPYkNPl1KZnYXB1k+Ia46wjOZg==}
-    dependencies:
-      shiki: 1.6.2
-    dev: true
+      shiki: 1.12.1
 
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -1607,6 +1602,11 @@ packages:
       '@types/minimatch': 5.1.2
       '@types/node': 20.11.30
     dev: true
+
+  /@types/hast@3.0.4:
+    resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
+    dependencies:
+      '@types/unist': 3.0.2
 
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -1686,6 +1686,9 @@ packages:
   /@types/tinycolor2@1.4.6:
     resolution: {integrity: sha512-iEN8J0BoMnsWBqjVbWH/c0G0Hh7O21lpR2/+PrvAVgWdzL7eexIFm4JN/Wn10PTcmNdtS6U67r499mlWMXOxNw==}
     dev: true
+
+  /@types/unist@3.0.2:
+    resolution: {integrity: sha512-dqId9J8K/vGi5Zr7oo212BGii5m3q5Hxlkwy3WpYuKPklmBEvsbMYYyLxAQpSffdLl/gdW0XUpKWFvYmyoWCoQ==}
 
   /@types/validator@13.11.9:
     resolution: {integrity: sha512-FCTsikRozryfayPuiI46QzH3fnrOoctTjvOYZkho9BTFLCOZ2rgZJHMOVgCOfttjPJcgOx52EpkY0CMfy87MIw==}
@@ -5730,16 +5733,17 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  /shiki@1.3.0:
-    resolution: {integrity: sha512-9aNdQy/etMXctnPzsje1h1XIGm9YfRcSksKOGqZWXA/qP9G18/8fpz5Bjpma8bOgz3tqIpjERAd6/lLjFyzoww==}
+  /shiki@1.12.1:
+    resolution: {integrity: sha512-nwmjbHKnOYYAe1aaQyEBHvQymJgfm86ZSS7fT8OaPRr4sbAcBNz7PbfAikMEFSDQ6se2j2zobkXvVKcBOm0ysg==}
     dependencies:
-      '@shikijs/core': 1.3.0
-    dev: false
+      '@shikijs/core': 1.12.1
+      '@types/hast': 3.0.4
 
   /shiki@1.6.2:
     resolution: {integrity: sha512-X3hSm5GzzBd/BmPmGfkueOUADLyBoZo1ojYQXhd+NU2VJn458yt4duaS0rVzC+WtqftSV7mTVvDw+OB9AHi3Eg==}
     dependencies:
       '@shikijs/core': 1.6.2
+    dev: true
 
   /side-channel@1.0.6:
     resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}

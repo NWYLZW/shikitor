@@ -7,7 +7,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@shikijs/markdown-it": "^1.6.2",
+    "@shikijs/markdown-it": "^1.12.1",
     "@shikitor/core": "workspace:*",
     "@shikitor/react": "workspace:*",
     "@types/markdown-it": "^14.1.1",
