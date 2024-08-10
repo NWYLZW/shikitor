@@ -1,5 +1,6 @@
 import { definePlugin } from '@shikitor/core'
 import type {} from '@shikitor/core/plugins/provide-completions'
+import { CompletionItemKind } from '@shikitor/core/plugins/provide-completions'
 
 export default definePlugin({
   name: 'expression-quick-completions',
@@ -32,12 +33,14 @@ export default definePlugin({
             return {
               suggestions: [
                 {
+                  kind: CompletionItemKind.Operator,
                   label: 'par',
                   detail: '(expr)',
                   range,
                   insertText: `(${expressionStr})`
                 },
                 {
+                  kind: CompletionItemKind.Operator,
                   label: 'not',
                   detail: '!expr',
                   range,

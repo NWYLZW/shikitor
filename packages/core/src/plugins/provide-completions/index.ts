@@ -117,9 +117,10 @@ function completionItemTemplate(
   index: number
 ) {
   const { prefix } = completionItemTemplate
+  const kind = item.kind ? CompletionItemKind[item.kind]?.[0] ?? 'U' : 'U'
   return `
     <div class="${classnames(prefix, selectedIndex === index && 'selected')}" data-index="${index}">
-      <div class="${prefix}__kind">${item.kind ? CompletionItemKind[item.kind][0] : 'U'}</div>
+      <div class="${prefix}__kind">${kind}</div>
       <div class="${prefix}__label">${highlightingKeyword(item.label, keywordParts)}</div>
       ${item.detail ? `<div class="${prefix}__detail">${item.detail}</div>` : ''}
       ${item.documentation ? `<div class="${prefix}__documentation">${item.documentation}</div>` : ''}
