@@ -53,6 +53,11 @@ export type BasePopup = {
    * If not provided, the popup will be auto-sized.
    */
   height?: number
+  // TODO
+  delay?: number | {
+    show?: number
+    hide?: number
+  }
 }
 
 type RelativeCursorPopup = {
